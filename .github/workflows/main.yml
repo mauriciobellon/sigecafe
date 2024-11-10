@@ -40,6 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Restore dependencies cache
+        id: cache-deps
         uses: actions/cache@v4
         with:
           path: |
@@ -47,13 +48,16 @@ jobs:
             .nuxt
           key: ${{ runner.os }}-node-nuxt-${{ hashFiles('**/package-lock.json') }}
       - name: Cache Playwright browsers
+        id: playwright-cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
       - name: Install Playwright Browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: |
+          npx playwright install --with-deps chromium
+          npx playwright install-deps
 
   test:
     needs: playwright
@@ -61,13 +65,16 @@ jobs:
     name: Run Tests
     steps:
       - uses: actions/checkout@master
-      - name: Restore cache
+      - name: Restore all caches
         uses: actions/cache@v4
         with:
           path: |
             node_modules
             .nuxt
+            ~/.cache/ms-playwright
           key: ${{ runner.os }}-node-nuxt-${{ hashFiles('**/package-lock.json') }}
+      - name: Verify Playwright installation
+        run: npx playwright install --with-deps chromium
       - name: Run tests
         run: npm run test
 
