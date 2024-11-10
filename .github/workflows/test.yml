@@ -35,9 +35,17 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Run tests
-        working-directory: ${{env.dir}}
-        run: npm run test
-      
+      - name: Lint code
+        run: npm run lint
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+      - name: Run integration tests
+        run: npm run test:integration
+
+      - name: Run end-to-end tests
+        run: npm run test:e2e
+
       - name: Build
         run: npm run build
