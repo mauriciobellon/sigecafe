@@ -1,5 +1,5 @@
 <template>
-    <div>Hello World</div>
+    <div data-testid="hello">Hello World</div>
 </template>
 
 <script setup lang="ts">
