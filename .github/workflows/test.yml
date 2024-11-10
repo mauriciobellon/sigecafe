@@ -19,7 +19,7 @@ jobs:
     name: Build and test
 
     env:
-      dir: ../
+      dir: ./
 
     steps:
       - uses: actions/checkout@master
