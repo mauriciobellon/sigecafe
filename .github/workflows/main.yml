@@ -38,7 +38,6 @@ jobs:
       - name: Run tests
         working-directory: ${{env.dir}}
         run: npm run test
-      
+
       - name: Build
         run: npm run build
-
