@@ -1,11 +1,8 @@
 export default defineNuxtConfig({
-  future: {
-    compatibilityVersion: 4
-  },
-
-  devtools: {
-    enabled: false
-  },
-
-  compatibilityDate: "2024-11-09"
+  future: { compatibilityVersion: 4 },
+  compatibilityDate: "2024-11-09",
+  devtools: { enabled: false },
+  modules: [
+    '@nuxt/test-utils/module'
+  ]
 })
