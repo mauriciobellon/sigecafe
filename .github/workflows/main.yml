@@ -14,9 +14,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  install:
+  build-and-test:
     runs-on: ubuntu-latest
-    name: Install dependencies
+    name: Build and test
+
+    env:
+      dir: ./
+
     steps:
       - uses: actions/checkout@master
 
@@ -24,71 +28,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install dependencies
         run: npm install
-
-      - name: Cache project files
-        uses: actions/cache@v3
-        with:
-          path: |
-            .nuxt
-            node_modules
-          key: ${{ runner.os }}-nuxt-${{ hashFiles('**/package-lock.json') }}
-
-  test:
-    needs: install
-    runs-on: ubuntu-latest
-    name: Run tests
-    steps:
-      - uses: actions/checkout@master
-
-      - name: Install node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Restore cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            .nuxt
-            node_modules
-          key: ${{ runner.os }}-nuxt-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
       - name: Run tests
+        working-directory: ${{env.dir}}
         run: npm run test
-
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    name: Build application
-    steps:
-      - uses: actions/checkout@master
-
-      - name: Install node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Restore cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            .nuxt
-            node_modules
-          key: ${{ runner.os }}-nuxt-${{ hashFiles('**/package-lock.json') }}
 
       - name: Build
         run: npm run build
