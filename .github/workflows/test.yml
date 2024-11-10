@@ -29,8 +29,11 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4.0.0
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9
+          run_install: false
 
       - name: Get pnpm store directory
         id: pnpm-cache
