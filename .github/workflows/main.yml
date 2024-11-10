@@ -28,8 +28,10 @@ jobs:
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: |
+            node_modules
+            .nuxt
+          key: ${{ runner.os }}-node-nuxt-${{ hashFiles('**/package-lock.json') }}
 
   playwright:
     needs: install
@@ -40,8 +42,10 @@ jobs:
       - name: Restore cache
         uses: actions/cache@v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: |
+            node_modules
+            .nuxt
+          key: ${{ runner.os }}-node-nuxt-${{ hashFiles('**/package-lock.json') }}
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
@@ -54,8 +58,10 @@ jobs:
       - name: Restore cache
         uses: actions/cache@v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: |
+            node_modules
+            .nuxt
+          key: ${{ runner.os }}-node-nuxt-${{ hashFiles('**/package-lock.json') }}
       - name: Run tests
         run: npm run test
 
@@ -68,7 +74,9 @@ jobs:
       - name: Restore cache
         uses: actions/cache@v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: |
+            node_modules
+            .nuxt
+          key: ${{ runner.os }}-node-nuxt-${{ hashFiles('**/package-lock.json') }}
       - name: Build
         run: npm run build
