@@ -14,30 +14,61 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-test:
+  install:
     runs-on: ubuntu-latest
-    name: Build and test
-
-    env:
-      dir: ./
-
+    name: Install Dependencies
     steps:
       - uses: actions/checkout@master
-
       - name: Install node
         uses: actions/setup-node@v4
         with:
           node-version: 22
-
       - name: Install dependencies
         run: npm install
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
+  playwright:
+    needs: install
+    runs-on: ubuntu-latest
+    name: Setup Playwright
+    steps:
+      - uses: actions/checkout@master
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
+  test:
+    needs: playwright
+    runs-on: ubuntu-latest
+    name: Run Tests
+    steps:
+      - uses: actions/checkout@master
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
       - name: Run tests
-        working-directory: ${{env.dir}}
         run: npm run test
 
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    name: Build
+    steps:
+      - uses: actions/checkout@master
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
       - name: Build
         run: npm run build
