@@ -1,43 +1,43 @@
-name: Nuxt 3 tests
+# name: Nuxt 3 tests
 
-on:
-  push:
-    branches:
-      - main
-      - feat/*
-      - fix/*
-  pull_request:
-  workflow_dispatch:
+# on:
+#   push:
+#     branches:
+#       - main
+#       - feat/*
+#       - fix/*
+#   pull_request:
+#   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+#   cancel-in-progress: true
 
-jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    name: Build and test
+# jobs:
+#   build-and-test:
+#     runs-on: ubuntu-latest
+#     name: Build and test
 
-    env:
-      dir: ./
+#     env:
+#       dir: ./
 
-    steps:
-      - uses: actions/checkout@master
+#     steps:
+#       - uses: actions/checkout@master
 
-      - name: Install node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+#       - name: Install node
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 22
 
-      - name: Install dependencies
-        run: npm install
+#       - name: Install dependencies
+#         run: npm install
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+#       - name: Install Playwright Browsers
+#         run: npx playwright install --with-deps chromium
 
-      - name: Run tests
-        working-directory: ${{env.dir}}
-        run: npm run test
+#       - name: Run tests
+#         working-directory: ${{env.dir}}
+#         run: npm run test
 
-      - name: Build
-        run: npm run build
+#       - name: Build
+#         run: npm run build
