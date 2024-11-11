@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import Hello from "../app/components/Hello.vue";
 import { mountSuspended } from "@nuxt/test-utils/runtime";
+import Hello from "@/components/Hello.vue";
 
 describe("Unit Test Components", () => {
   it("Hello", async () => {
