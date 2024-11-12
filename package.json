@@ -2,24 +2,39 @@
   "name": "escola-on",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@9.12.3",
   "scripts": {
     "build": "nuxt build",
-    "dev": "NODE_NO_WARNINGS=1 nuxt dev",
+    "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "install-playwright": "pnpm dlx playwright install --with-deps chromium",
-    "test": "NODE_NO_WARNINGS=1 node ./scripts/run-test.js"
+    "postinstall": "nuxt prepare && pnpm run env && pnpm run db",
+    "install-playwright": "playwright install --with-deps chromium",
+    "test": "node ./scripts/run-test.js",
+    "all": "pnpm install && pnpm run build && pnpm run preview",
+    "env": "node scripts/env-create.mjs",
+    "db": "pnpm run db:down && pnpm run db:up && pnpm run db:migrate && pnpm run db:seed",
+    "db:up": "node scripts/db-create.mjs",
+    "db:down": "node scripts/db-destroy.mjs",
+    "db:seed": "node scripts/db-seed.mjs",
+    "db:migrate": "prisma migrate dev --name init",
+    "db:reset": "prisma migrate reset --force",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
-    "nuxt": "^3.14.159",
-    "vue": "latest",
-    "vue-router": "latest"
+    "nuxt": "^3.13",
+    "vue": "^3.5.12",
+    "vue-router": "^4.4.5"
   },
   "devDependencies": {
     "@nuxt/test-utils": "^3.14.4",
-    "happy-dom": "^15.11.0",
-    "playwright-core": "^1.47.2",
-    "vitest": "^2.1.4"
+    "@prisma/client": "^5.22.0",
+    "@prisma/nuxt": "^0.0.35",
+    "@vue/test-utils": "^2.4.6",
+    "happy-dom": "^15.11.1",
+    "playwright-core": "^1.48.2",
+    "prisma": "5.22.0",
+    "vitest": "^2.1.4",
+    "vitest-environment-nuxt": "^1.0.1"
   }
 }
