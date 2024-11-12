@@ -1,8 +1,11 @@
 <template>
   <div>
     <NuxtRouteAnnouncer />
-    <Hello />
+    <NuxtLoadingIndicator />
+    <UiVueSonner />
   </div>
+  <Hello />
+  <NuxtLayout>
+    <NuxtPage />
+  </NuxtLayout>
 </template>
-
-<script setup></script>
