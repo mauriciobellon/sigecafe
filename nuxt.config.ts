@@ -1,6 +1,7 @@
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-09",
   devtools: { enabled: false },
+  future: { compatibilityVersion: 4 },
 
   modules: [
     "@prisma/nuxt",
@@ -37,6 +38,8 @@ export default defineNuxtConfig({
     exposeConfig: true,
     editorSupport: true,
   },
+
+  css: ['~/assets/css/global.css'],
 
   colorMode: {
     classSuffix: "",
