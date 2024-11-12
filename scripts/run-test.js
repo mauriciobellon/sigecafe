@@ -20,7 +20,7 @@ async function iniciar() {
 
     if (servidorRodando) {
         console.log('Servidor já está rodando, iniciando testes...');
-        const processoTeste = spawn('npx', ['vitest'], {
+        const processoTeste = spawn('pnpm', ['dlx', 'vitest'], {
             stdio: 'inherit',
             detached: true
         });
@@ -31,7 +31,7 @@ async function iniciar() {
         return;
     }
 
-    const processoDev = spawn('npm', ['run', 'dev'], {
+    const processoDev = spawn('npm', ['run', 'all'], {
         detached: true
     });
     let processoTeste = null;
@@ -56,9 +56,9 @@ async function iniciar() {
 
     processoDev.stdout.on('data', (data) => {
         const saida = data.toString();
-        if (saida.includes('Vite server warmed up')) {
+        if (saida.includes('Listening on http://[::]:3000')) {
 
-            processoTeste = spawn('npx', ['vitest'], {
+            processoTeste = spawn('pnpm', ['dlx', 'vitest'], {
                 stdio: 'inherit',
                 detached: true
             });
