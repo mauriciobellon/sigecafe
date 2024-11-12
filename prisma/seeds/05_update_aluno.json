@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "escola": {
+            "connect": {
+                "id": 1
+            }
+        }
+    },
+    {
+        "id": 2,
+        "escola": {
+            "connect": {
+                "id": 1
+            }
+        }
+    },
+    {
+        "id": 3,
+        "escola": {
+            "connect": {
+                "id": 1
+            }
+        }
+    }
+]
