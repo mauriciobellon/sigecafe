@@ -1,0 +1,236 @@
+[
+    {
+        "path": "/api/navigation",
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR",
+            "PROFESSOR",
+            "RESPONSAVEL",
+            "AUTENTICADO"
+        ]
+    },
+    {
+        "path": "/api/professor",
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR"
+        ]
+    },
+    {
+        "path": "/api/filhos",
+        "userType": [
+            "RESPONSAVEL"
+        ]
+    },
+    {
+        "path": "/app/sobre",
+        "title": "Sobre",
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR",
+            "PROFESSOR",
+            "RESPONSAVEL",
+            "AUTENTICADO"
+        ]
+    },
+    {
+        "path": "/app/ajuda",
+        "title": "Ajuda",
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR",
+            "PROFESSOR",
+            "RESPONSAVEL",
+            "AUTENTICADO"
+        ]
+    },
+    {
+        "path": "/app",
+        "title": "Inicio",
+        "icon": "lets-icons:home-duotone",
+        "description": "Sistema Digital para Controle de Frequência e Desempenho de Alunos",
+        "menuType": [
+            "ROOT",
+            "PERFIL"
+        ],
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR",
+            "PROFESSOR",
+            "RESPONSAVEL",
+            "AUTENTICADO"
+        ]
+    },
+    {
+        "path": "/app/professores",
+        "title": "Professores",
+        "icon": "ph:chalkboard-teacher-duotone",
+        "description": "Gerencie os professores da escola",
+        "menuType": [
+            "ROOT"
+        ],
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR"
+        ]
+    },
+    {
+        "path": "/app/disciplinas",
+        "title": "Disciplinas",
+        "icon": "icon-park-twotone:book-one",
+        "description": "Gerencie as disciplinas da escola",
+        "menuType": [
+            "ROOT"
+        ],
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR"
+        ]
+    },
+    {
+        "path": "/app/turmas",
+        "title": "Turmas",
+        "icon": "clarity:group-solid",
+        "description": "Gerencie as turmas da escola",
+        "menuType": [
+            "ROOT"
+        ],
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR"
+        ]
+    },
+    {
+        "path": "/app/alunos",
+        "title": "Alunos",
+        "icon": "ph:student-duotone",
+        "description": "Gerencie os alunos da escola",
+        "menuType": [
+            "ROOT"
+        ],
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR",
+            "PROFESSOR"
+        ]
+    },
+    {
+        "path": "/app/ocorrencias",
+        "title": "Ocorrencias",
+        "icon": "material-symbols-light:event-list-outline",
+        "description": "Gerencie as ocorrências da escola",
+        "menuType": [
+            "ROOT"
+        ],
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR",
+            "PROFESSOR"
+        ]
+    },
+    {
+        "path": "/app/notificacoes",
+        "title": "Notificações",
+        "icon": "solar:notification-unread-lines-bold-duotone",
+        "description": "Gerencie as notificações da escola",
+        "menuType": [
+            "ROOT"
+        ],
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR",
+            "RESPONSAVEL"
+        ]
+    },
+    {
+        "path": "/app/atividades",
+        "title": "Atividades",
+        "icon": "subway:book",
+        "description": "Gerencie as atividades da escola",
+        "menuType": [
+            "ROOT"
+        ],
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR",
+            "PROFESSOR"
+        ]
+    },
+    {
+        "path": "/app/desempenho",
+        "title": "Desempenho",
+        "icon": "ph:student-duotone",
+        "description": "Veja o desempenho dos seu filho",
+        "menuType": [
+            "ROOT"
+        ],
+        "userType": [
+            "RESPONSAVEL"
+        ]
+    },
+    {
+        "path": "/app/perfil",
+        "title": "Conta",
+        "icon": "fluent:person-12-regular",
+        "description": "Minha Conta",
+        "menuType": [
+            "DROPDOWN",
+            "PERFIL"
+        ],
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR",
+            "PROFESSOR",
+            "RESPONSAVEL",
+            "AUTENTICADO"
+        ]
+    },
+    {
+        "path": "/app/perfil/senha",
+        "title": "Senha",
+        "icon": "ph:lock-duotone",
+        "description": "Alterar minha senha",
+        "menuType": [
+            "PERFIL"
+        ],
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR",
+            "PROFESSOR",
+            "RESPONSAVEL",
+            "AUTENTICADO"
+        ]
+    },
+    {
+        "path": "/app/perfil/notificacoes",
+        "title": "Notificações",
+        "icon": "solar:notification-unread-lines-bold-duotone",
+        "description": "Configurar minhas notificações",
+        "menuType": [
+            "PERFIL"
+        ],
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR",
+            "PROFESSOR",
+            "RESPONSAVEL",
+            "AUTENTICADO"
+        ]
+    },
+    {
+        "path": "/app/perfil/excluir",
+        "title": "Excluir Conta",
+        "icon": "ph:trash-duotone",
+        "description": "Excluir minha conta",
+        "menuType": [
+            "PERFIL"
+        ],
+        "userType": [
+            "ADMINISTRADOR",
+            "COORDENADOR",
+            "PROFESSOR",
+            "RESPONSAVEL",
+            "AUTENTICADO"
+        ]
+    }
+]

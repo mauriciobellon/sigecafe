@@ -1,0 +1,38 @@
+[
+    {
+        "name": "Admin Escola",
+        "email": "admin@escola.com",
+        "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+        "type": "ADMINISTRADOR"
+    },
+    {
+        "name": "Coordenador Escola",
+        "email": "coordenador@escola.com",
+        "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+        "type": "COORDENADOR"
+    },
+    {
+        "name": "Professor 1",
+        "email": "professor1@escola.com",
+        "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+        "type": "PROFESSOR"
+    },
+    {
+        "name": "Professor 2",
+        "email": "professor2@escola.com",
+        "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+        "type": "PROFESSOR"
+    },
+    {
+        "name": "Maria Aparecida",
+        "email": "maria@teste.com",
+        "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+        "type": "RESPONSAVEL"
+    },
+    {
+        "name": "João da Silva",
+        "email": "joao@teste.com",
+        "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+        "type": "RESPONSAVEL"
+    }
+]
