@@ -1,7 +1,7 @@
-import path from "path";
 import { readdirSync, readFileSync } from "fs";
-import { PrismaClient } from "@prisma/client";
+import path from "path";
 import { fileURLToPath } from "url";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -44,7 +44,7 @@ async function updateItem(model, item, relationships) {
     }
     await prisma[modelName].update({
       where: { id: item.id },
-      data: relationships
+      data: relationships,
     });
   } catch (e) {
     console.error(`Error updating relationships in ${model}:`, e);
@@ -59,7 +59,7 @@ async function seedModel(model, filePath) {
   }
 
   // Check if this is an update file
-  const isUpdateFile = filePath.includes('_update_');
+  const isUpdateFile = filePath.includes("_update_");
 
   // Extract model name from filename and normalize it
   const modelName = model.charAt(0).toLowerCase() + model.slice(1);
@@ -81,22 +81,22 @@ async function seedModel(model, filePath) {
   try {
     // First process regular seed files
     const seedFiles = readdirSync(__seedDir)
-      .filter(file => !file.includes('_update_'))
+      .filter((file) => !file.includes("_update_"))
       .sort();
 
     for (const seedFile of seedFiles) {
-      const model = seedFile.split('_')[1].split('.')[0];
+      const model = seedFile.split("_")[1].split(".")[0];
       const filePath = path.join(__seedDir, seedFile);
       await seedModel(model, filePath);
     }
 
     // Then process update files
     const updateFiles = readdirSync(__seedDir)
-      .filter(file => file.includes('_update_'))
+      .filter((file) => file.includes("_update_"))
       .sort();
 
     for (const updateFile of updateFiles) {
-      const model = updateFile.split('_update_')[1].split('.')[0];
+      const model = updateFile.split("_update_")[1].split(".")[0];
       const filePath = path.join(__seedDir, updateFile);
       await seedModel(model, filePath);
     }
