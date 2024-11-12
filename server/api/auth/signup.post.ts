@@ -1,6 +1,6 @@
 import { defineEventHandler, readBody } from 'h3'
-import { UserRepository } from '../../repositories/UserRepository'
-import { hashPassword } from '../../utils/cryptUtil'
+import { UserRepository } from '@/repositories/UserRepository'
+import { hashPassword } from '@/utils/cryptUtil'
 
 const userRepository = new UserRepository()
 

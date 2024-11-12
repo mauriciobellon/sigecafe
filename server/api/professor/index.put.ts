@@ -1,6 +1,6 @@
 import { H3Event } from 'h3'
 import { PrismaClient } from "@prisma/client"
-import { UserRepository } from '../../repositories/UserRepository';
+import { UserRepository } from '@/repositories/UserRepository';
 
 const prisma = new PrismaClient()
 

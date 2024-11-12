@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-09",
-  devtools: { enabled: true },
-  future: { compatibilityVersion: 4 },
+  devtools: { enabled: false },
+
   experimental: { watcher: "chokidar" },
 
   modules: [
@@ -41,7 +41,7 @@ export default defineNuxtConfig({
     resolve: {
       alias: {
         ".prisma/client/index-browser":
-          "./node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/.prisma/client/index-browser.js",
+          "./node_modules/.prisma/client/index-browser.js",
       },
     },
   },

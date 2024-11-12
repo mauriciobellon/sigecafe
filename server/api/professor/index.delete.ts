@@ -1,5 +1,5 @@
 import { H3Event } from 'h3'
-import { UserRepository } from '../../repositories/UserRepository'
+import { UserRepository } from '@/repositories/UserRepository'
 
 export default defineEventHandler(async (event: H3Event) => {
 

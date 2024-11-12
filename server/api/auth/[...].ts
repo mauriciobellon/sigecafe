@@ -1,7 +1,7 @@
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { NuxtAuthHandler } from '#auth'
-import { UserRepository } from '../../repositories/UserRepository'
-import { comparePasswords } from '../../utils/cryptUtil'
+import { UserRepository } from '@/repositories/UserRepository'
+import { comparePasswords } from '@/utils/cryptUtil'
 import { User } from '@prisma/client'
 
 const userRepository = new UserRepository()

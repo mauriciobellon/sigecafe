@@ -4,8 +4,8 @@
     <NuxtLoadingIndicator />
     <UiVueSonner />
   </div>
+  <Hello />
   <NuxtLayout>
-    <Hello />
     <NuxtPage />
   </NuxtLayout>
 </template>

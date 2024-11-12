@@ -9,7 +9,7 @@ export default {
   utilsLocation: "app/utils",
   force: true,
   useDefaultFilename: true,
-  packageManager: "pnpm",
+  packageManager: "npm",
 };
 
 /** Installed things
