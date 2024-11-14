@@ -1,6 +1,6 @@
 import { getServerSession } from '#auth'
 import { defineEventHandler, createError } from 'h3'
-import { hasPermission } from '@/utils/permissions'
+import { hasPermission } from '@@/utils/permissions'
 import type { User } from '@prisma/client'
 
 export default defineEventHandler(async (event) => {

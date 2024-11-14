@@ -1,4 +1,4 @@
-import prisma from "~/lib/prisma";
+import prisma from "@@/lib/prisma";
 import type { Permission, UserType } from "@prisma/client";
 
 let cachedPermissions: Permission[] | null = null;

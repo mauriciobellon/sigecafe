@@ -1,6 +1,6 @@
 import { H3Event } from 'h3'
 import type { User, UserType } from '@prisma/client';
-import { UserRepository } from '@/repositories/UserRepository';
+import { UserRepository } from '@@/repositories/UserRepository'
 
 export default defineEventHandler(async (event: H3Event) => {
 
@@ -8,6 +8,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
   try {
     const userType = 'PROFESSOR' as UserType
+    //@ts-ignore
     const user: User = {
       type: userType,
       email: body.email,

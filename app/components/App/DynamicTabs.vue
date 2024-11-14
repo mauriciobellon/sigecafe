@@ -1,19 +1,15 @@
 <template>
-  <UiTabs v-model="currentTab" :default-value="firstTab">
-    <UiTabsList :pill="false" class="tabslist">
-      <UiTabsTrigger v-for="tab in tabs" :key="tab.value" :value="tab.value" :pill="false">
-        {{ tab.label }}
-      </UiTabsTrigger>
-      <UiTabsIndicator />
-    </UiTabsList>
-
-    <component
-      :is="tab.component"
-      v-for="tab in tabs"
-      v-show="currentTab === tab.value"
-      :key="tab.value"
-    />
-  </UiTabs>
+  <div>
+    <UiTabs v-model="currentTab" :default-value="firstTab">
+      <UiTabsList :pill="false" class="tabslist">
+        <UiTabsTrigger v-for="tab in tabs" :key="tab.value" :value="tab.value" :pill="false">
+          {{ tab.label }}
+        </UiTabsTrigger>
+        <UiTabsIndicator />
+      </UiTabsList>
+      <component :is="tab.component" v-for="tab in tabs" v-show="currentTab === tab.value" :key="tab.value" />
+    </UiTabs>
+  </div>
 </template>
 
 <script setup lang="ts">
