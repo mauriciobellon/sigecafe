@@ -1,7 +1,6 @@
 import { defineEventHandler, readBody } from 'h3'
-import { UserRepository } from '@/repositories/UserRepository'
-import { hashPassword } from '@/utils/cryptUtil'
-
+import { hashPassword } from '@@/utils/cryptUtil'
+import { UserRepository } from '@@/repositories/UserRepository'
 const userRepository = new UserRepository()
 
 export default defineEventHandler(async (event) => {

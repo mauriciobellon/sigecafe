@@ -1,7 +1,7 @@
 <template>
   <div>
     <AppPage>
-      <AppDynamicTabs tabs-folder="Professores" default-tab="teste" :order="['teste', 'Todos']" />
+      <AppDynamicTabs tabs-folder="Professores" />
     </AppPage>
   </div>
 </template>

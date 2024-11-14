@@ -1,20 +1,22 @@
+import { fileURLToPath } from 'url'
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-09",
   devtools: { enabled: false },
-
+  future: { compatibilityVersion: 4 },
   experimental: { watcher: "chokidar" },
 
   modules: [
     "@morev/vue-transitions/nuxt",
-    "@prisma/nuxt",
-    "@nuxt/test-utils",
-    "@nuxtjs/tailwindcss",
-    "@nuxtjs/color-mode",
-    "@vueuse/nuxt",
-    "@nuxt/icon",
     "@nuxt/fonts",
-    "@sidebase/nuxt-auth",
+    "@nuxt/icon",
+    "@nuxt/test-utils",
+    "@nuxtjs/color-mode",
+    "@nuxtjs/tailwindcss",
     "@pinia/nuxt",
+    "@prisma/nuxt",
+    "radix-vue/nuxt",
+    "@sidebase/nuxt-auth",
+    "@vueuse/nuxt",
   ],
 
   auth: {
@@ -34,7 +36,7 @@ export default defineNuxtConfig({
     installClient: false,
     generateClient: false,
     installStudio: false,
-    autoSetupPrisma: true,
+    autoSetupPrisma: false,
   },
 
   vite: {
@@ -49,6 +51,7 @@ export default defineNuxtConfig({
   tailwindcss: {
     exposeConfig: true,
     editorSupport: true,
+    viewer: false
   },
 
   css: ["~/assets/css/global.css"],

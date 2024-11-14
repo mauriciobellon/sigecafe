@@ -1,6 +1,5 @@
-import prisma from '~/lib/prisma'
-import type { Aluno, User } from '@prisma/client';
-import type { UserType } from '@prisma/client';
+import prisma from '@@/lib/prisma'
+import type { Aluno, User, UserType } from '@prisma/client';
 
 export class UserRepository {
     async getAllUsers(): Promise<User[]> {
