@@ -34,5 +34,11 @@
     "email": "joao@teste.com",
     "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
     "type": "RESPONSAVEL"
+  },
+  {
+    "name": "Teste",
+    "email": "test@test.com",
+    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+    "type": "ADMINISTRADOR"
   }
 ]

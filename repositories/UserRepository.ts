@@ -28,9 +28,13 @@ export class UserRepository {
         const type = user.type;
         return prisma.user.update({ where: { id }, data: { email, name, password, type } });
     }
-    async deleteUser(id: number): Promise<void> {
+    async deleteUserById(id: number): Promise<void> {
         await prisma.user.delete({ where: { id } });
     }
+    async deleteUserByEmail(email: string): Promise<void> {
+        await prisma.user.delete({ where: { email } });
+    }
+
     async getFilhos(id: number): Promise<Aluno[]> {
         return prisma.aluno.findMany({
             where: {

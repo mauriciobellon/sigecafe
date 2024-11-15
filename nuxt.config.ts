@@ -46,6 +46,16 @@ export default defineNuxtConfig({
           "./node_modules/.prisma/client/index-browser.js",
       },
     },
+    optimizeDeps: {
+      include: [
+        "vue-use-active-scroll",
+        "radix-vue",
+        "tailwind-variants",
+        "pinia",
+        "vue-sonner",
+        "datatables.net-plugins/i18n/pt-BR",
+      ],
+    },
   },
 
   tailwindcss: {

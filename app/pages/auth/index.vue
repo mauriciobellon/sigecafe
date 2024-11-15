@@ -16,23 +16,14 @@
       </div>
       <form @submit="auth.validateAndProceed">
         <div class="form-grid">
-          <AuthInput
-            v-if="auth.step === 'email'"
-            :key="'email-input'"
-            v-model="auth.email"
-            placeholder="name@example.com"
-            type="email"
-            autocomplete="email"
-            :disabled="auth.loading"
-          />
-          <AuthInput
-            v-if="auth.step === 'password'"
-            :key="'password-input'"
-            v-model="auth.password"
-            placeholder="********"
-            type="password"
-            :disabled="auth.loading"
-          />
+
+
+          <AuthInput v-if="auth.step === 'email'" :key="'email-input'" v-model="auth.email" model-name="email"
+            placeholder="name@example.com" type="email" autocomplete="email" :disabled="auth.loading" />
+
+
+          <AuthInput v-if="auth.step === 'password'" :key="'password-input'" v-model="auth.password"
+            model-name="password" placeholder="********" type="password" :disabled="auth.loading" />
           <UiButton type="submit" :disabled="auth.loading" class="submit-button">
             <Icon name="lucide:loader-2" color="white" v-if="auth.loading" class="loading-icon" />
             <p v-if="auth.step === 'email'">Continuar</p>
@@ -43,7 +34,7 @@
     </UiCardContent>
     <UiCardFooter class="footer">
       <p class="footer-text">
-        <NuxtLink to="/auth/signup" class="register-link"> Cadastre-se </NuxtLink>
+        <NuxtLink data-testid="signup-link" to="/auth/signup" class="register-link"> Cadastre-se </NuxtLink>
       </p>
     </UiCardFooter>
   </div>

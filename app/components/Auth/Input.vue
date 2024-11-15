@@ -1,19 +1,9 @@
 <template>
   <div class="input-group">
     <UiLabel class="sr-only" :for="computedId">{{ computedId }}</UiLabel>
-    <UiInput
-      :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
-      :id="computedId"
-      :placeholder="placeholder"
-      :type="type"
-      :autocapitalize="autocapitalize"
-      :autocomplete="autocomplete"
-      :spellcheck="spellcheck"
-      class="input"
-      :disabled="disabled"
-      v-autofocus
-    />
+    <UiInput :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" :id="computedId"
+      :name="modelName" :placeholder="placeholder" :type="type" :autocapitalize="autocapitalize"
+      :autocomplete="autocomplete" :spellcheck="spellcheck" class="input" :disabled="disabled" v-autofocus />
   </div>
 </template>
 

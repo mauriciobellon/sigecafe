@@ -14,6 +14,17 @@ export const useUserStore = defineStore("user", {
       this.userPreferences = session.user as User | null;
       this.isInitialized = true;
     },
-  },
-  persist: true,
+    async deleteUser() {
+      await $fetch("/api/perfil/excluir", {
+        method: "POST",
+        credentials: "include"
+      });
+      const router = useRouter();
+      useAuth()
+        .signOut()
+        .then(() => {
+          router.push("/auth");
+        });
+    },
+  }
 });

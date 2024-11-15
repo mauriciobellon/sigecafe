@@ -2,7 +2,7 @@
   <div>
     <UiDropdownMenu>
       <UiDropdownMenuTrigger as-child>
-        <UiButton id="dropdown-button" class="dropdown-button" variant="outline" size="icon">
+        <UiButton data-testid="dropdown-button" class="dropdown-button" variant="outline" size="icon">
           <div class="flex flex-col space-y-1">
             <p class="text-sm font-medium leading-none">{{ userStore.userPreferences?.name }}</p>
             <p class="text-xs leading-none text-muted-foreground">
@@ -14,21 +14,11 @@
         </UiButton>
       </UiDropdownMenuTrigger>
       <UiDropdownMenuContent align="center" :side-offset="15">
-        <UiDropdownMenuItem
-          v-for="(page, i) in pages"
-          :key="i"
-          class="menu-item"
-          :icon="page.icon"
-          :title="page.title"
-          @click="navigateTo(page.path)"
-        />
+        <UiDropdownMenuItem :data-testid="`dropdown-button-${page.title}`" v-for="(page, i) in pages" :key="i"
+          class="menu-item" :icon="page.icon ?? ''" :title="page.title ?? ''" @click="navigateTo(page.path)" />
 
-        <UiDropdownMenuItem
-          class="menu-item"
-          icon="ph:sign-out-duotone"
-          title="Sair"
-          @click="signOut"
-        />
+        <UiDropdownMenuItem :data-testid="dropdownLogoutButton" class="menu-item" icon="ph:sign-out-duotone"
+          title="Sair" @click="signOut" />
       </UiDropdownMenuContent>
     </UiDropdownMenu>
   </div>
@@ -43,6 +33,8 @@
         router.push("/auth");
       });
   };
+
+  const dropdownLogoutButton = ref("dropdown-button-Sair");
 
   const userStore = useUserStore();
   const navigationStore = useNavigationStore();
