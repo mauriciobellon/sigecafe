@@ -48,6 +48,7 @@ export const useProfessorStore = defineStore("professor", {
           credentials: "include",
           body: JSON.stringify(this.newProfessor),
         });
+        // @ts-ignore
         this.professors.push(response);
         this.resetForm();
       } catch (error) {
@@ -67,6 +68,7 @@ export const useProfessorStore = defineStore("professor", {
         });
 
         if (this.editingRowIndex !== null) {
+          // @ts-ignore
           this.professors[this.editingRowIndex] = response;
         }
         this.resetForm();

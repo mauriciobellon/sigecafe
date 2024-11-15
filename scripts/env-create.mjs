@@ -1,20 +1,19 @@
-import { execSync } from "child_process";
-import { copyFileSync } from "fs";
+import { writeFileSync } from "fs";
 import { platform } from "os";
-import path, { dirname, join } from "path";
+import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
-
 const __dirname = dirname(__filename);
-
 const __projectRoot = path.join(__dirname, "..");
+const destination = path.join(__projectRoot, ".env");
 
-const source = join(__projectRoot, ".env.example");
-const destination = join(__projectRoot, ".env");
+const template = `
+NUXT_AUTH_ORIGIN="http://localhost:3000"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres"
+AUTH_SECRET="secret"
+SESSION_REFRESH_SECONDS=10
+SESSION_MAX_AGE_SECONDS=600
+`;
 
-if (platform() === "win32") {
-  copyFileSync(source, destination);
-} else {
-  execSync(`cp ${source} ${destination}`);
-}
+writeFileSync(destination, template);
