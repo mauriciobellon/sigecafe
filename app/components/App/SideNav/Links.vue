@@ -3,7 +3,8 @@
     <UiTooltip disable-closing-trigger :delay-duration="1000" side="bottom">
       <template #trigger>
         <UiTooltipTrigger as-child>
-          <NuxtLink class="nav-link" exact-active-class="nav-link-active" :to="page.path">
+          <NuxtLink :data-testid="`nav-link-${page.title}`" class="nav-link" exact-active-class="nav-link-active"
+            :to="page.path">
             <Icon v-if="page.icon" :name="page.icon" class="nav-icon" />
             {{ page.title }}
           </NuxtLink>

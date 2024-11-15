@@ -20,7 +20,5 @@ export const useThemeStore = defineStore("theme", {
         ? (colorMode.preference as "light" | "dark" | "system")
         : "system";
     },
-  },
-
-  persist: true,
+  }
 });

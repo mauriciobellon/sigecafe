@@ -4,7 +4,6 @@
     <NuxtLoadingIndicator />
     <UiVueSonner />
   </div>
-  <Hello />
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>

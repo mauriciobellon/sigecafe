@@ -1,6 +1,6 @@
 <template>
   <div>
-    <AppPage> </AppPage>
+    <AppPage>meu perfil</AppPage>
   </div>
 </template>
 

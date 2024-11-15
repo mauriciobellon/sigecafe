@@ -1,6 +1,6 @@
 <template>
   <div>
-    <AppPage> </AppPage>
+    <AppPage> notificacoes</AppPage>
   </div>
 </template>
 
