@@ -1,32 +1,8 @@
 -- CreateEnum
-CREATE TYPE "UserType" AS ENUM ('ADMINISTRADOR', 'COORDENADOR', 'PROFESSOR', 'RESPONSAVEL', 'AUTENTICADO');
-
--- CreateEnum
 CREATE TYPE "MenuType" AS ENUM ('ROOT', 'PERFIL', 'DROPDOWN');
 
--- CreateTable
-CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
-    "email" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
-    "type" "UserType" NOT NULL DEFAULT 'AUTENTICADO',
-
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Permission" (
-    "id" SERIAL NOT NULL,
-    "path" TEXT NOT NULL,
-    "title" TEXT,
-    "icon" TEXT,
-    "description" TEXT,
-    "menuType" "MenuType"[],
-    "userType" "UserType"[],
-
-    CONSTRAINT "Permission_pkey" PRIMARY KEY ("id")
-);
+-- CreateEnum
+CREATE TYPE "UserType" AS ENUM ('ADMINISTRADOR', 'COORDENADOR', 'PROFESSOR', 'RESPONSAVEL', 'AUTENTICADO');
 
 -- CreateTable
 CREATE TABLE "Aluno" (
@@ -45,6 +21,32 @@ CREATE TABLE "Escola" (
 );
 
 -- CreateTable
+CREATE TABLE "Permission" (
+    "id" SERIAL NOT NULL,
+    "path" TEXT NOT NULL,
+    "title" TEXT,
+    "icon" TEXT,
+    "description" TEXT,
+    "menuType" "MenuType"[],
+    "userType" "UserType"[],
+
+    CONSTRAINT "Permission_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "User" (
+    "id" SERIAL NOT NULL,
+    "email" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "type" "UserType" NOT NULL DEFAULT 'AUTENTICADO',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_AlunoToEscola" (
     "A" INTEGER NOT NULL,
     "B" INTEGER NOT NULL
@@ -57,10 +59,10 @@ CREATE TABLE "_AlunoToUser" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX "Permission_path_key" ON "Permission"("path");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Permission_path_key" ON "Permission"("path");
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_AlunoToEscola_AB_unique" ON "_AlunoToEscola"("A", "B");

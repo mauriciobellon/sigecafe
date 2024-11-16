@@ -1,5 +1,5 @@
 import prisma from "@@/lib/prisma";
-import type { Permission, UserType } from "@prisma/client";
+import type { Permission, UsuarioType } from "@prisma/client";
 
 let cachedPermissions: Permission[] | null = null;
 let lastCacheTime = 0;
@@ -15,8 +15,8 @@ export const getPermissions = async (): Promise<Permission[]> => {
   return cachedPermissions;
 };
 
-export const hasPermission = async (path: string, userType: UserType): Promise<boolean> => {
+export const hasPermission = async (path: string, usuarioType: UsuarioType): Promise<boolean> => {
   const permissions = await getPermissions();
   const route = permissions.find((r) => r.path === path);
-  return route ? route.userType.includes(userType) : false;
+  return route ? route.usuarioType.includes(usuarioType) : false;
 };

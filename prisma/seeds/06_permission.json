@@ -1,7 +1,27 @@
 [
   {
     "path": "/api/navigation",
-    "userType": [
+    "usuarioType": [
+      "ADMINISTRADOR",
+      "COORDENADOR",
+      "PROFESSOR",
+      "RESPONSAVEL",
+      "AUTENTICADO"
+    ]
+  },
+  {
+    "path": "/api/usuario/trocar-senha",
+    "usuarioType": [
+      "ADMINISTRADOR",
+      "COORDENADOR",
+      "PROFESSOR",
+      "RESPONSAVEL",
+      "AUTENTICADO"
+    ]
+  },
+  {
+    "path": "/api/usuario/perfil",
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR",
       "PROFESSOR",
@@ -11,7 +31,7 @@
   },
   {
     "path": "/api/perfil/excluir",
-    "userType": [
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR",
       "PROFESSOR",
@@ -21,21 +41,21 @@
   },
   {
     "path": "/api/professor",
-    "userType": [
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR"
     ]
   },
   {
     "path": "/api/filhos",
-    "userType": [
+    "usuarioType": [
       "RESPONSAVEL"
     ]
   },
   {
     "path": "/app/sobre",
     "title": "Sobre",
-    "userType": [
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR",
       "PROFESSOR",
@@ -46,7 +66,7 @@
   {
     "path": "/app/ajuda",
     "title": "Ajuda",
-    "userType": [
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR",
       "PROFESSOR",
@@ -63,7 +83,7 @@
       "ROOT",
       "PERFIL"
     ],
-    "userType": [
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR",
       "PROFESSOR",
@@ -79,7 +99,7 @@
     "menuType": [
       "ROOT"
     ],
-    "userType": [
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR"
     ]
@@ -92,7 +112,7 @@
     "menuType": [
       "ROOT"
     ],
-    "userType": [
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR"
     ]
@@ -105,7 +125,7 @@
     "menuType": [
       "ROOT"
     ],
-    "userType": [
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR"
     ]
@@ -118,7 +138,7 @@
     "menuType": [
       "ROOT"
     ],
-    "userType": [
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR",
       "PROFESSOR"
@@ -132,7 +152,7 @@
     "menuType": [
       "ROOT"
     ],
-    "userType": [
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR",
       "PROFESSOR"
@@ -146,7 +166,7 @@
     "menuType": [
       "ROOT"
     ],
-    "userType": [
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR",
       "RESPONSAVEL"
@@ -160,7 +180,7 @@
     "menuType": [
       "ROOT"
     ],
-    "userType": [
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR",
       "PROFESSOR"
@@ -174,20 +194,20 @@
     "menuType": [
       "ROOT"
     ],
-    "userType": [
+    "usuarioType": [
       "RESPONSAVEL"
     ]
   },
   {
     "path": "/app/perfil",
-    "title": "Conta",
+    "title": "Meu Perfil",
     "icon": "fluent:person-12-regular",
-    "description": "Minha Conta",
+    "description": "Gerencie suas informações pessoais",
     "menuType": [
       "DROPDOWN",
       "PERFIL"
     ],
-    "userType": [
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR",
       "PROFESSOR",
@@ -197,29 +217,13 @@
   },
   {
     "path": "/app/perfil/senha",
-    "title": "Senha",
+    "title": "Alterar Senha",
     "icon": "ph:lock-duotone",
-    "description": "Alterar minha senha",
+    "description": "Atualize sua senha de acesso ao sistema",
     "menuType": [
       "PERFIL"
     ],
-    "userType": [
-      "ADMINISTRADOR",
-      "COORDENADOR",
-      "PROFESSOR",
-      "RESPONSAVEL",
-      "AUTENTICADO"
-    ]
-  },
-  {
-    "path": "/app/perfil/notificacoes",
-    "title": "Notificações",
-    "icon": "solar:notification-unread-lines-bold-duotone",
-    "description": "Configurar minhas notificações",
-    "menuType": [
-      "PERFIL"
-    ],
-    "userType": [
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR",
       "PROFESSOR",
@@ -235,7 +239,7 @@
     "menuType": [
       "PERFIL"
     ],
-    "userType": [
+    "usuarioType": [
       "ADMINISTRADOR",
       "COORDENADOR",
       "PROFESSOR",

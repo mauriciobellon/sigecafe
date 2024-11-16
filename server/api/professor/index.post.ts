@@ -1,22 +1,22 @@
 import { H3Event } from 'h3'
-import type { User, UserType } from '@prisma/client';
-import { UserRepository } from '@@/repositories/UserRepository'
+import type { Usuario, UsuarioType } from '@prisma/client';
+import { UsuarioRepository } from '@@/repositories/UsuarioRepository'
 
 export default defineEventHandler(async (event: H3Event) => {
 
   const body = await readBody(event);
 
   try {
-    const userType = 'PROFESSOR' as UserType
+    const usuarioType = 'PROFESSOR' as UsuarioType
     //@ts-ignore
-    const user: User = {
-      type: userType,
+    const usuario: Usuario = {
+      type: usuarioType,
       email: body.email,
       password: "$2b$10$ZHrUNAK/cI8svJjK/d/Fg.pPdLWfkxjpQVfFY4ub9Z/eUPqJn.NXW", // Senha padrão "123"
       name: body.name,
     }
-    const userRepository = new UserRepository()
-    const newProfessor = await userRepository.createUser(user)
+    const usuarioRepository = new UsuarioRepository()
+    const newProfessor = await usuarioRepository.createUsuario(usuario)
     return newProfessor;
   } catch (error) {
     return {

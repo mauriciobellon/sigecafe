@@ -1,38 +1,38 @@
 import { createPage, url } from "@nuxt/test-utils/e2e";
 import type { Page } from "playwright-core";
 import { describe, expect, test, beforeAll, afterAll } from "vitest";
-import { UserRepository } from "~~/repositories/UserRepository";
+import { UsuarioRepository } from "~~/repositories/UsuarioRepository";
 import setup from "./__setup";
 describe("Authentication Flow", () => {
-    const testUser = {
-        name: "Test User",
+    const testUsuario = {
+        name: "Test Usuario",
         email: "test@test.com",
         password: "password"
     };
 
     let page: Page;
-    let userRepository: UserRepository;
+    let usuarioRepository: UsuarioRepository;
 
     beforeAll(async () => {
         // Setup
         setup();
-        userRepository = new UserRepository();
+        usuarioRepository = new UsuarioRepository();
         page = await createPage();
 
-        // Cleanup existing test user if exists
+        // Cleanup existing test usuario if exists
         try {
-            await userRepository.deleteUserByEmail(testUser.email);
+            await usuarioRepository.deleteUsuarioByEmail(testUsuario.email);
         } catch (error) {
-            // Ignore if user doesn't exist
+            // Ignore if usuario doesn't exist
         }
     });
 
     afterAll(async () => {
         // Cleanup
         try {
-            await userRepository.deleteUserByEmail(testUser.email);
+            await usuarioRepository.deleteUsuarioByEmail(testUsuario.email);
         } catch (error) {
-            // Ignore if user doesn't exist
+            // Ignore if usuario doesn't exist
         }
         await page.close();
     });
@@ -52,19 +52,19 @@ describe("Authentication Flow", () => {
         });
 
         test("should allow entering name", async () => {
-            await page.getByPlaceholder("Nome Completo").fill(testUser.name);
+            await page.getByPlaceholder("Nome Completo").fill(testUsuario.name);
             await page.getByRole("button").click();
             // Add assertion for next step visibility if applicable
         });
 
         test("should allow entering email", async () => {
-            await page.getByPlaceholder("name@example.com").fill(testUser.email);
+            await page.getByPlaceholder("name@example.com").fill(testUsuario.email);
             await page.getByRole("button").click();
             // Add assertion for next step visibility if applicable
         });
 
         test("should allow entering password and complete signup", async () => {
-            await page.getByPlaceholder("********").fill(testUser.password);
+            await page.getByPlaceholder("********").fill(testUsuario.password);
             await page.getByRole("button").click();
 
             await page.waitForURL(url("app"));
@@ -95,13 +95,13 @@ describe("Authentication Flow", () => {
         });
 
         test("should allow entering email", async () => {
-            await page.getByRole("textbox", { name: "email" }).fill(testUser.email);
+            await page.getByRole("textbox", { name: "email" }).fill(testUsuario.email);
             await page.getByRole("button").click();
             // Add assertion for password field visibility if applicable
         });
 
         test("should allow entering password and complete login", async () => {
-            await page.getByRole("textbox", { name: "password" }).fill(testUser.password);
+            await page.getByRole("textbox", { name: "password" }).fill(testUsuario.password);
             await page.getByRole("button").click();
 
             await page.waitForURL(url("app"));

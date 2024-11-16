@@ -1,6 +1,6 @@
 import { H3Event } from 'h3'
 import { PrismaClient } from "@prisma/client"
-import { UserRepository } from '@@/repositories/UserRepository'
+import { UsuarioRepository } from '@@/repositories/UsuarioRepository'
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event: H3Event) => {
@@ -12,17 +12,17 @@ export default defineEventHandler(async (event: H3Event) => {
   const password = body.password;
 
 
-  const userRepository = new UserRepository()
-  const user = await userRepository.getUserByEmail(email)
-  if (!user) {
+  const usuarioRepository = new UsuarioRepository()
+  const usuario = await usuarioRepository.getUsuarioByEmail(email)
+  if (!usuario) {
     return {
       status: 404,
       body: "Usuário não encontrado",
     }
   }
-  user.name = name
-  user.password = password
-  const userUpdated = await userRepository.updateUser(user)
+  usuario.name = name
+  usuario.password = password
+  const usuarioUpdated = await usuarioRepository.updateUsuario(usuario)
 
-  return userUpdated
+  return usuarioUpdated
 })

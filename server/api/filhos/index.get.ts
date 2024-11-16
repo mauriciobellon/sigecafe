@@ -1,6 +1,6 @@
 import { defineEventHandler } from 'h3';
 import { getServerSession } from '#auth';
-import { UserType, Aluno, User, Escola } from '@prisma/client';
+import { UsuarioType, Aluno, Usuario, Escola } from '@prisma/client';
 import { AlunoRepository } from '@@/repositories/AlunoRepository'
 import { EscolaRepository } from '@@/repositories/EscolaRepository'
 
@@ -10,16 +10,16 @@ export default defineEventHandler(async (event) => {
   if (!session?.user) {
     return [];
   }
-  const userType = (session.user as User)?.type;
+  const usuarioType = (session.user as Usuario)?.type;
 
-  if (userType !== UserType.RESPONSAVEL) {
+  if (usuarioType !== UsuarioType.RESPONSAVEL) {
     return [];
   }
 
   const alunoRepository = new AlunoRepository();
   const escolaRepository = new EscolaRepository();
 
-  const filhos = await alunoRepository.getAlunosByResponsavel((session.user as User).id);
+  const filhos = await alunoRepository.getAlunosByResponsavel((session.user as Usuario).id);
 
   const filhosComEscola = await Promise.all(
     filhos.map(async (filho) => {

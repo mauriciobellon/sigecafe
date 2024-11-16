@@ -1,7 +1,7 @@
 import { defineEventHandler } from 'h3';
 import { getServerSession } from '#auth';
 import { getPermissions } from '@@/utils/permissions';
-import { User, UserType } from '@prisma/client';
+import { Usuario, UsuarioType } from '@prisma/client';
 
 export default defineEventHandler(async (event) => {
   const session = await getServerSession(event);
@@ -10,14 +10,14 @@ export default defineEventHandler(async (event) => {
     return [];
   }
 
-  const userType = (session.user as User)?.type;
+  const usuarioType = (session.user as Usuario)?.type;
 
   const permissions = await getPermissions();
 
   const allPagesWithShowInAndTitle = permissions.filter(page => page.menuType && page.title)
 
   const filteredLinks = allPagesWithShowInAndTitle
-    .filter(route => route.userType.includes(userType as UserType))
+    .filter(route => route.usuarioType.includes(usuarioType as UsuarioType))
     .sort((a, b) => (a.title || '').localeCompare(b.title || ''))
     .map(route => ({
       path: route.path,

@@ -10,13 +10,13 @@ export const useFilhosSelectorStore = defineStore("filhosSelector", {
 
   actions: {
     async fetchFilhos() {
-      const userStore = useUserStore();
-      if (userStore.userPreferences?.type === "RESPONSAVEL") {
+      const usuarioStore = useUsuarioStore();
+      if (usuarioStore.usuarioPreferences?.type === "RESPONSAVEL") {
         try {
           this.filhos = await $fetch<Aluno[]>("/api/filhos", {
             credentials: "include",
           });
-          this.show = userStore.userPreferences?.type === "RESPONSAVEL";
+          this.show = usuarioStore.usuarioPreferences?.type === "RESPONSAVEL";
         } catch (error) {
           console.error(error);
         }
@@ -55,6 +55,5 @@ export const useFilhosSelectorStore = defineStore("filhosSelector", {
       }
       return escola;
     },
-  },
-  persist: true,
+  }
 });

@@ -15,7 +15,7 @@ try {
         }
     } else {
         try {
-            execSync(`fuser -k ${port}/tcp`);
+            execSync(`fusuario -k ${port}/tcp`);
             console.log(`Successfully killed process using port ${port}`);
         } catch (error) {
             if (error.status === 1) {

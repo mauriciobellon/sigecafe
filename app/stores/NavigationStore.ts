@@ -7,6 +7,21 @@ export const useNavigationStore = defineStore("navigation", {
   }),
 
   actions: {
+    movePagesToStart(pages: Permission[], priorityPaths: string[]) {
+      const result = [...pages];
+
+      // Process paths in reverse to maintain correct order
+      for (const path of [...priorityPaths].reverse()) {
+        const index = result.findIndex((p) => p.path === path);
+        if (index !== -1) {
+          const [page] = result.splice(index, 1);
+          result.unshift(page);
+        }
+      }
+
+      return result;
+    },
+
     async fetchPages() {
       try {
         const allPagesFetched = await $fetch<Permission[]>("/api/navigation", {
@@ -17,13 +32,7 @@ export const useNavigationStore = defineStore("navigation", {
           const sortedPages = [...allPagesFetched];
           sortedPages.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
 
-          const dashboardIndex = sortedPages.findIndex((p) => p.path === "/app");
-          if (dashboardIndex !== -1) {
-            const [dashboardPage] = sortedPages.splice(dashboardIndex, 1);
-            sortedPages.unshift(dashboardPage);
-          }
-
-          this.pages = sortedPages;
+          this.pages = this.movePagesToStart(sortedPages, ["/app", "/app/perfil"]);
         } else {
           console.error("No pages found or data is null");
         }
