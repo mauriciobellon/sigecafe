@@ -1,10 +1,10 @@
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { User } from '@prisma/client'
+import { Usuario } from '@prisma/client'
 import { NuxtAuthHandler } from '#auth'
 import { comparePasswords } from '@@/utils/cryptUtil'
-import { UserRepository } from '@@/repositories/UserRepository'
+import { UsuarioRepository } from '@@/repositories/UsuarioRepository'
 
-const userRepository = new UserRepository()
+const usuarioRepository = new UsuarioRepository()
 
 export default NuxtAuthHandler({
     secret: process.env.AUTH_SECRET,
@@ -25,27 +25,27 @@ export default NuxtAuthHandler({
                     throw new Error('Credenciais inválidas')
                 }
 
-                const user = await userRepository.getUserByEmail(credentials.email)
+                const usuario = await usuarioRepository.getUsuarioByEmail(credentials.email)
 
-                if (!user || !user.password) {
+                if (!usuario || !usuario.password) {
                     throw new Error('Credenciais inválidas')
                 }
 
-                const isPasswordValid = await comparePasswords(credentials.password, user.password)
+                const isPasswordValid = await comparePasswords(credentials.password, usuario.password)
                 if (!isPasswordValid) {
                     throw new Error('Credenciais inválidas')
                 }
 
-                return user
+                return usuario
             },
         }),
     ],
     callbacks: {
         async session({ session, token }) {
             if (token?.email) {
-                const user: User | null = await userRepository.getUserByEmail(token.email)
-                if (user) {
-                    session.user = user
+                const usuario: Usuario | null = await usuarioRepository.getUsuarioByEmail(token.email)
+                if (usuario) {
+                    session.user = usuario
                 } else {
                     session.user = undefined
                 }

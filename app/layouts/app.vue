@@ -16,8 +16,8 @@
 
 <script lang="ts" setup>
   // Inicia o usuário
-  const userStore = useUserStore();
-  await userStore.syncWithAuth();
+  const userStore = useUsuarioStore();
+  userStore.fetchUsuarioPreferences();
 
   // Inicia o tema
   const themeStore = useThemeStore();

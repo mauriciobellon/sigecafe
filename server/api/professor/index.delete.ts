@@ -1,15 +1,15 @@
 import { H3Event } from 'h3'
-import { UserRepository } from '@@/repositories/UserRepository'
+import { UsuarioRepository } from '@@/repositories/UsuarioRepository'
 
 export default defineEventHandler(async (event: H3Event) => {
 
   const body = await readBody(event);
 
-  const id = body.user.id
+  const id = body.usuario.id
 
-  const userRepository = new UserRepository()
+  const usuarioRepository = new UsuarioRepository()
 
-  await userRepository.deleteUser(id)
+  await usuarioRepository.deleteUsuario(id)
 
   return true
 })

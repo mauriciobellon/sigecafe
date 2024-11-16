@@ -225,7 +225,7 @@ const newOcorrencia = reactive({
 
 
 
-  async function remove(user: any, event: Event) {
+  async function remove(usuario: any, event: Event) {
     event.stopPropagation(); 
 
     $fetch("http://localhost:3000/api/ocorrencia", {
@@ -233,10 +233,10 @@ const newOcorrencia = reactive({
       headers: {
         "Content-Type": "application/json",
       },
-      body: { user },
+      body: { usuario },
     }).then(() => {
 
-      const row = tableRef.value?.row((idx, data) => data.id === user.id);
+      const row = tableRef.value?.row((idx, data) => data.id === usuario.id);
       if (row) {
         row.remove().draw(false);
       }
@@ -244,11 +244,11 @@ const newOcorrencia = reactive({
   }
 
 
-  function edit(user: any, event: Event) {
+  function edit(usuario: any, event: Event) {
     event.stopPropagation(); 
     isEditing.value = true;
-    Object.assign(newOcorrencia, user);
-    editingRowIndex.value = data.findIndex((item: any) => item.id === user.id);
+    Object.assign(newOcorrencia, usuario);
+    editingRowIndex.value = data.findIndex((item: any) => item.id === usuario.id);
     modalState.value = true;
   }
 

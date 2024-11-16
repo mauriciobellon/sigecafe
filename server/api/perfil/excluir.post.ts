@@ -1,17 +1,17 @@
 import { defineEventHandler } from 'h3';
 import { getServerSession } from '#auth';
-import { UserRepository } from '@@/repositories/UserRepository';
+import { UsuarioRepository } from '@@/repositories/UsuarioRepository';
 
 export default defineEventHandler(async (event) => {
   const session = await getServerSession(event);
 
-  if (!session?.user) {
+  if (!session?.usuario) {
     return [];
   }
 
-  const userRepository = new UserRepository();
+  const usuarioRepository = new UsuarioRepository();
 
   if (session.user.email) {
-    await userRepository.deleteUserByEmail(session.user.email);
+    await usuarioRepository.deleteUsuarioByEmail(session.user.email);
   }
 });

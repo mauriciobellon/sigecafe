@@ -4,9 +4,9 @@
       <UiDropdownMenuTrigger as-child>
         <UiButton data-testid="dropdown-button" class="dropdown-button" variant="outline" size="icon">
           <div class="flex flex-col space-y-1">
-            <p class="text-sm font-medium leading-none">{{ userStore.userPreferences?.name }}</p>
+            <p class="text-sm font-medium leading-none">{{ usuarioStore.usuarioPreferences?.name }}</p>
             <p class="text-xs leading-none text-muted-foreground">
-              {{ userStore.userPreferences?.email }}
+              {{ usuarioStore.usuarioPreferences?.email }}
             </p>
           </div>
 
@@ -36,7 +36,7 @@
 
   const dropdownLogoutButton = ref("dropdown-button-Sair");
 
-  const userStore = useUserStore();
+  const usuarioStore = useUsuarioStore();
   const navigationStore = useNavigationStore();
   const pages = computed(() => navigationStore.filterPages("DROPDOWN"));
 </script>

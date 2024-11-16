@@ -1,13 +1,13 @@
 import { H3Event } from 'h3'
-import { UserType } from '@prisma/client'
-import { UserRepository } from '@@/repositories/UserRepository'
+import { UsuarioType } from '@prisma/client'
+import { UsuarioRepository } from '@@/repositories/UsuarioRepository'
 
 
 export default defineEventHandler(async (event: H3Event) => {
   try {
-    const userType = 'PROFESSOR' as UserType
-    const userRepository = new UserRepository()
-    const allProfessors = await userRepository.getUserByType(userType)
+    const usuarioType = 'PROFESSOR' as UsuarioType
+    const usuarioRepository = new UsuarioRepository()
+    const allProfessors = await usuarioRepository.getUsuarioByType(usuarioType)
     return allProfessors;
   } catch (error) {
     return {

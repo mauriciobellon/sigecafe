@@ -1,7 +1,7 @@
 import { getServerSession } from '#auth'
 import { defineEventHandler, createError } from 'h3'
 import { hasPermission } from '@@/utils/permissions'
-import type { User } from '@prisma/client'
+import type { Usuario } from '@prisma/client'
 
 export default defineEventHandler(async (event) => {
     const session = await getServerSession(event)
@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
 
     if (isPageRoute(path)) {
         const routePath = '/' + path.split('/').slice(1).join('/')
-        if (!hasPermission(routePath, (session.user as User).type)) {
+        if (!hasPermission(routePath, (session.user as Usuario).type)) {
             throw createError({
                 statusMessage: 'Acesso não autorizado',
                 statusCode: 403

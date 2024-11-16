@@ -8,16 +8,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id       Int      @id @default(autoincrement())
-  email    String   @unique
+model Usuario {
+  id       Int         @id @default(autoincrement())
+  email    String      @unique
   name     String
   password String
-  type     UserType @default(AUTENTICADO)
+  celular  String?
+  type     UsuarioType @default(AUTENTICADO)
   filhos   Aluno[]
 }
 
-enum UserType {
+enum UsuarioType {
   ADMINISTRADOR
   COORDENADOR
   PROFESSOR
@@ -32,20 +33,21 @@ enum MenuType {
 }
 
 model Permission {
-  id          Int        @id @default(autoincrement())
-  path        String     @unique
+  id          Int           @id @default(autoincrement())
+  path        String        @unique
   title       String?
   icon        String?
   description String?
   menuType    MenuType[]
-  userType    UserType[]
+  usuarioType UsuarioType[]
 }
 
 model Aluno {
-  id           Int      @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   nome         String
-  escola       Escola[]
-  responsaveis User[]
+  escola       Escola?   @relation(fields: [escolaId], references: [id])
+  escolaId     Int?
+  responsaveis Usuario[]
 }
 
 model Escola {

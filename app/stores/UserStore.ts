@@ -1,30 +1,55 @@
 import { defineStore } from "pinia";
-import type { User } from "@prisma/client";
 
-export const useUserStore = defineStore("user", {
+interface UsuarioPreferences {
+  name: string;
+  email: string;
+  celular?: string;
+  type: string;
+}
+
+export const useUsuarioStore = defineStore("usuario", {
   state: () => ({
-    userPreferences: null as User | null,
-    isInitialized: false,
+    usuarioPreferences: null as UsuarioPreferences | null,
+    loading: false,
+    error: null as string | null,
+    initialized: false
   }),
   actions: {
-    async syncWithAuth() {
-      const auth = useAuth();
-      const session = await auth.getSession();
+    async fetchUsuarioPreferences() {
+      if (this.initialized && this.usuarioPreferences) {
+        return this.usuarioPreferences;
+      }
 
-      this.userPreferences = session.user as User | null;
-      this.isInitialized = true;
-    },
-    async deleteUser() {
-      await $fetch("/api/perfil/excluir", {
-        method: "POST",
-        credentials: "include"
-      });
-      const router = useRouter();
-      useAuth()
-        .signOut()
-        .then(() => {
-          router.push("/auth");
+      try {
+        this.loading = true;
+        const response = await $fetch("/api/usuario/perfil", {
+          credentials: "include"
         });
+
+        if (!response.success) {
+          throw new Error(response.message);
+        }
+
+        this.usuarioPreferences = response.data;
+        this.initialized = true;
+
+        if (response.data.type === "RESPONSAVEL") {
+          const filhosStore = useFilhosSelectorStore();
+          filhosStore.fetchFilhos();
+        }
+
+        return response.data;
+      } catch (err: any) {
+        this.error = err.message || "Erro ao carregar dados do usuário";
+        throw err;
+      } finally {
+        this.loading = false;
+      }
     },
+    clearStore() {
+      this.usuarioPreferences = null;
+      this.error = null;
+      this.initialized = false;
+    }
   }
 });

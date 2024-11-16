@@ -18,6 +18,7 @@
   const props = defineProps<{
     title?: string;
     description?: string;
+    hideTop?: boolean;
   }>();
 
   const useNavigation = useNavigationStore();

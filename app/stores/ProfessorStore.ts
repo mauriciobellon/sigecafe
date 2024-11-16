@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
-import type { User } from "@prisma/client";
+import type { Usuario } from "@prisma/client";
 
 interface ProfessorState {
-  professors: User[];
+  professors: Usuario[];
   selectedRows: number;
   isEditing: boolean;
   modalState: boolean;
@@ -31,7 +31,7 @@ export const useProfessorStore = defineStore("professor", {
   actions: {
     async fetchProfessors() {
       try {
-        const response = await $fetch<User[]>("http://localhost:3000/api/professor");
+        const response = await $fetch<Usuario[]>("http://localhost:3000/api/professor");
         this.professors = response;
       } catch (error) {
         console.error("Error fetching professors:", error);
@@ -77,14 +77,14 @@ export const useProfessorStore = defineStore("professor", {
       }
     },
 
-    async removeProfessor(professor: User) {
+    async removeProfessor(professor: Usuario) {
       try {
         await $fetch("http://localhost:3000/api/professor", {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
           },
-          body: { user: professor },
+          body: { usuario: professor },
           credentials: "include",
         });
 
@@ -108,7 +108,7 @@ export const useProfessorStore = defineStore("professor", {
       };
     },
 
-    setEditingProfessor(professor: User) {
+    setEditingProfessor(professor: Usuario) {
       this.isEditing = true;
       this.newProfessor = { ...professor };
       this.editingRowIndex = this.professors.findIndex((p) => p.id === professor.id);
