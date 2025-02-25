@@ -46,6 +46,19 @@ export const useUsuarioStore = defineStore("usuario", {
         this.loading = false;
       }
     },
+
+    async deleteUsuario() {
+      const response = await $fetch("/api/usuario/perfil", {
+        method: "DELETE",
+        credentials: "include"
+      });
+
+      if (!response.success) {
+        throw new Error(response.message);
+      }
+
+    },
+
     clearStore() {
       this.usuarioPreferences = null;
       this.error = null;

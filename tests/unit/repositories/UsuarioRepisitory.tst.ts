@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { UsuarioRepository } from '@@/repositories/UsuarioRepository';
+import { UsuarioRepository } from '@@/server/repositories/UsuarioRepository';
 
 describe('UsuarioRepository', () => {
     let usuarioRepository: UsuarioRepository;

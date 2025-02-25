@@ -1,7 +1,7 @@
 import { createPage, url } from "@nuxt/test-utils/e2e";
 import type { Page } from "playwright-core";
 import { describe, expect, test, beforeAll, afterAll } from "vitest";
-import { UsuarioRepository } from "~~/repositories/UsuarioRepository";
+import { UsuarioRepository } from "@@/server/repositories/UsuarioRepository";
 import setup from "./__setup";
 describe("Authentication Flow", () => {
     const testUsuario = {

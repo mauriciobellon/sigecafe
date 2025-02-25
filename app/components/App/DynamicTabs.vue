@@ -1,7 +1,7 @@
 <template>
   <div>
     <UiTabs v-model="currentTab" :default-value="firstTab">
-      <UiTabsList :pill="false" class="tabslist">
+      <UiTabsList v-if="tabs.length > 1" :pill="false" class="tabslist">
         <UiTabsTrigger v-for="tab in tabs" :key="tab.value" :value="tab.value" :pill="false">
           {{ tab.label }}
         </UiTabsTrigger>

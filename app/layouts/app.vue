@@ -15,17 +15,12 @@
 </template>
 
 <script lang="ts" setup>
-  // Inicia o usuário
   const userStore = useUsuarioStore();
   userStore.fetchUsuarioPreferences();
 
-  // Inicia o tema
-  const themeStore = useThemeStore();
-  themeStore.initTheme();
-
-  // Inicia a navegação
   const navigationStore = useNavigationStore();
   navigationStore.fetchPages();
+
 </script>
 
 <style scoped>

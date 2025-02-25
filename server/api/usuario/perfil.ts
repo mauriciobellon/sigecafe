@@ -103,4 +103,25 @@ export default defineEventHandler(async (event) => {
       }
     }
   }
+
+  // DELETE request to delete user profile
+  if (event.method === 'DELETE') {
+    try {
+      await prisma.usuario.delete({
+        where: { email: session.user.email }
+      })
+
+
+      return {
+        success: true,
+        message: 'Perfil excluído com sucesso'
+      }
+    } catch (error) {
+      console.error('Erro ao excluir perfil:', error)
+      return {
+        success: false,
+        message: 'Erro ao excluir perfil'
+      }
+    }
+  }
 })

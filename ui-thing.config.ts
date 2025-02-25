@@ -3,7 +3,7 @@ export default {
   theme: "zinc",
   tailwindCSSLocation: "app/assets/css/tailwind.css",
   tailwindConfigLocation: "tailwind.config.js",
-  componentsLocation: "components/Ui",
+  componentsLocation: "app/components/Ui",
   composablesLocation: "app/composables",
   pluginsLocation: "app/plugins",
   utilsLocation: "app/utils",

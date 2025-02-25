@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useAuthStore } from "~/stores/auth";
+  import { useAuthStore } from "~/stores/AuthStore";
 
   const auth = useAuthStore();
   auth.setFormType("auth");

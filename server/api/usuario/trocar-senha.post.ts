@@ -1,6 +1,6 @@
 import { getServerSession } from '#auth'
 import prisma from '~~/lib/prisma'
-import { comparePasswords, hashPassword } from '~~/utils/cryptUtil'
+import { verify, hash } from '@@/server/utils/crypto'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -34,11 +34,11 @@ export default defineEventHandler(async (event) => {
         message: 'Usuário não encontrado'
       }
     }
-    const hashedPassword = await hashPassword(newPassword)
+    const hashedPassword = await hash(newPassword)
 
     console.log(usuario.password)
     console.log(hashedPassword)
-    const isValid = await comparePasswords(currentPassword, usuario.password)
+    const isValid = await verify(currentPassword, usuario.password)
     if (!isValid) {
       return {
         success: false,

@@ -1,8 +1,8 @@
 import { defineEventHandler } from 'h3';
 import { getServerSession } from '#auth';
 import { UsuarioType, Aluno, Usuario, Escola } from '@prisma/client';
-import { AlunoRepository } from '@@/repositories/AlunoRepository'
-import { EscolaRepository } from '@@/repositories/EscolaRepository'
+import { AlunoRepository } from '@@/server/repositories/AlunoRepository'
+import { EscolaRepository } from '@@/server/repositories/EscolaRepository'
 
 export default defineEventHandler(async (event) => {
   const session = await getServerSession(event);

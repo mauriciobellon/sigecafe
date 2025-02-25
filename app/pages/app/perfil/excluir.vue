@@ -63,6 +63,14 @@
     try {
       loading.value = true
       await usuarioStore.deleteUsuario()
+
+      const router = useRouter();
+      useAuth()
+        .signOut()
+        .then(() => {
+          router.push("/auth");
+        });
+
       navigateTo('/auth')
     } catch (error) {
       console.error('Erro ao excluir conta:', error)

@@ -10,6 +10,13 @@
     ]
   },
   {
+    "path": "/api/alunos",
+    "usuarioType": [
+      "COORDENADOR",
+      "PROFESSOR"
+    ]
+  },
+  {
     "path": "/api/usuario/trocar-senha",
     "usuarioType": [
       "ADMINISTRADOR",
@@ -32,7 +39,6 @@
   {
     "path": "/api/perfil/excluir",
     "usuarioType": [
-      "ADMINISTRADOR",
       "COORDENADOR",
       "PROFESSOR",
       "RESPONSAVEL",
@@ -42,8 +48,19 @@
   {
     "path": "/api/professor",
     "usuarioType": [
-      "ADMINISTRADOR",
       "COORDENADOR"
+    ]
+  },
+  {
+    "path": "/api/colaborador/coordenador",
+    "usuarioType": [
+      "ADMINISTRADOR"
+    ]
+  },
+  {
+    "path": "/api/colaborador/professor",
+    "usuarioType": [
+      "ADMINISTRADOR"
     ]
   },
   {
@@ -100,7 +117,6 @@
       "ROOT"
     ],
     "usuarioType": [
-      "ADMINISTRADOR",
       "COORDENADOR"
     ]
   },
@@ -113,7 +129,6 @@
       "ROOT"
     ],
     "usuarioType": [
-      "ADMINISTRADOR",
       "COORDENADOR"
     ]
   },
@@ -126,7 +141,6 @@
       "ROOT"
     ],
     "usuarioType": [
-      "ADMINISTRADOR",
       "COORDENADOR"
     ]
   },
@@ -139,9 +153,50 @@
       "ROOT"
     ],
     "usuarioType": [
-      "ADMINISTRADOR",
       "COORDENADOR",
       "PROFESSOR"
+    ]
+  },
+  {
+    "path": "/app/escola",
+    "title": "Escola",
+    "icon": "ph:solar-roof-duotone",
+    "description": "Gerencie as informações da escola",
+    "menuType": [
+      "ROOT"
+    ],
+    "usuarioType": [
+      "ADMINISTRADOR"
+    ]
+  },
+  {
+    "path": "/app/permissoes",
+    "title": "Permissões",
+    "icon": "ph:lock-duotone",
+    "description": "Gerencie as permissões dos usuários",
+    "menuType": [
+      "ROOT"
+    ],
+    "usuarioType": [
+      "ADMINISTRADOR"
+    ]
+  },
+  {
+    "path": "/app/permissoes/api",
+    "usuarioType": [
+      "ADMINISTRADOR"
+    ]
+  },
+  {
+    "path": "/app/colaboradores",
+    "title": "Colaboradores",
+    "icon": "ph:lock-duotone",
+    "description": "Gerencie os colaboradores da escola",
+    "menuType": [
+      "ROOT"
+    ],
+    "usuarioType": [
+      "ADMINISTRADOR"
     ]
   },
   {
@@ -153,8 +208,6 @@
       "ROOT"
     ],
     "usuarioType": [
-      "ADMINISTRADOR",
-      "COORDENADOR",
       "PROFESSOR"
     ]
   },
@@ -167,7 +220,6 @@
       "ROOT"
     ],
     "usuarioType": [
-      "ADMINISTRADOR",
       "COORDENADOR",
       "RESPONSAVEL"
     ]
@@ -181,8 +233,6 @@
       "ROOT"
     ],
     "usuarioType": [
-      "ADMINISTRADOR",
-      "COORDENADOR",
       "PROFESSOR"
     ]
   },
@@ -190,11 +240,24 @@
     "path": "/app/desempenho",
     "title": "Desempenho",
     "icon": "ph:student-duotone",
-    "description": "Veja o desempenho dos seu filho",
+    "description": "Acompanhe o desempenho e compare com a média da turma",
     "menuType": [
       "ROOT"
     ],
     "usuarioType": [
+      "RESPONSAVEL"
+    ]
+  },
+  {
+    "path": "/app/frequencia",
+    "title": "Frequência",
+    "icon": "line-md:confirm-square-twotone",
+    "description": "Histórico de Frequência por Disciplina",
+    "menuType": [
+      "ROOT"
+    ],
+    "usuarioType": [
+      "PROFESSOR",
       "RESPONSAVEL"
     ]
   },
@@ -240,7 +303,6 @@
       "PERFIL"
     ],
     "usuarioType": [
-      "ADMINISTRADOR",
       "COORDENADOR",
       "PROFESSOR",
       "RESPONSAVEL",

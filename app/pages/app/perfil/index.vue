@@ -2,12 +2,6 @@
   <div>
     <AppPage>
       <UiCard class="mt-10 mb-6">
-        <UiCardHeader>
-          <UiCardTitle>Meu Perfil</UiCardTitle>
-          <UiCardDescription>
-            Gerencie suas informações pessoais
-          </UiCardDescription>
-        </UiCardHeader>
         <UiCardContent>
           <div v-if="usuarioStore.loading" class="flex justify-center py-4">
             <Icon name="lucide:loader-2" class="h-6 w-6 animate-spin" />
@@ -44,11 +38,6 @@
               <UiButton type="submit" :disabled="loading" class="flex-1">
                 <Icon v-if="loading" name="lucide:loader-2" class="mr-2 h-4 w-4 animate-spin" />
                 {{ loading ? 'Salvando...' : 'Salvar Alterações' }}
-              </UiButton>
-
-              <UiButton type="button" variant="outline" @click="navigateTo('/app/perfil/senha')" class="flex-1">
-                <Icon name="lucide:key" class="mr-2 h-4 w-4" />
-                Alterar Senha
               </UiButton>
             </div>
           </form>
