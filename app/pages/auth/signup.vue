@@ -17,36 +17,14 @@
       </div>
       <form @submit="auth.validateAndProceed">
         <div class="form-grid">
-          <AuthInput
-            v-if="auth.step === 'name'"
-            v-model="auth.name"
-            placeholder="Nome Completo"
-            type="text"
-            autocomplete="name"
-            :disabled="auth.loading"
-          />
-          <AuthInput
-            v-if="auth.step === 'email'"
-            v-model="auth.email"
-            placeholder="name@example.com"
-            type="email"
-            autocomplete="email"
-            :disabled="auth.loading"
-          />
-          <AuthInput
-            v-if="auth.step === 'password'"
-            v-model="auth.password"
-            placeholder="********"
-            type="password"
-            :disabled="auth.loading"
-          />
+          <AuthInput v-if="auth.step === 'name'" v-model="auth.name" placeholder="Nome Completo" type="text"
+            autocomplete="name" :disabled="auth.loading" />
+          <AuthInput v-if="auth.step === 'email'" v-model="auth.email" placeholder="name@example.com" type="email"
+            autocomplete="email" :disabled="auth.loading" />
+          <AuthInput v-if="auth.step === 'password'" v-model="auth.password" placeholder="********" type="password"
+            :disabled="auth.loading" />
           <UiButton type="submit" :disabled="auth.loading" class="h-12">
-            <Icon
-              name="lucide:loader-2"
-              color="white"
-              v-if="auth.loading"
-              class="mr-2 h-4 w-4 animate-spin"
-            />
+            <Icon name="lucide:loader-2" color="white" v-if="auth.loading" class="mr-2 h-4 w-4 animate-spin" />
             <p v-if="auth.step === 'name'">Continuar</p>
             <p v-if="auth.step === 'email'">Continuar</p>
             <p v-if="auth.step === 'password'">Cadastrar</p>
@@ -63,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useAuthStore } from "~/stores/auth";
+  import { useAuthStore } from "~/stores/AuthStore";
 
   const auth = useAuthStore();
   auth.setFormType("signup");

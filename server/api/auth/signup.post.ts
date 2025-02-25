@@ -1,6 +1,6 @@
 import { defineEventHandler, readBody } from 'h3'
-import { hashPassword } from '@@/utils/cryptUtil'
-import { UsuarioRepository } from '@@/repositories/UsuarioRepository'
+import { hash } from '@@/server/utils/crypto'
+import { UsuarioRepository } from '@@/server/repositories/UsuarioRepository'
 const usuarioRepository = new UsuarioRepository()
 
 export default defineEventHandler(async (event) => {
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
             return { success: false, errorCode: 'USER_EXISTS', message: 'Usuário já existe' }
         }
 
-        const encodedPassword = await hashPassword(password)
+        const encodedPassword = await hash(password)
 
         await usuarioRepository.createUsuario({
             name,

@@ -1,6 +1,6 @@
 import { H3Event } from 'h3'
 import { UsuarioType } from '@prisma/client'
-import { UsuarioRepository } from '@@/repositories/UsuarioRepository'
+import { UsuarioRepository } from '@@/server/repositories/UsuarioRepository'
 
 
 export default defineEventHandler(async (event: H3Event) => {

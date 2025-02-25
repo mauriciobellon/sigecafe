@@ -1,6 +1,8 @@
 <template>
   <div>
-    <AppPage> </AppPage>
+    <AppPage>
+      <AppDynamicTabs tabs-folder="Alunos" default-tab="Todos" :order="['Todos']" />
+    </AppPage>
   </div>
 </template>
 

@@ -1,8 +1,8 @@
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { Usuario } from '@prisma/client'
 import { NuxtAuthHandler } from '#auth'
-import { comparePasswords } from '@@/utils/cryptUtil'
-import { UsuarioRepository } from '@@/repositories/UsuarioRepository'
+import { verify } from '@@/server/utils/crypto'
+import { UsuarioRepository } from '@@/server/repositories/UsuarioRepository'
 
 const usuarioRepository = new UsuarioRepository()
 
@@ -31,7 +31,7 @@ export default NuxtAuthHandler({
                     throw new Error('Credenciais inválidas')
                 }
 
-                const isPasswordValid = await comparePasswords(credentials.password, usuario.password)
+                const isPasswordValid = await verify(credentials.password, usuario.password)
                 if (!isPasswordValid) {
                     throw new Error('Credenciais inválidas')
                 }

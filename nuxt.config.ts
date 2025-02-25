@@ -19,6 +19,25 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
   ],
 
+
+  app: {
+    pageTransition: { name: "fade", mode: "out-in" },
+    layoutTransition: { name: "fade", mode: "out-in" },
+    head: {
+      title: "Escola ON",
+      script: [
+        {
+          src: "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/pdfmake.min.js",
+          defer: true,
+        },
+        {
+          src: "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/vfs_fonts.min.js",
+          defer: true,
+        },
+      ],
+    },
+  },
+
   auth: {
     globalAppMiddleware: true,
     originEnvKey: "NUXT_AUTH_ORIGIN",
@@ -36,7 +55,8 @@ export default defineNuxtConfig({
     installClient: false,
     generateClient: false,
     installStudio: false,
-    autoSetupPrisma: false,
+    formatSchema: false,
+    runMigration: false,
   },
 
   vite: {
@@ -46,6 +66,7 @@ export default defineNuxtConfig({
           "./node_modules/.prisma/client/index-browser.js",
       },
     },
+
     optimizeDeps: {
       include: [
         "vue-use-active-scroll",
@@ -58,13 +79,13 @@ export default defineNuxtConfig({
     },
   },
 
+  css: ["~/assets/css/global.css"],
+
   tailwindcss: {
     exposeConfig: true,
     editorSupport: true,
     viewer: false
   },
-
-  css: ["~/assets/css/global.css"],
 
   colorMode: {
     classSuffix: "",
@@ -87,26 +108,5 @@ export default defineNuxtConfig({
         as: "useSonner",
       },
     ],
-  },
-
-  app: {
-    pageTransition: { name: "fade", mode: "out-in" },
-    layoutTransition: { name: "fade", mode: "out-in" },
-    head: {
-      script: [
-        {
-          src: "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/pdfmake.min.js",
-          defer: true,
-        },
-        {
-          src: "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/vfs_fonts.min.js",
-          defer: true,
-        },
-      ],
-    },
-  },
-
-  build: {
-    transpile: ["vue-sonner"],
   },
 });

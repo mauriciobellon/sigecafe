@@ -120,7 +120,10 @@
     turmaId: '',
   });
 
-  const data = await $fetch<any>("http://localhost:3000/api/aluno");
+  const data = await $fetch<any>("http://localhost:3000/api/alunos", {
+    credentials: 'include'
+  }
+  );
 
   const tableRef = shallowRef<InstanceType<typeof DataTableRef<any[]>> | null>(null);
 
@@ -162,9 +165,6 @@
   const columns: ConfigColumns[] = [
     { data: "id", title: "Id" },
     { data: "nome", title: "Nome" },
-    { data: "email", title: "Email" },
-    { data: "nomeResponsavel", title: "Nome Responsável" },
-    { data: "celularResponsavel", title: "Celular Responsável" },
     {
       data: null,
       title: "",
@@ -290,13 +290,20 @@
     Object.assign(newAluno, { id: null, nome: '', email: '', endereco: '', nomeResponsavel: '', celularResponsavel: '', turmaId: '' });
   }
 
-  const turmas = ref([]);
+  const turmas = ref([
+    { id: '1', nome: '1º Ano A' },
+    { id: '2', nome: '1º Ano B' },
+    { id: '3', nome: '2º Ano A' },
+    { id: '4', nome: '2º Ano B' },
+    { id: '5', nome: '3º Ano A' },
+    { id: '6', nome: '3º Ano B' },
+  ]);
 
-  onMounted(async () => {
-    const response = await fetch('http://localhost:3000/api/turmas');
-    const data = await response.json();
-    turmas.value = data;
-  });
+  // onMounted(async () => {
+  //   const response = await fetch('http://localhost:3000/api/turmas');
+  //   const data = await response.json();
+  //   turmas.value = data;
+  // });
 </script>
 
 

@@ -16,6 +16,8 @@ model Usuario {
   celular  String?
   type     UsuarioType @default(AUTENTICADO)
   filhos   Aluno[]
+  escola   Escola?     @relation(fields: [escolaId], references: [id])
+  escolaId Int?
 }
 
 enum UsuarioType {
@@ -51,7 +53,9 @@ model Aluno {
 }
 
 model Escola {
-  id     Int     @id @default(autoincrement())
-  nome   String
-  alunos Aluno[]
+  id            Int       @id @default(autoincrement())
+  nome          String
+  celular       String?
+  alunos        Aluno[]
+  colaboradores Usuario[]
 }

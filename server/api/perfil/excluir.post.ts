@@ -1,6 +1,6 @@
 import { defineEventHandler } from 'h3';
 import { getServerSession } from '#auth';
-import { UsuarioRepository } from '@@/repositories/UsuarioRepository';
+import { UsuarioRepository } from '@@/server/repositories/UsuarioRepository';
 
 export default defineEventHandler(async (event) => {
   const session = await getServerSession(event);

@@ -8,3 +8,8 @@
     <NuxtPage />
   </NuxtLayout>
 </template>
+
+<script lang="ts" setup>
+  const themeToggleStore = useThemeToggleStore();
+  themeToggleStore.initTheme();
+</script>
