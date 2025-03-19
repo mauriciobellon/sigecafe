@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="icon-container">
-      <Icon name="solar:map-point-school-broken" class="icon" />
+      <SharedLogo />
     </div>
     <UiCardHeader class="header">
       <UiCardTitle class="title">Faça seu Login</UiCardTitle>
