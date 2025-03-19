@@ -1,1 +1,1 @@
-<template>Escola ON</template>
+<template></template>

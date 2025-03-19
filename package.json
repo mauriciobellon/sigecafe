@@ -7,7 +7,7 @@
     "dev": "cross-env NODE_NO_WARNINGS=1 nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare && npm run env && npm run db",
+    "postinstall": "nuxt prepare && npm run env && npm install playwright",
     "install-playwright": "npx playwright install --with-deps chromium",
     "test": "node ./scripts/run-test.mjs",
     "all": "npm install && npm run build && npm run preview",
