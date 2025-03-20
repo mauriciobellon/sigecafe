@@ -7,7 +7,7 @@ import { UsuarioRepository } from '@@/server/repositories/UsuarioRepository'
 const usuarioRepository = new UsuarioRepository()
 
 export default NuxtAuthHandler({
-    secret: process.env.AUTH_SECRET,
+    secret: process.env.AUTH_SECRET || 'secret',
     pages: {
         signIn: '/auth',
     },
