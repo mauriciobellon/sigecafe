@@ -14,4 +14,8 @@ WORKDIR /nuxtapp
 
 COPY --from=build-stage /nuxtapp/.output/ ./.output/
 
+RUN npm run migrate
+
+RUN npm run seed
+
 CMD [ "node", ".output/server/index.mjs" ]

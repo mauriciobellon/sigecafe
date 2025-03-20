@@ -82,7 +82,7 @@ describe("Authentication Flow", () => {
 
         test("should successfully logout and redirect to auth", async () => {
             await page.getByTestId("dropdown-button-Sair").click();
-            await page.waitForURL(url("auth?callbackUrl=http://localhost:3000/app"));
+            await page.waitForURL(url("auth?callbackUrl=https://sigecafe.bellon.dev/app"));
             const currentPath = new URL(page.url()).pathname;
             expect(currentPath).toBe("/auth");
         });
@@ -133,7 +133,7 @@ describe("Authentication Flow", () => {
 
         test("should successfully delete account and redirect to auth", async () => {
             await page.getByTestId("delete-account-button").click();
-            await page.waitForURL(url("auth?callbackUrl=http://localhost:3000/app/perfil/excluir"));
+            await page.waitForURL(url("auth?callbackUrl=https://sigecafe.bellon.dev/app/perfil/excluir"));
             const currentPath = new URL(page.url()).pathname;
             expect(currentPath).toBe("/auth");
         });

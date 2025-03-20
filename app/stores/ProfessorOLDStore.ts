@@ -31,7 +31,7 @@ export const useProfessorStore = defineStore("professor", {
   actions: {
     async fetchProfessors() {
       try {
-        const response = await $fetch<Usuario[]>("http://localhost:3000/api/professor");
+        const response = await $fetch<Usuario[]>("https://sigecafe.bellon.dev/api/professor");
         this.professors = response;
       } catch (error) {
         console.error("Error fetching professors:", error);
@@ -40,7 +40,7 @@ export const useProfessorStore = defineStore("professor", {
 
     async createProfessor() {
       try {
-        const response = await $fetch("http://localhost:3000/api/professor", {
+        const response = await $fetch("https://sigecafe.bellon.dev/api/professor", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -58,7 +58,7 @@ export const useProfessorStore = defineStore("professor", {
 
     async updateProfessor() {
       try {
-        const response = await $fetch(`http://localhost:3000/api/professor`, {
+        const response = await $fetch(`https://sigecafe.bellon.dev/api/professor`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -79,7 +79,7 @@ export const useProfessorStore = defineStore("professor", {
 
     async removeProfessor(professor: Usuario) {
       try {
-        await $fetch("http://localhost:3000/api/professor", {
+        await $fetch("https://sigecafe.bellon.dev/api/professor", {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",

@@ -98,7 +98,7 @@ const newDisciplina = reactive({
   nome: '',
 });
 
-  const data = await $fetch<any>("http://localhost:3000/api/disciplinas");
+  const data = await $fetch<any>("https://sigecafe.bellon.dev/api/disciplinas");
 
   const tableRef = shallowRef<InstanceType<typeof DataTableRef<any[]>> | null>(null);
 
@@ -131,7 +131,7 @@ const newDisciplina = reactive({
         text: "Novo",
         action: function (e, dt, node, config) {
           isEditing.value = false;
-          Object.assign(newDisciplina, { id: null, nome: '' }); 
+          Object.assign(newDisciplina, { id: null, nome: '' });
           modalState.value = true;
         },
       }
@@ -207,9 +207,9 @@ const newDisciplina = reactive({
 
 
   async function remove(usuario: any, event: Event) {
-    event.stopPropagation(); 
+    event.stopPropagation();
 
-    $fetch("http://localhost:3000/api/disciplinas", {
+    $fetch("https://sigecafe.bellon.dev/api/disciplinas", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -226,7 +226,7 @@ const newDisciplina = reactive({
 
 
   function edit(usuario: any, event: Event) {
-    event.stopPropagation(); 
+    event.stopPropagation();
     isEditing.value = true;
     Object.assign(newDisciplina, usuario);
     editingRowIndex.value = data.findIndex((item: any) => item.id === usuario.id);
@@ -236,7 +236,7 @@ const newDisciplina = reactive({
 
   async function handleSave() {
     if (isEditing.value) {
-      const response = await $fetch(`http://localhost:3000/api/disciplinas`, {
+      const response = await $fetch(`https://sigecafe.bellon.dev/api/disciplinas`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -247,10 +247,10 @@ const newDisciplina = reactive({
       const row = tableRef.value?.row(editingRowIndex.value);
       if (row) {
         row.data(response).draw(false);
-        Object.assign(data[editingRowIndex.value], response); 
+        Object.assign(data[editingRowIndex.value], response);
       }
-    } else {    
-      const response = await $fetch("http://localhost:3000/api/disciplinas", {
+    } else {
+      const response = await $fetch("https://sigecafe.bellon.dev/api/disciplinas", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -263,13 +263,13 @@ const newDisciplina = reactive({
     }
 
     modalState.value = false;
-    Object.assign(newDisciplina, { id: null, nome: '' }); 
+    Object.assign(newDisciplina, { id: null, nome: '' });
   }
 
 const turmas = ref([]);
 
 onMounted(async () => {
-  const response = await fetch('http://localhost:3000/api/turmas');
+  const response = await fetch('https://sigecafe.bellon.dev/api/turmas');
   const data = await response.json();
   turmas.value = data;
 });
