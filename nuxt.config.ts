@@ -41,7 +41,7 @@ export default defineNuxtConfig({
   auth: {
     globalAppMiddleware: true,
     originEnvKey: "NUXT_AUTH_ORIGIN",
-    baseURL: `${process.env.BASE_URL || "https://sigecafe.bellon.dev"}/api/auth`,
+    baseURL: `${process.env.BASE_URL || 'https://sigecafe.bellon.dev'}/api/auth`,
     provider: {
       type: "authjs",
     },

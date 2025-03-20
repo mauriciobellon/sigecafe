@@ -14,6 +14,6 @@ WORKDIR /nuxtapp
 
 COPY --from=build-stage /nuxtapp/.output/ ./.output/
 COPY --from=build-stage /nuxtapp/package.json ./package.json
-
+COPY --from=build-stage /nuxtapp/prisma/ ./prisma/
 
 CMD [ "node", ".output/server/index.mjs" ]
