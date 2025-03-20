@@ -120,7 +120,7 @@
     turmaId: '',
   });
 
-  const data = await $fetch<any>("http://localhost:3000/api/alunos", {
+  const data = await $fetch<any>(`${process.env.BASE_URL || "https://sigecafe.bellon.dev"}/api/alunos`, {
     credentials: 'include'
   }
   );
@@ -233,7 +233,7 @@
   async function remove(usuario: any, event: Event) {
     event.stopPropagation();
 
-    $fetch("http://localhost:3000/api/aluno", {
+    $fetch("https://sigecafe.bellon.dev/api/aluno", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -260,7 +260,7 @@
 
   async function handleSave() {
     if (isEditing.value) {
-      const response = await $fetch(`http://localhost:3000/api/aluno`, {
+      const response = await $fetch(`https://sigecafe.bellon.dev/api/aluno`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -274,7 +274,7 @@
         Object.assign(data[editingRowIndex.value], response);
       }
     } else {
-      const response = await $fetch("http://localhost:3000/api/aluno", {
+      const response = await $fetch("https://sigecafe.bellon.dev/api/aluno", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -300,7 +300,7 @@
   ]);
 
   // onMounted(async () => {
-  //   const response = await fetch('http://localhost:3000/api/turmas');
+  //   const response = await fetch('https://sigecafe.bellon.dev/api/turmas');
   //   const data = await response.json();
   //   turmas.value = data;
   // });

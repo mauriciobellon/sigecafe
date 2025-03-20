@@ -107,7 +107,7 @@
   const selectedProfessorNome = ref('');
   const selectedDisciplinaId = ref('');
   const selectedDisciplinaNome = ref('');
-  
+
 const newOcorrencia = reactive({
   id: null,
   turmaId: '',
@@ -120,7 +120,7 @@ const newOcorrencia = reactive({
   disciplinaNome: '',
 });
 
-  const data = await $fetch<any>("http://localhost:3000/api/ocorrencia");
+  const data = await $fetch<any>("https://sigecafe.bellon.dev/api/ocorrencia");
 
   const tableRef = shallowRef<InstanceType<typeof DataTableRef<any[]>> | null>(null);
 
@@ -153,7 +153,7 @@ const newOcorrencia = reactive({
         text: "Novo",
         action: function (e, dt, node, config) {
           isEditing.value = false;
-          Object.assign(newOcorrencia, { id: null, turmaId: '', turmaNome: '', alunoId: '', alunoNome: '', professorId: '', professorNome: '', disciplinaId: '', disciplinaNome: '', }); 
+          Object.assign(newOcorrencia, { id: null, turmaId: '', turmaNome: '', alunoId: '', alunoNome: '', professorId: '', professorNome: '', disciplinaId: '', disciplinaNome: '', });
           modalState.value = true;
         },
       }
@@ -226,9 +226,9 @@ const newOcorrencia = reactive({
 
 
   async function remove(usuario: any, event: Event) {
-    event.stopPropagation(); 
+    event.stopPropagation();
 
-    $fetch("http://localhost:3000/api/ocorrencia", {
+    $fetch("https://sigecafe.bellon.dev/api/ocorrencia", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -245,7 +245,7 @@ const newOcorrencia = reactive({
 
 
   function edit(usuario: any, event: Event) {
-    event.stopPropagation(); 
+    event.stopPropagation();
     isEditing.value = true;
     Object.assign(newOcorrencia, usuario);
     editingRowIndex.value = data.findIndex((item: any) => item.id === usuario.id);
@@ -254,7 +254,7 @@ const newOcorrencia = reactive({
 
 
   async function handleSave() {
-      const response = await $fetch("http://localhost:3000/api/ocorrencia", {
+      const response = await $fetch("https://sigecafe.bellon.dev/api/ocorrencia", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -266,17 +266,17 @@ const newOcorrencia = reactive({
     data.push(response);
 
     modalState.value = false;
-    Object.assign(newOcorrencia, { 
-        id: null, 
-        turmaId: '', 
-        turmaNome: '', 
-        alunoId: '', 
-        alunoNome: '', 
-        professorId: '', 
-        professorNome: '', 
-        disciplinaId: '', 
-        disciplinaNome: '', 
-    }); 
+    Object.assign(newOcorrencia, {
+        id: null,
+        turmaId: '',
+        turmaNome: '',
+        alunoId: '',
+        alunoNome: '',
+        professorId: '',
+        professorNome: '',
+        disciplinaId: '',
+        disciplinaNome: '',
+    });
 }
 
 
@@ -286,25 +286,25 @@ const professores = ref([]);
 const disciplinas = ref([]);
 
 onMounted(async () => {
-  const response = await fetch('http://localhost:3000/api/turmas');
+  const response = await fetch('https://sigecafe.bellon.dev/api/turmas');
   const data = await response.json();
   turmas.value = data;
 });
 
 onMounted(async () => {
-  const response = await fetch('http://localhost:3000/api/aluno');
+  const response = await fetch('https://sigecafe.bellon.dev/api/aluno');
   const data = await response.json();
   alunos.value = data;
 });
 
 onMounted(async () => {
-  const response = await fetch('http://localhost:3000/api/professor');
+  const response = await fetch('https://sigecafe.bellon.dev/api/professor');
   const data = await response.json();
   professores.value = data;
 });
 
 onMounted(async () => {
-  const response = await fetch('http://localhost:3000/api/disciplinas');
+  const response = await fetch('https://sigecafe.bellon.dev/api/disciplinas');
   const data = await response.json();
   disciplinas.value = data;
 });

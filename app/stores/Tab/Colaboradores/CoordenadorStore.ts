@@ -31,7 +31,7 @@ export const useCoordenadorStore = defineStore("Coordenador", {
   actions: {
     async fetch() {
       try {
-        const response = await $fetch<Usuario[]>(`http://localhost:3000/api/colaborador/coordenador`, {
+        const response = await $fetch<Usuario[]>(`https://sigecafe.bellon.dev/api/colaborador/coordenador`, {
           credentials: "include"
         });
         this.coordenadores = response;
@@ -42,7 +42,7 @@ export const useCoordenadorStore = defineStore("Coordenador", {
 
     async create() {
       try {
-        const response = await $fetch(`http://localhost:3000/api/colaborador/coordenador`, {
+        const response = await $fetch(`https://sigecafe.bellon.dev/api/colaborador/coordenador`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export const useCoordenadorStore = defineStore("Coordenador", {
 
     async update() {
       try {
-        const response = await $fetch(`http://localhost:3000/api/colaborador/coordenador`, {
+        const response = await $fetch(`https://sigecafe.bellon.dev/api/colaborador/coordenador`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export const useCoordenadorStore = defineStore("Coordenador", {
 
     async remove(coordenador: Usuario) {
       try {
-        await $fetch(`http://localhost:3000/api/colaborador/coordenador`, {
+        await $fetch(`https://sigecafe.bellon.dev/api/colaborador/coordenador`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",

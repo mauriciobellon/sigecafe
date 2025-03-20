@@ -4,7 +4,7 @@ import http from "http";
 function verificarServidorRodando() {
     return new Promise((resolve) => {
         const req = http
-            .get("http://localhost:3000", (res) => {
+            .get("https://sigecafe.bellon.dev", (res) => {
                 resolve(true);
             })
             .on("error", () => {
