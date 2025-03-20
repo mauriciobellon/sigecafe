@@ -5,7 +5,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    container_name: nuxt-app
+    container_name: sigecafe-nuxt-app
     restart: always
     ports:
       - "3000:3000"
@@ -13,9 +13,9 @@ services:
       - postgres
     environment:
       - NODE_ENV=production
-      - NUXT_AUTH_ORIGIN="https://sigecafe.bellon.dev"
-      - DATABASE_URL="postgresql://postgres:postgres@postgres:5432/postgres"
-      - AUTH_SECRET="secret"
+      - NUXT_AUTH_ORIGIN=https://sigecafe.bellon.dev
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
+      - AUTH_SECRET=secret
       - SESSION_REFRESH_SECONDS=10
       - SESSION_MAX_AGE_SECONDS=600
     networks:
@@ -23,7 +23,7 @@ services:
 
   postgres:
     image: postgres:14
-    container_name: postgres
+    container_name: sigecafe-postgres
     restart: always
     # Removed the ports mapping to avoid exposing it externally.
     environment:
@@ -44,6 +44,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+    container_name: sigecafe-migration
     depends_on:
       postgres:
         condition: service_healthy
@@ -51,7 +52,7 @@ services:
       sh -c "npm install prisma@5.22.0 &&
              npx prisma migrate deploy"
     environment:
-      - DATABASE_URL="postgresql://postgres:postgres@postgres:5432/postgres"
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
     networks:
       - app-network
 
