@@ -17,6 +17,7 @@
     "db:down": "node scripts/db-destroy.mjs",
     "db:seed": "node scripts/db-seed.mjs",
     "db:migrate": "prisma migrate dev --name init",
+    "db:deploy": "prisma migrate deploy",
     "db:reset": "prisma migrate reset --force",
     "db:studio": "prisma studio",
     "kill": "node scripts/server-destroy.mjs"
