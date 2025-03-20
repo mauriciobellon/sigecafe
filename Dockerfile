@@ -15,8 +15,6 @@ WORKDIR /nuxtapp
 COPY --from=build-stage /nuxtapp/.output/ ./.output/
 COPY --from=build-stage /nuxtapp/package.json ./package.json
 
-RUN npm install --production
-
 RUN npm run migrate
 
 RUN npm run seed
