@@ -8,24 +8,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// modelo de usuário para autenticação e papéis no contexto do café
 model Usuario {
-  id       Int         @id @default(autoincrement())
-  email    String      @unique
-  name     String
-  password String
-  celular  String?
-  type     UsuarioType @default(AUTENTICADO)
-  filhos   Aluno[]
-  escola   Escola?     @relation(fields: [escolaId], references: [id])
-  escolaId Int?
+  id                  Int          @id @default(autoincrement())
+  email               String       @unique
+  name                String
+  password            String
+  celular             String?
+  type                UsuarioType  @default(COMPRADOR)
+  // transações onde o usuário atua como comprador
+  transacoesComprador Transacao[]  @relation("Comprador")
+  // transações onde o usuário atua como vendedor
+  transacoesVendedor  Transacao[]  @relation("Vendedor")
 }
 
+// enum pra definir os papéis dos usuários no sigecafe
 enum UsuarioType {
   ADMINISTRADOR
-  COORDENADOR
-  PROFESSOR
-  RESPONSAVEL
-  AUTENTICADO
+  COMPRADOR
+  VENDEDOR
+  PRODUTOR
+  COOPERATIVA
 }
 
 enum MenuType {
@@ -44,18 +47,62 @@ model Permission {
   usuarioType UsuarioType[]
 }
 
-model Aluno {
-  id           Int       @id @default(autoincrement())
-  nome         String
-  escola       Escola?   @relation(fields: [escolaId], references: [id])
-  escolaId     Int?
-  responsaveis Usuario[]
+// modelo pra representar um produtor de café
+model Produtor {
+  id      Int      @id @default(autoincrement())
+  nome    String
+  contato String?
+  // relação 1:1 com o estoque do produtor
+  estoque Estoque?
 }
 
-model Escola {
-  id            Int       @id @default(autoincrement())
-  nome          String
-  celular       String?
-  alunos        Aluno[]
-  colaboradores Usuario[]
+// modelo pra gerenciar o estoque de café de um produtor
+model Estoque {
+  id         Int      @id @default(autoincrement())
+  sacas      Int      // quantidade de sacas disponíveis
+  produtor   Produtor @relation(fields: [produtorId], references: [id])
+  produtorId Int      @unique
+}
+
+// modelo pra cadastrar os tipos de café (ex: brazilian naturals, robustas, etc.)
+model Produto {
+  id         Int         @id @default(autoincrement())
+  nome       String      // nome do tipo de café
+  descricao  String?
+  transacoes Transacao[]
+}
+
+// enum pra definir o tipo de transação (venda ou compra)
+enum TransacaoTipo {
+  VENDA
+  COMPRA
+}
+
+// modelo pra registrar as negociações (vendas/compras) realizadas na plataforma
+model Transacao {
+  id            Int             @id @default(autoincrement())
+  data          DateTime        @default(now())
+  tipo          TransacaoTipo
+  quantidade    Int             // número de sacas negociadas
+  precoUnitario Float           // preço por saca (em brl) no momento da transação
+  total         Float           // valor total (quantidade * precoUnitario)
+  // relação com o tipo de café negociado
+  produto       Produto         @relation(fields: [produtoId], references: [id])
+  produtoId     Int
+  // usuário que comprou (opcional)
+  comprador     Usuario?        @relation("Comprador", fields: [compradorId], references: [id])
+  compradorId   Int?
+  // usuário que vendeu (opcional)
+  vendedor      Usuario?        @relation("Vendedor", fields: [vendedorId], references: [id])
+  vendedorId    Int?
+}
+
+// modelo pra salvar os preços do mercado do café
+model PrecoCafe {
+  id                Int      @id @default(autoincrement())
+  data              DateTime // data de referência do preço
+  precoRobusta      Float?   // preço do café robusta (em centavos de dólar por libra ou convertido pra brl)
+  precoArabica      Float?   // preço do café arábica
+  variacaoRobusta   Float?   // variação (percentual ou valor) do robusta
+  variacaoArabica   Float?   // variação (percentual ou valor) do arábica
 }
