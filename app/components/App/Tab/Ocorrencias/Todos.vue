@@ -120,7 +120,7 @@ const newOcorrencia = reactive({
   disciplinaNome: '',
 });
 
-  const data = await $fetch<any>("https://sigecafe.bellon.dev/api/ocorrencia");
+  const data = await $fetch<any>(`/api/ocorrencia`);
 
   const tableRef = shallowRef<InstanceType<typeof DataTableRef<any[]>> | null>(null);
 
@@ -228,7 +228,7 @@ const newOcorrencia = reactive({
   async function remove(usuario: any, event: Event) {
     event.stopPropagation();
 
-    $fetch("https://sigecafe.bellon.dev/api/ocorrencia", {
+    $fetch(`/api/ocorrencia`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -254,7 +254,7 @@ const newOcorrencia = reactive({
 
 
   async function handleSave() {
-      const response = await $fetch("https://sigecafe.bellon.dev/api/ocorrencia", {
+      const response = await $fetch(`/api/ocorrencia`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -286,25 +286,25 @@ const professores = ref([]);
 const disciplinas = ref([]);
 
 onMounted(async () => {
-  const response = await fetch('https://sigecafe.bellon.dev/api/turmas');
+  const response = await fetch(`/api/turmas`);
   const data = await response.json();
   turmas.value = data;
 });
 
 onMounted(async () => {
-  const response = await fetch('https://sigecafe.bellon.dev/api/aluno');
+  const response = await fetch(`/api/aluno`);
   const data = await response.json();
   alunos.value = data;
 });
 
 onMounted(async () => {
-  const response = await fetch('https://sigecafe.bellon.dev/api/professor');
+  const response = await fetch(`/api/professor`);
   const data = await response.json();
   professores.value = data;
 });
 
 onMounted(async () => {
-  const response = await fetch('https://sigecafe.bellon.dev/api/disciplinas');
+  const response = await fetch(`/api/disciplinas`);
   const data = await response.json();
   disciplinas.value = data;
 });

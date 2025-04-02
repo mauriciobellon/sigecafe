@@ -98,7 +98,7 @@ const newDisciplina = reactive({
   nome: '',
 });
 
-  const data = await $fetch<any>("https://sigecafe.bellon.dev/api/disciplinas");
+  const data = await $fetch<any>(`/api/disciplinas`);
 
   const tableRef = shallowRef<InstanceType<typeof DataTableRef<any[]>> | null>(null);
 
@@ -209,7 +209,7 @@ const newDisciplina = reactive({
   async function remove(usuario: any, event: Event) {
     event.stopPropagation();
 
-    $fetch("https://sigecafe.bellon.dev/api/disciplinas", {
+    $fetch(`/api/disciplinas`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -236,7 +236,7 @@ const newDisciplina = reactive({
 
   async function handleSave() {
     if (isEditing.value) {
-      const response = await $fetch(`https://sigecafe.bellon.dev/api/disciplinas`, {
+      const response = await $fetch(`/api/disciplinas`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -250,7 +250,7 @@ const newDisciplina = reactive({
         Object.assign(data[editingRowIndex.value], response);
       }
     } else {
-      const response = await $fetch("https://sigecafe.bellon.dev/api/disciplinas", {
+      const response = await $fetch(`/api/disciplinas`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -269,7 +269,7 @@ const newDisciplina = reactive({
 const turmas = ref([]);
 
 onMounted(async () => {
-  const response = await fetch('https://sigecafe.bellon.dev/api/turmas');
+  const response = await fetch(`/api/turmas`);
   const data = await response.json();
   turmas.value = data;
 });

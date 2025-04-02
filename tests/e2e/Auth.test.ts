@@ -3,6 +3,10 @@ import type { Page } from "playwright-core";
 import { describe, expect, test, beforeAll, afterAll } from "vitest";
 import { UsuarioRepository } from "@@/server/repositories/UsuarioRepository";
 import setup from "./__setup";
+
+const baseURL = process.env.BASE_URL
+const basePort = parseInt(baseURL?.split(':')[2] ?? '80')
+
 describe("Authentication Flow", () => {
     const testUsuario = {
         name: "Test Usuario",
@@ -82,7 +86,7 @@ describe("Authentication Flow", () => {
 
         test("should successfully logout and redirect to auth", async () => {
             await page.getByTestId("dropdown-button-Sair").click();
-            await page.waitForURL(url("auth?callbackUrl=https://sigecafe.bellon.dev/app"));
+            await page.waitForURL(url(`${baseURL}:${basePort}/app`));
             const currentPath = new URL(page.url()).pathname;
             expect(currentPath).toBe("/auth");
         });
@@ -133,7 +137,7 @@ describe("Authentication Flow", () => {
 
         test("should successfully delete account and redirect to auth", async () => {
             await page.getByTestId("delete-account-button").click();
-            await page.waitForURL(url("auth?callbackUrl=https://sigecafe.bellon.dev/app/perfil/excluir"));
+            await page.waitForURL(url(`${baseURL}:${basePort}/app/perfil/excluir`));
             const currentPath = new URL(page.url()).pathname;
             expect(currentPath).toBe("/auth");
         });
