@@ -9,9 +9,9 @@ const __projectRoot = path.join(__dirname, "..");
 const destination = path.join(__projectRoot, ".env");
 
 const template = `
-NUXT_AUTH_ORIGIN="https://sigecafe.bellon.dev"
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres"
+BASE_URL="http://localhost:3000"
 AUTH_SECRET="secret"
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres"
 SESSION_REFRESH_SECONDS=10
 SESSION_MAX_AGE_SECONDS=600
 `;

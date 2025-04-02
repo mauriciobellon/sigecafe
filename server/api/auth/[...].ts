@@ -5,9 +5,10 @@ import { verify } from '@@/server/utils/crypto'
 import { UsuarioRepository } from '@@/server/repositories/UsuarioRepository'
 
 const usuarioRepository = new UsuarioRepository()
+const authSecret = process.env.AUTH_SECRET
 
 export default NuxtAuthHandler({
-    secret: process.env.AUTH_SECRET || 'secret',
+    secret: authSecret,
     pages: {
         signIn: '/auth',
     },

@@ -1,10 +1,13 @@
 import { spawn } from "child_process";
 import http from "http";
 
+const baseURL = process.env.BASE_URL
+const basePort = parseInt(baseURL?.split(':')[2] ?? '80')
+
 function verificarServidorRodando() {
     return new Promise((resolve) => {
         const req = http
-            .get("https://sigecafe.bellon.dev", (res) => {
+            .get(`${baseURL}:${basePort}`, (res) => {
                 resolve(true);
             })
             .on("error", () => {

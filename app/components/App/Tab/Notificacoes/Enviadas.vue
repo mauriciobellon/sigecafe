@@ -22,9 +22,9 @@
     select: {
       style: "multi",
     }
-  };
+};
 
-  const dataFetched = await $fetch<any>("https://sigecafe.bellon.dev/api/notificacao/enviadas");
+  const dataFetched = await $fetch<any>(`/api/notificacao/enviadas`);
   const data = dataFetched.map((item: any) => {
     return {
       id: item.id,

@@ -13,11 +13,12 @@ services:
       - postgres
     environment:
       - NODE_ENV=production
-      - NUXT_AUTH_ORIGIN=https://sigecafe.bellon.dev
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
-      - AUTH_SECRET=secret
+      - BASE_URL=https://sigecafe.bellon.dev
+      - AUTH_SECRET="secret"
+      - DATABASE_URL="postgresql://postgres:postgres@localhost:5432/postgres"
       - SESSION_REFRESH_SECONDS=10
       - SESSION_MAX_AGE_SECONDS=600
+
     networks:
       - app-network
 

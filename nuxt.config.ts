@@ -1,10 +1,21 @@
 import { fileURLToPath } from 'url'
+
+
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-09",
   devtools: { enabled: false },
   future: { compatibilityVersion: 4 },
   experimental: { watcher: "chokidar" },
-
+  devServer: {
+    port: parseInt(process.env.BASE_PORT ?? '80'),
+  },
+  runtimeConfig: {
+    public: {
+      BASE_URL: process.env.BASE_URL,
+      BASE_PORT: process.env.BASE_PORT,
+      AUTH_URL: `${process.env.BASE_URL}/api/auth`,
+    },
+  },
   modules: [
     "@morev/vue-transitions/nuxt",
     "@nuxt/fonts",
@@ -40,8 +51,8 @@ export default defineNuxtConfig({
 
   auth: {
     globalAppMiddleware: true,
-    originEnvKey: "NUXT_AUTH_ORIGIN",
-    baseURL: `${process.env.BASE_URL || 'https://sigecafe.bellon.dev'}/api/auth`,
+    originEnvKey: "BASE_URL",
+    baseURL: process.env.AUTH_URL,
     provider: {
       type: "authjs",
     },

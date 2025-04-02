@@ -47,7 +47,7 @@
             const rows = selectedRows.map((item: any) => item.id);
             for (let i = 0; i < rows.length; i++) {
               const id = rows[i];
-              await $fetch(`https://sigecafe.bellon.dev/api/notificacao`, {
+              await $fetch(`/api/notificacao`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -62,7 +62,7 @@
     ],
   };
 
-  const dataFetched = await $fetch<any>("https://sigecafe.bellon.dev/api/notificacao/pendente");
+  const dataFetched = await $fetch<any>(`/api/notificacao/pendente`);
   let data: any[] = [];
   if (dataFetched) {
     data = dataFetched.map((item: any) => {
