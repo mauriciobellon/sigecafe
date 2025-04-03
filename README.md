@@ -100,8 +100,8 @@ Para uma colaboração mais segura e sem a necessidade de autenticação frequen
 Obtenha uma cópia local do código-fonte e prepare seu ambiente de desenvolvimento:
 
 ```bash
-git clone git@github.com:mauriciobellon/projeto-integrador-1.git
-cd projeto-integrador-1
+git clone git@github.com:mauriciobellon/sigecafe.git
+cd sigecafe
 git checkout -b feature/<seuNome>
 ```
 
