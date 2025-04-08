@@ -6,6 +6,6 @@
 
 <style scoped>
   .app-icon {
-    @apply h-8 w-8;
+    @apply h-8;
   }
 </style>
