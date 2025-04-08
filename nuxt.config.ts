@@ -1,5 +1,7 @@
 import { fileURLToPath } from 'url'
 
+const baseUrl = process.env.BASE_URL
+const basePort = baseUrl?.split(':')[2]
 
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-09",
@@ -7,12 +9,12 @@ export default defineNuxtConfig({
   future: { compatibilityVersion: 4 },
   experimental: { watcher: "chokidar" },
   devServer: {
-    port: parseInt(process.env.BASE_PORT ?? '80'),
+    port: parseInt(basePort ?? '80'),
   },
   runtimeConfig: {
     public: {
       BASE_URL: process.env.BASE_URL,
-      BASE_PORT: process.env.BASE_PORT,
+      BASE_PORT: basePort,
       AUTH_URL: `${process.env.BASE_URL}/api/auth`,
     },
   },
@@ -52,7 +54,7 @@ export default defineNuxtConfig({
   auth: {
     globalAppMiddleware: true,
     originEnvKey: "BASE_URL",
-    baseURL: process.env.AUTH_URL,
+    baseURL: `${process.env.BASE_URL}/api/auth`,
     provider: {
       type: "authjs",
     },
