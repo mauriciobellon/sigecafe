@@ -53,6 +53,7 @@
     "jszip": "^3.10.1",
     "next-auth": "4.21.1",
     "nuxt": "^3.14.159",
+    "openmeteo": "^1.2.0",
     "pinia": "^2.2.6",
     "puppeteer": "^24.4.0",
     "radix-vue": "^1.9.9",

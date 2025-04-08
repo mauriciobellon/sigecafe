@@ -23,7 +23,7 @@
           <UiCardHeader>
             <UiCardTitle>Bem-vindo {{ usuario?.name }}</UiCardTitle>
             <UiCardDescription>
-              Acompanhe em tempo real todas as informações importantes
+              Acompanhe em tempo real o preço do café
             </UiCardDescription>
           </UiCardHeader>
           <UiCardContent>
@@ -31,30 +31,30 @@
               <!-- Quick Stats -->
               <div class="rounded-lg border p-4">
                 <div class="flex items-center gap-2">
-                  <Icon name="lucide:bell" class="h-5 w-5 text-primary" />
-                  <h3 class="font-semibold">Notificações</h3>
+                  <Icon name="lucide:circle-dollar-sign" class="h-5 w-5 text-primary" />
+                  <h3 class="font-semibold">Café Arábica</h3>
                 </div>
-                <p class="mt-2 text-2xl font-bold">{{ notificacoesPendentes }}</p>
-                <p class="text-sm text-muted-foreground">notificações pendentes</p>
+                <p class="mt-2 text-2xl font-bold">R$ {{ coffeePrices['Café Arábica CEPEA/ESALQ'].valorR$ }}</p>
+                <p class="text-sm text-muted-foreground">{{ coffeePrices['Café Arábica CEPEA/ESALQ'].data }}</p>
               </div>
 
               <div class="rounded-lg border p-4">
                 <div class="flex items-center gap-2">
-                  <Icon name="lucide:book" class="h-5 w-5 text-primary" />
-                  <h3 class="font-semibold">Atividades</h3>
+                  <Icon name="lucide:circle-dollar-sign" class="h-5 w-5 text-primary" />
+                  <h3 class="font-semibold">Café Robusta</h3>
                 </div>
-                <p class="mt-2 text-2xl font-bold">{{ atividadesPendentes }}</p>
-                <p class="text-sm text-muted-foreground">atividades pendentes</p>
+                <p class="mt-2 text-2xl font-bold">R$ {{ coffeePrices['Café Robusta CEPEA/ESALQ'].valorR$ }}</p>
+                <p class="text-sm text-muted-foreground">{{ coffeePrices['Café Robusta CEPEA/ESALQ'].data }}</p>
               </div>
 
-              <div class="rounded-lg border p-4">
+              <!-- <div class="rounded-lg border p-4">
                 <div class="flex items-center gap-2">
                   <Icon name="lucide:alert-circle" class="h-5 w-5 text-primary" />
                   <h3 class="font-semibold">Ocorrências</h3>
                 </div>
                 <p class="mt-2 text-2xl font-bold">{{ ocorrenciasPendentes }}</p>
                 <p class="text-sm text-muted-foreground">ocorrências pendentes</p>
-              </div>
+              </div> -->
             </div>
           </UiCardContent>
         </UiCard>
@@ -64,40 +64,44 @@
           v-if="usuario?.type === 'ADMINISTRADOR' || usuario?.type === 'COORDENADOR' || usuario?.type === 'PROFESSOR'">
           <UiCard class="mb-6">
             <UiCardHeader>
-              <UiCardTitle>Ações Rápidas</UiCardTitle>
+              <UiCardTitle>Controle Climático</UiCardTitle>
             </UiCardHeader>
             <UiCardContent>
               <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <UiButton variant="outline" class="h-24 flex-col gap-2">
-                  <Icon name="lucide:users" class="h-6 w-6" />
-                  <span>Gerenciar Turmas</span>
+                <UiButton variant="outline" class="h-32 flex-col gap-2 text-center whitespace-nowrap items-center justify-center">
+                  <Icon name="lucide:thermometer" class="h-6 w-6" />
+                  <span class="text-sm">Temperatura</span>
+                  <span class="text-sm">{{ weatherStore.weatherData?.hourly?.temperature2m }}°C</span>
                 </UiButton>
 
-                <UiButton variant="outline" class="h-24 flex-col gap-2">
-                  <Icon name="lucide:book-open" class="h-6 w-6" />
-                  <span>Ver Disciplinas</span>
+                <UiButton variant="outline" class="h-32 flex-col gap-2 text-center whitespace-nowrap items-center justify-center">
+                  <Icon name="lucide:droplets" class="h-6 w-6" />
+                  <span class="text-sm">Humidade</span>
+                  <span class="text-sm">{{ weatherStore.weatherData?.hourly?.relativeHumidity2m }} %</span>
                 </UiButton>
 
-                <UiButton variant="outline" class="h-24 flex-col gap-2">
-                  <Icon name="lucide:message-square" class="h-6 w-6" />
-                  <span>Enviar Notificação</span>
+                <UiButton variant="outline" class="h-32 flex-col gap-2 text-center whitespace-nowrap items-center justify-center">
+                  <Icon name="lucide:cloud-hail" class="h-6 w-6" />
+                  <span class="text-sm">Precipitação</span>
+                  <span class="text-sm">{{ weatherStore.weatherData?.hourly?.precipitation }} %</span>
                 </UiButton>
 
-                <UiButton variant="outline" class="h-24 flex-col gap-2">
-                  <Icon name="lucide:file-text" class="h-6 w-6" />
-                  <span>Registrar Ocorrência</span>
+                <UiButton variant="outline" class="h-32 flex-col gap-2 text-center whitespace-nowrap items-center justify-center">
+                  <Icon name="lucide:percent" class="h-6 w-6" />
+                  <span class="text-sm">Chance de Precipitação</span>
+                  <span class="text-sm">{{ weatherStore.weatherData?.hourly?.precipitationProbability }} %</span>
                 </UiButton>
               </div>
             </UiCardContent>
           </UiCard>
         </div>
 
-        <!-- Atividades Recentes -->
+        <!-- Quadro de Avisos -->
         <UiCard>
           <UiCardHeader>
-            <UiCardTitle>Atividades Recentes</UiCardTitle>
+            <UiCardTitle>Quadro de Avisos</UiCardTitle>
             <UiCardDescription>
-              Últimas atualizações e eventos do sistema
+              Últimas atualizações do seu negócio
             </UiCardDescription>
           </UiCardHeader>
           <UiCardContent>
@@ -120,6 +124,9 @@
 </template>
 
 <script lang="ts" setup>
+  import coffeePrices from '../../../data/coffee-prices.json';
+  import { useWeatherStore } from '../../stores/WeatherStore';
+
   const usuarioStore = useUsuarioStore();
   const usuario = computed(() => usuarioStore.usuarioPreferences);
 
@@ -131,24 +138,29 @@
   const atividadesRecentes = ref([
     {
       id: 1,
-      icon: 'lucide:book',
-      titulo: 'Nova atividade registrada',
-      descricao: 'Matemática - Turma A',
+      icon: 'lucide:move-up',
+      titulo: 'Venda para empresa "xxx" autorizada!',
+      descricao: '350 sacas de café prontas para envio',
       data: 'Há 5 min'
     },
     {
       id: 2,
-      icon: 'lucide:bell',
-      titulo: 'Notificação enviada',
-      descricao: 'Aviso sobre reunião de pais',
+      icon: 'lucide:triangle-alert',
+      titulo: 'Aviso!',
+      descricao: 'Tempestade prevista para sua região!',
       data: 'Há 30 min'
     },
     {
       id: 3,
-      icon: 'lucide:check-circle',
-      titulo: 'Frequência registrada',
-      descricao: 'Português - Turma B',
+      icon: 'lucide:move-up',
+      titulo: 'Venda para empresa "xxx" autorizada!',
+      descricao: '350 sacas de café prontas para envio',
       data: 'Há 1h'
     }
   ]);
+
+  const weatherStore = useWeatherStore();
+  weatherStore.fetchWeather().then(() => {
+    console.log(weatherStore.weatherData);
+  });
 </script>
