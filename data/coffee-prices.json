@@ -1,16 +1,16 @@
 {
   "Café Arábica CEPEA/ESALQ": {
-    "data": "09/04/2025",
-    "valorR$": "2.389,03",
-    "variacaoDia": "-0,55%",
-    "variacaoMes": "-5,24%",
-    "valorUS$": "409,15"
+    "data": "17/04/2025",
+    "valorR$": "2.520,65",
+    "variacaoDia": "-0,38%",
+    "variacaoMes": "-0,02%",
+    "valorUS$": "434,07"
   },
   "Café Robusta CEPEA/ESALQ": {
-    "data": "09/04/2025",
-    "valorR$": "1.576,39",
-    "variacaoDia": "0,22%",
-    "variacaoMes": "-19,03%",
-    "valorUS$": "269,98"
+    "data": "17/04/2025",
+    "valorR$": "1.712,52",
+    "variacaoDia": "0,04%",
+    "variacaoMes": "-12,04%",
+    "valorUS$": "294,91"
   }
 }
