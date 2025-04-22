@@ -1,62 +1,50 @@
 [
   {
-    "name": "Josoaldo Admin da Silva",
-    "email": "admin@escola1.com",
+    "name": "Mauricio Faria Bellon",
+    "email": "mauricio@sigecafe.com",
+    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+    "type": "ADMINISTRADOR"
+  },
+  {
+    "name": "Larissa Machado",
+    "email": "larissa@sigecafe.com",
+    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+    "type": "ADMINISTRADOR"
+  },
+  {
+    "name": "Vitor Miura",
+    "email": "vitor@sigecafe.com",
+    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+    "type": "ADMINISTRADOR"
+  },
+  {
+    "name": "Ingrid Hayumi",
+    "email": "ingrid@sigecafe.com",
+    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+    "type": "ADMINISTRADOR"
+  },
+  {
+    "name": "Gustavo Bittencourt",
+    "email": "gustavo@sigecafe.com",
     "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
     "type": "ADMINISTRADOR"
   },
   {
     "name": "Antonio Ademir da Silva",
-    "email": "coordenador@escola1.com",
+    "email": "antonio@cce.com",
     "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "COORDENADOR"
-  },
-  {
-    "name": "Professor 1 Escola 1",
-    "email": "professor1@escola1.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "PROFESSOR"
-  },
-  {
-    "name": "Professor 2 Escola 1",
-    "email": "professor2@escola1.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "PROFESSOR"
-  },
-  {
-    "name": "Administrador Escola 2",
-    "email": "admin@escola2.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "ADMINISTRADOR"
-  },
-  {
-    "name": "Coordenador Escola 2",
-    "email": "coordenador@escola2.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "COORDENADOR"
-  },
-  {
-    "name": "Professor 1 Escola 2",
-    "email": "professor1@escola2.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "PROFESSOR"
-  },
-  {
-    "name": "Professor 2 Escola 2",
-    "email": "professor2@escola2.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "PROFESSOR"
-  },
-  {
-    "name": "Maria Aparecida",
-    "email": "maria@teste.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "RESPONSAVEL"
+    "type": "COOPERATIVA"
   },
   {
     "name": "João da Silva",
-    "email": "joao@teste.com",
+    "email": "joao@gmail.com",
     "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "RESPONSAVEL"
+    "type": "PRODUTOR"
+  },
+  {
+    "name": "Daniel de Oliveira",
+    "email": "daniel@gmail.com",
+    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+    "type": "COMPRADOR"
   }
 ]

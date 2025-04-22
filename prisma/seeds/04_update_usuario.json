@@ -1,87 +1,26 @@
 [
   {
-    "id": 1,
-    "escola": {
-      "connect": {
-        "id": 1
-      }
-    }
-  },
-  {
-    "id": 2,
-    "escola": {
-      "connect": {
-        "id": 1
-      }
-    }
-  },
-  {
-    "id": 3,
-    "escola": {
-      "connect": {
-        "id": 1
-      }
-    }
-  },
-  {
-    "id": 4,
-    "escola": {
-      "connect": {
-        "id": 1
-      }
-    }
-  },
-  {
-    "id": 5,
-    "escola": {
-      "connect": {
-        "id": 2
-      }
-    }
-  },
-  {
     "id": 6,
-    "escola": {
+    "cooperativa": {
       "connect": {
-        "id": 2
+        "id": 1
       }
     }
   },
   {
     "id": 7,
-    "escola": {
-      "connect": {
-        "id": 2
-      }
-    }
-  },
-  {
-    "id": 8,
-    "escola": {
-      "connect": {
-        "id": 2
-      }
-    }
-  },
-  {
-    "id": 9,
-    "filhos": {
+    "cooperativa": {
       "connect": {
         "id": 1
       }
     }
   },
   {
-    "id": 10,
-    "filhos": {
-      "connect": [
-        {
-          "id": 2
-        },
-        {
-          "id": 3
-        }
-      ]
+    "id": 8,
+    "cooperativa": {
+      "connect": {
+        "id": 1
+      }
     }
   }
 ]

@@ -3,26 +3,26 @@
     "path": "/api/navigation",
     "usuarioType": [
       "ADMINISTRADOR",
-      "COORDENADOR",
-      "PROFESSOR",
-      "RESPONSAVEL",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR",
       "AUTENTICADO"
     ]
   },
   {
     "path": "/api/alunos",
     "usuarioType": [
-      "COORDENADOR",
-      "PROFESSOR"
+      "COOPERATIVA",
+      "PRODUTOR"
     ]
   },
   {
     "path": "/api/usuario/trocar-senha",
     "usuarioType": [
       "ADMINISTRADOR",
-      "COORDENADOR",
-      "PROFESSOR",
-      "RESPONSAVEL",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR",
       "AUTENTICADO"
     ]
   },
@@ -30,35 +30,35 @@
     "path": "/api/usuario/perfil",
     "usuarioType": [
       "ADMINISTRADOR",
-      "COORDENADOR",
-      "PROFESSOR",
-      "RESPONSAVEL",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR",
       "AUTENTICADO"
     ]
   },
   {
     "path": "/api/perfil/excluir",
     "usuarioType": [
-      "COORDENADOR",
-      "PROFESSOR",
-      "RESPONSAVEL",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR",
       "AUTENTICADO"
     ]
   },
   {
-    "path": "/api/professor",
+    "path": "/api/PRODUTOR",
     "usuarioType": [
-      "COORDENADOR"
+      "COOPERATIVA"
     ]
   },
   {
-    "path": "/api/colaborador/coordenador",
+    "path": "/api/colaborador/COOPERATIVA",
     "usuarioType": [
       "ADMINISTRADOR"
     ]
   },
   {
-    "path": "/api/colaborador/professor",
+    "path": "/api/colaborador/PRODUTOR",
     "usuarioType": [
       "ADMINISTRADOR"
     ]
@@ -66,7 +66,7 @@
   {
     "path": "/api/filhos",
     "usuarioType": [
-      "RESPONSAVEL"
+      "COMPRADOR"
     ]
   },
   {
@@ -74,9 +74,9 @@
     "title": "Sobre",
     "usuarioType": [
       "ADMINISTRADOR",
-      "COORDENADOR",
-      "PROFESSOR",
-      "RESPONSAVEL",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR",
       "AUTENTICADO"
     ]
   },
@@ -85,9 +85,9 @@
     "title": "Ajuda",
     "usuarioType": [
       "ADMINISTRADOR",
-      "COORDENADOR",
-      "PROFESSOR",
-      "RESPONSAVEL",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR",
       "AUTENTICADO"
     ]
   },
@@ -102,22 +102,22 @@
     ],
     "usuarioType": [
       "ADMINISTRADOR",
-      "COORDENADOR",
-      "PROFESSOR",
-      "RESPONSAVEL",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR",
       "AUTENTICADO"
     ]
   },
   {
-    "path": "/app/professores",
-    "title": "Professores",
+    "path": "/app/PRODUTORes",
+    "title": "PRODUTORes",
     "icon": "ph:chalkboard-teacher-duotone",
-    "description": "Gerencie os professores da escola",
+    "description": "Gerencie os PRODUTORes da escola",
     "menuType": [
       "ROOT"
     ],
     "usuarioType": [
-      "COORDENADOR"
+      "COOPERATIVA"
     ]
   },
   {
@@ -129,7 +129,7 @@
       "ROOT"
     ],
     "usuarioType": [
-      "COORDENADOR"
+      "COOPERATIVA"
     ]
   },
   {
@@ -141,7 +141,7 @@
       "ROOT"
     ],
     "usuarioType": [
-      "COORDENADOR"
+      "COOPERATIVA"
     ]
   },
   {
@@ -153,8 +153,8 @@
       "ROOT"
     ],
     "usuarioType": [
-      "COORDENADOR",
-      "PROFESSOR"
+      "COOPERATIVA",
+      "PRODUTOR"
     ]
   },
   {
@@ -208,7 +208,7 @@
       "ROOT"
     ],
     "usuarioType": [
-      "PROFESSOR"
+      "PRODUTOR"
     ]
   },
   {
@@ -220,8 +220,8 @@
       "ROOT"
     ],
     "usuarioType": [
-      "COORDENADOR",
-      "RESPONSAVEL"
+      "COOPERATIVA",
+      "COMPRADOR"
     ]
   },
   {
@@ -233,7 +233,7 @@
       "ROOT"
     ],
     "usuarioType": [
-      "PROFESSOR"
+      "PRODUTOR"
     ]
   },
   {
@@ -245,7 +245,7 @@
       "ROOT"
     ],
     "usuarioType": [
-      "RESPONSAVEL"
+      "COMPRADOR"
     ]
   },
   {
@@ -257,8 +257,8 @@
       "ROOT"
     ],
     "usuarioType": [
-      "PROFESSOR",
-      "RESPONSAVEL"
+      "PRODUTOR",
+      "COMPRADOR"
     ]
   },
   {
@@ -272,9 +272,9 @@
     ],
     "usuarioType": [
       "ADMINISTRADOR",
-      "COORDENADOR",
-      "PROFESSOR",
-      "RESPONSAVEL",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR",
       "AUTENTICADO"
     ]
   },
@@ -288,9 +288,9 @@
     ],
     "usuarioType": [
       "ADMINISTRADOR",
-      "COORDENADOR",
-      "PROFESSOR",
-      "RESPONSAVEL",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR",
       "AUTENTICADO"
     ]
   },
@@ -303,9 +303,9 @@
       "PERFIL"
     ],
     "usuarioType": [
-      "COORDENADOR",
-      "PROFESSOR",
-      "RESPONSAVEL",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR",
       "AUTENTICADO"
     ]
   }

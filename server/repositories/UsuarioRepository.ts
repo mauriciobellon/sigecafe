@@ -14,9 +14,6 @@ export class UsuarioRepository {
     async getUsuarioByType(type: UsuarioType): Promise<Usuario[]> {
         return prisma.usuario.findMany({ where: { type } });
     }
-    async getUsuarioByEscolaAndType(escolaId: number, type: UsuarioType): Promise<Usuario[]> {
-        return prisma.usuario.findMany({ where: { escolaId, type } });
-    }
     async createUsuario(usuario: Usuario): Promise<Usuario> {
         const email = usuario.email;
         const name = usuario.name;
@@ -36,17 +33,5 @@ export class UsuarioRepository {
     }
     async deleteUsuarioByEmail(email: string): Promise<void> {
         await prisma.usuario.delete({ where: { email } });
-    }
-
-    async getFilhos(id: number): Promise<Aluno[]> {
-        return prisma.aluno.findMany({
-            where: {
-                responsaveis: {
-                    some: {
-                        id: id
-                    }
-                }
-            }
-        });
     }
 }

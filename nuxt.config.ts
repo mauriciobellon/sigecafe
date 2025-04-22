@@ -1,7 +1,10 @@
 import { fileURLToPath } from 'url'
 
 const baseUrl = process.env.BASE_URL
+const baseHost = baseUrl?.split(':')[1]
 const basePort = baseUrl?.split(':')[2]
+const baseAuthUrl = `${baseUrl}/api/auth`
+const baseSessionRefresh = parseInt(process.env.SESSION_REFRESH_SECONDS ?? '10') * 1000
 
 export default defineNuxtConfig({
   compatibilityDate: "2024-11-09",
@@ -13,9 +16,11 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      BASE_URL: process.env.BASE_URL,
+      BASE_URL: baseUrl,
+      BASE_HOST: baseHost,
       BASE_PORT: basePort,
-      AUTH_URL: `${process.env.BASE_URL}/api/auth`,
+      AUTH_URL: baseAuthUrl,
+      SESSION_REFRESH_SECONDS: baseSessionRefresh,
     },
   },
   modules: [
@@ -54,12 +59,12 @@ export default defineNuxtConfig({
   auth: {
     globalAppMiddleware: true,
     originEnvKey: "BASE_URL",
-    baseURL: `${process.env.BASE_URL}/api/auth`,
+    baseURL: baseAuthUrl,
     provider: {
       type: "authjs",
     },
     sessionRefresh: {
-      enablePeriodically: parseInt(process.env.SESSION_REFRESH_SECONDS ?? '10') * 1000,
+      enablePeriodically: baseSessionRefresh,
     },
   },
 

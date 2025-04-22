@@ -1,7 +1,7 @@
 import { defineEventHandler } from 'h3';
 import { getServerSession } from '#auth';
 import { UsuarioType, Usuario } from '@prisma/client';
-import { EscolaRepository } from '@@/server/repositories/EscolaRepository'
+import { CooperativaRepository } from '@@/server/repositories/CooperativaRepository'
 
 export default defineEventHandler(async (event) => {
   const session = await getServerSession(event);
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     return [];
   }
 
-  const escolaRepository = new EscolaRepository();
+  const cooperativaRepository = new CooperativaRepository();
 
-  return await escolaRepository.getEscolaByUsuario((session.user as Usuario));
+  return await cooperativaRepository.getCooperativaByUsuario((session.user as Usuario));
 });

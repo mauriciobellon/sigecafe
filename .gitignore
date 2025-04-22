@@ -27,3 +27,6 @@ logs
 .cursorrules
 .cursorignore
 .vscode
+
+# Syncthing
+.stfolder
