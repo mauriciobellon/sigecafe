@@ -1,8 +1,8 @@
 # Projeto Integrador
 
-Bem-vindo ao Projeto Integrador, uma plataforma educacional inovadora que revoluciona a comunicação entre escolas e famílias. Nossa solução oferece um ecossistema digital completo que integra gestão acadêmica, comunicação instantânea e acompanhamento em tempo real do desempenho escolar.
+Bem-vindo ao Projeto Integrador, uma plataforma de gestão inovadora que revoluciona a comunicação e negócios entre cafeicultores e cooperativas de exportação. Nossa solução oferece um ecossistema digital completo que integra gestão de vendas e comunicação.
 
-Desenvolvida com tecnologias modernas e focada na experiência do usuário, nossa plataforma permite que escolas gerenciem eficientemente suas operações diárias enquanto mantêm os responsáveis constantemente informados através de notificações automáticas via WhatsApp sobre notas, frequência e ocorrências dos alunos.
+Desenvolvida com tecnologias modernas e focada na experiência do usuário, nossa plataforma permite que cafeicultores e cooperativas gerenciem eficientemente suas operações diárias enquanto mantêm os responsáveis constantemente informados.
 
 ### Principais Diferenciais
 

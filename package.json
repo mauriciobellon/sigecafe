@@ -1,5 +1,5 @@
 {
-  "name": "escola-on",
+  "name": "sigecafe",
   "private": true,
   "type": "module",
   "scripts": {
@@ -20,8 +20,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:reset": "prisma migrate reset --force",
     "db:studio": "prisma studio",
-    "kill": "node scripts/server-destroy.mjs",
-    "scrape:coffee": "node scripts/scrape-coffee-prices.mjs"
+    "kill": "node scripts/server-destroy.mjs"
   },
   "dependencies": {
     "@iconify-json/clarity": "^1.2.1",

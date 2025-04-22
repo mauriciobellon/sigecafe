@@ -15,16 +15,21 @@ model Usuario {
   password String
   celular  String?
   type     UsuarioType @default(AUTENTICADO)
-  filhos   Aluno[]
-  escola   Escola?     @relation(fields: [escolaId], references: [id])
-  escolaId Int?
+  cooperativa   Cooperativa?     @relation(fields: [cooperativaId], references: [id])
+  cooperativaId Int?
+  produtor      Produtor?        @relation(fields: [produtorId], references: [id])
+  produtorId    Int?
+  comprador     Comprador?        @relation(fields: [compradorId], references: [id])
+  compradorId    Int?
+  compras       Transacao[]      @relation("Comprador")
+  vendas        Transacao[]      @relation("Produtor")
 }
 
 enum UsuarioType {
   ADMINISTRADOR
-  COORDENADOR
-  PROFESSOR
-  RESPONSAVEL
+  COOPERATIVA
+  PRODUTOR
+  COMPRADOR
   AUTENTICADO
 }
 
@@ -44,18 +49,41 @@ model Permission {
   usuarioType UsuarioType[]
 }
 
-model Aluno {
-  id           Int       @id @default(autoincrement())
-  nome         String
-  escola       Escola?   @relation(fields: [escolaId], references: [id])
-  escolaId     Int?
-  responsaveis Usuario[]
-}
-
-model Escola {
+model Cooperativa {
   id            Int       @id @default(autoincrement())
   nome          String
   celular       String?
-  alunos        Aluno[]
   colaboradores Usuario[]
+}
+
+model Produtor {
+  id            Int       @id @default(autoincrement())
+  nome          String
+  celular       String?
+  usuarios      Usuario[]
+}
+
+model Comprador {
+  id            Int       @id @default(autoincrement())
+  nome          String
+  celular       String?
+  usuarios      Usuario[]
+}
+
+model Transacao {
+  id            Int             @id @default(autoincrement())
+  data          DateTime        @default(now())
+  quantidade    Int
+  precoUnitario Float
+  comprador     Usuario?        @relation("Comprador", fields: [compradorId], references: [id])
+  compradorId   Int?
+  produtor      Usuario?        @relation("Produtor", fields: [produtorId], references: [id])
+  produtorId    Int?
+}
+
+model PrecoCafe {
+  id                Int      @id @default(autoincrement())
+  data              DateTime
+  precoRobusta      Float?
+  precoArabica      Float?
 }

@@ -7,18 +7,18 @@ export default defineEventHandler(async (event) => {
   const method = event.method
 
   const session = await getServerSession(event)
-  if (!session?.user || !(session.user as Usuario).escolaId) {
+  if (!session?.user || !(session.user as Usuario).cooperativaId) {
     return []
   }
 
-  const escolaId = (session.user as Usuario).escolaId
-  if (!escolaId) return []
+  const cooperativaId = (session.user as Usuario).cooperativaId
+  if (!cooperativaId) return []
 
   const usuarioRepository = new UsuarioRepository()
 
   // GET - List coordenadores
   if (method === "GET") {
-    return await usuarioRepository.getUsuarioByEscolaAndType(escolaId, UsuarioType.COORDENADOR)
+    return await usuarioRepository.getUsuarioByCooperativaAndType(cooperativaId, UsuarioType.COOPERATIVA)
   }
 
   // POST - Create coordenador
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
         email: body.email,
         password: "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa", // password
         name: body.name,
-        escolaId: escolaId
+        cooperativaId: cooperativaId
       }
 
       return await usuarioRepository.createUsuario(usuario as Usuario)
