@@ -6,9 +6,9 @@ export default defineEventHandler(async (event) => {
   const method = event.method
 
   const session = await getServerSession(event)
-  if (!session?.user || !(session.user as Usuario).escolaId) {
-    return []
-  }
+  if (!session?.user) return []
+  const user = session.user as any
+  if (!user.cooperativaId) return []
 
   // Verificar se o usuário é ADMINISTRADOR
   if ((session.user as Usuario).type !== UsuarioType.ADMINISTRADOR) {
