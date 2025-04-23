@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   const method = event.method
 
   const session = await getServerSession(event)
-  if (!session?.user || !(session.user as Usuario).escolaId) {
+  if (!session?.user || !(session.user as Usuario).cooperativaId) {
     return []
   }
 
