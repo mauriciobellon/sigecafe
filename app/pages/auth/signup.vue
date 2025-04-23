@@ -7,7 +7,7 @@
       <UiCardTitle class="title">Faça seu Cadastro</UiCardTitle>
       <UiCardDescription>
         <p v-if="auth.step === 'name'">Digite seu nome para começarmos.</p>
-        <p v-if="auth.step === 'email'">Digite seu email para continuar.</p>
+        <p v-if="auth.step === 'celular'">Digite seu número de celular para continuar.</p>
         <p v-if="auth.step === 'password'">Digite sua senha para Cadastrar.</p>
       </UiCardDescription>
     </UiCardHeader>
@@ -19,14 +19,14 @@
         <div class="form-grid">
           <AuthInput v-if="auth.step === 'name'" v-model="auth.name" placeholder="Nome Completo" type="text"
             autocomplete="name" :disabled="auth.loading" />
-          <AuthInput v-if="auth.step === 'email'" v-model="auth.email" placeholder="name@example.com" type="email"
-            autocomplete="email" :disabled="auth.loading" />
+          <AuthInput v-if="auth.step === 'celular'" v-model="auth.celular" placeholder="(99) 9 9999-9999" type="tel"
+            autocomplete="tel" maxlength="16" :disabled="auth.loading" @input="auth.maskPhoneNumber" />
           <AuthInput v-if="auth.step === 'password'" v-model="auth.password" placeholder="********" type="password"
             :disabled="auth.loading" />
           <UiButton type="submit" :disabled="auth.loading" class="h-12">
             <Icon name="lucide:loader-2" color="white" v-if="auth.loading" class="mr-2 h-4 w-4 animate-spin" />
             <p v-if="auth.step === 'name'">Continuar</p>
-            <p v-if="auth.step === 'email'">Continuar</p>
+            <p v-if="auth.step === 'celular'">Continuar</p>
             <p v-if="auth.step === 'password'">Cadastrar</p>
           </UiButton>
         </div>

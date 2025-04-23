@@ -3,12 +3,12 @@ import { nextTick } from "vue";
 
 // Add type definitions
 type FormType = "auth" | "signup";
-type StepType = "name" | "email" | "password";
+type StepType = "name" | "celular" | "password";
 
 export const useAuthStore = defineStore("Auth", {
   state: () => ({
     name: "",
-    email: "",
+    celular: "",
     password: "",
     loading: false,
     error: "",
@@ -25,13 +25,13 @@ export const useAuthStore = defineStore("Auth", {
       this.error = "";
     },
 
-    setLoading(status: boolean) {
-      this.loading = status;
+    setLoading(value: boolean) {
+      this.loading = value;
     },
 
     resetForm() {
       this.name = "";
-      this.email = "";
+      this.celular = "";
       this.password = "";
       this.error = "";
       this.loading = false;
@@ -41,7 +41,7 @@ export const useAuthStore = defineStore("Auth", {
     setFormType(type: FormType) {
       this.resetForm();
       this.formType = type;
-      this.step = type === "auth" ? "email" : "name";
+      this.step = type === "auth" ? "celular" : "name";
     },
 
     async handleSignup() {
@@ -50,7 +50,7 @@ export const useAuthStore = defineStore("Auth", {
           method: "POST",
           body: {
             name: this.name,
-            email: this.email,
+            celular: this.celular,
             password: this.password,
           },
         });
@@ -59,7 +59,7 @@ export const useAuthStore = defineStore("Auth", {
           const { signIn } = useAuth();
           const result = await signIn("credentials", {
             redirect: false,
-            email: this.email,
+            celular: this.celular,
             password: this.password,
           });
 
@@ -73,7 +73,7 @@ export const useAuthStore = defineStore("Auth", {
         // @ts-ignore
         if (response.errorCode === "USER_EXISTS") {
           this.setError(
-            'Email já cadastrado, <a href="/auth/login" class="login-link">clique aqui para fazer login</a>'
+            'Número de celular já cadastrado, <a href="/auth/login" class="login-link">clique aqui para fazer login</a>'
           );
         } else {
           this.setError("Problema ao cadastrar tente novamente mais tarde");
@@ -87,10 +87,13 @@ export const useAuthStore = defineStore("Auth", {
 
     async handleLogin() {
       try {
+        // Extract only the digits for authentication
+        const celularDigits = this.celular.replace(/\D/g, '');
+
         const { signIn } = useAuth();
         const result = await signIn("credentials", {
           redirect: false,
-          email: this.email,
+          celular: celularDigits, // Send only digits
           password: this.password,
         });
 
@@ -99,11 +102,28 @@ export const useAuthStore = defineStore("Auth", {
         }
         return navigateTo("/app");
       } catch (e) {
-        this.setError("Email ou senha inválidos");
-        this.step = "email";
-        this.email = "";
+        this.setError("Número de celular ou senha inválidos");
+        this.step = "celular";
+        this.celular = "";
         this.password = "";
         this.loading = false;
+      }
+    },
+
+    maskPhoneNumber() {
+      let value = this.celular.replace(/\D/g, ''); // Remove non-digits
+      if (value.length <= 11) {
+        // Format as (XX) X XXXX-XXXX
+        if (value.length >= 2) {
+          value = value.replace(/^(\d{2})/, '($1) ');
+        }
+        if (value.length >= 4) {
+          value = value.replace(/^\((\d{2})\) (\d{1})/, '($1) $2 ');
+        }
+        if (value.length >= 8) {
+          value = value.replace(/^\((\d{2})\) (\d{1}) (\d{4})/, '($1) $2 $3-');
+        }
+        this.celular = value;
       }
     },
 
@@ -119,12 +139,13 @@ export const useAuthStore = defineStore("Auth", {
         this.setLoading(true);
         await nextTick();
         setTimeout(() => {
-          this.step = "email";
+          this.step = "celular";
           this.setLoading(false);
         }, 500);
-      } else if (this.step === "email") {
-        if (!this.email.trim()) {
-          this.setError("Email não pode ser vazio");
+      } else if (this.step === "celular") {
+        const phoneDigits = this.celular.replace(/\D/g, '');
+        if (!this.celular.trim() || phoneDigits.length !== 11) {
+          this.setError("Digite um número de celular válido (11 dígitos)");
           return;
         }
         this.setLoading(true);
@@ -142,6 +163,6 @@ export const useAuthStore = defineStore("Auth", {
         // Call appropriate handler based on form type
         await (this.formType === "auth" ? this.handleLogin() : this.handleSignup());
       }
-    },
-  },
+    }
+  }
 });

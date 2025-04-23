@@ -1,6 +1,7 @@
 <template>
-  <div class="right-section">
+  <div class="flex items-center space-x-4">
     <AppHeaderRightThemeToggle />
+    <AppHeaderRightFontSizeToggle />
     <AppHeaderRightDropdown />
   </div>
 </template>

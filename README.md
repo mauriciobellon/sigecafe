@@ -1,24 +1,24 @@
-# Projeto Integrador
+# SigeCafé
 
-Bem-vindo ao Projeto Integrador, uma plataforma de gestão inovadora que revoluciona a comunicação e negócios entre cafeicultores e cooperativas de exportação. Nossa solução oferece um ecossistema digital completo que integra gestão de vendas e comunicação.
+Bem-vindo ao SigeCafé, uma plataforma de gestão inovadora que revoluciona a comunicação e negócios entre cafeicultores e cooperativas de exportação. Nossa solução oferece um ecossistema digital completo que integra gestão de vendas e comunicação.
 
-Desenvolvida com tecnologias modernas e focada na experiência do usuário, nossa plataforma permite que cafeicultores e cooperativas gerenciem eficientemente suas operações diárias enquanto mantêm os responsáveis constantemente informados.
+Desenvolvida com tecnologias modernas e focada na experiência do usuário, nossa plataforma permite que cafeicultores e cooperativas gerenciem eficientemente suas operações diárias enquanto mantêm todos os envolvidos constantemente informados.
 
 ### Principais Diferenciais
 
 - **Comunicação Instantânea**: Integração nativa com WhatsApp para notificações automáticas e personalizáveis
-- **Multi-perfil**: Interfaces específicas para coordenadores, professores e responsáveis
-- **Gestão Completa**: Controle de notas, frequência, ocorrências e atividades escolares
+- **Multi-perfil**: Interfaces específicas para cooperativas, produtores e compradores
+- **Gestão Completa**: Controle de transações, preços, associados e relatórios
 - **Análise de Dados**: Dashboards interativos com métricas e indicadores de desempenho
 - **Segurança**: Autenticação robusta e controle granular de permissões
 - **Experiência Adaptativa**: Interface responsiva com suporte a temas claro/escuro
 
 ### Para Quem é Destinado
 
-- **Escolas**: Otimize processos administrativos e pedagógicos
-- **Professores**: Gerencie turmas e acompanhe o progresso dos alunos
-- **Coordenadores**: Monitore indicadores e tome decisões baseadas em dados
-- **Responsáveis**: Acompanhe em tempo real a vida escolar dos alunos
+- **Cooperativas**: Otimize processos administrativos e comerciais
+- **Produtores**: Gerencie suas vendas e acompanhe preços do mercado
+- **Compradores**: Tenha acesso a uma plataforma organizada para suas compras
+- **Gestores**: Monitore indicadores e tome decisões baseadas em dados
 
 ## Visão Geral
 
@@ -35,7 +35,7 @@ Este projeto utiliza uma arquitetura robusta baseada em:
 
 - **Sistema de Notificações**
   - Envio automático via WhatsApp
-  - Notificações de frequência e notas
+  - Notificações de transações e preços
   - Sistema de reenvio para mensagens falhas
   - Personalização de preferências de notificação
 
@@ -45,17 +45,17 @@ Este projeto utiliza uma arquitetura robusta baseada em:
   - Controle de acesso baseado em funções (RBAC)
   - Interface adaptativa (modo claro/escuro)
 
-- **Gestão Acadêmica**
-  - Registro e acompanhamento de notas
-  - Controle de frequência
-  - Gestão de ocorrências
+- **Gestão de Transações**
+  - Registro e acompanhamento de vendas
+  - Controle de preços
+  - Gestão de associados
   - Análise de desempenho
 
-- **Área do Responsável**
-  - Visualização do desempenho escolar
+- **Área do Produtor e Comprador**
+  - Visualização do histórico de transações
   - Histórico de notificações
-  - Comunicação direta com professores
-  - Acompanhamento de atividades
+  - Comunicação direta com a cooperativa
+  - Acompanhamento de preços do mercado
 
 ## Pré-requisitos
 
@@ -152,7 +152,7 @@ npm install
 
 ## Deploy
 
-O projeto está configurado para deploy na plataforma Fly.io, oferecendo:
+O projeto está configurado para deploy na plataforma Coolify, oferecendo:
 - Suporte a aplicações full-stack
 - Banco de dados PostgreSQL integrado
 - CLI simplificada para deploy

@@ -3,48 +3,56 @@
     "name": "Mauricio Faria Bellon",
     "email": "mauricio@sigecafe.com",
     "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "ADMINISTRADOR"
+    "type": "ADMINISTRADOR",
+    "celular": "11999990001"
   },
   {
     "name": "Larissa Machado",
     "email": "larissa@sigecafe.com",
     "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "ADMINISTRADOR"
+    "type": "ADMINISTRADOR",
+    "celular": "11999990002"
   },
   {
     "name": "Vitor Miura",
     "email": "vitor@sigecafe.com",
     "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "ADMINISTRADOR"
+    "type": "ADMINISTRADOR",
+    "celular": "11999990003"
   },
   {
     "name": "Ingrid Hayumi",
     "email": "ingrid@sigecafe.com",
     "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "ADMINISTRADOR"
+    "type": "ADMINISTRADOR",
+    "celular": "11999990004"
   },
   {
     "name": "Gustavo Bittencourt",
     "email": "gustavo@sigecafe.com",
     "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "ADMINISTRADOR"
+    "type": "ADMINISTRADOR",
+    "celular": "11999990005"
   },
   {
     "name": "Antonio Ademir da Silva",
     "email": "antonio@cce.com",
     "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "COOPERATIVA"
+    "type": "COOPERATIVA",
+    "celular": "11999990006"
   },
   {
     "name": "João da Silva",
     "email": "joao@gmail.com",
     "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "PRODUTOR"
+    "type": "PRODUTOR",
+    "celular": "11999990007"
   },
   {
     "name": "Daniel de Oliveira",
     "email": "daniel@gmail.com",
     "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "COMPRADOR"
+    "type": "COMPRADOR",
+    "celular": "11999990008"
   }
 ]
