@@ -33,11 +33,6 @@ export const useUsuarioStore = defineStore("usuario", {
         this.usuarioPreferences = response.data;
         this.initialized = true;
 
-        if (response.data.type === "RESPONSAVEL") {
-          const filhosStore = useFilhosSelectorStore();
-          filhosStore.fetchFilhos();
-        }
-
         return response.data;
       } catch (err: any) {
         this.error = err.message || "Erro ao carregar dados do usuário";

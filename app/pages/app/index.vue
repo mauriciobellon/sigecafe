@@ -2,7 +2,7 @@
   <div>
     <div v-if="usuario?.type === 'AUTENTICADO'">
       <SharedMsgWarning title="Cadastro Pendente"
-        description="Por favor, entre em contato com a administração da escola para finalizar seu cadastro e liberar o acesso completo ao sistema." />
+        description="Por favor, entre em contato com a cooperativa para finalizar seu cadastro e liberar o acesso completo ao sistema." />
     </div>
 
     <div v-else>
@@ -12,7 +12,7 @@
           <UiCardHeader>
             <UiCardTitle>Bem-vindo {{ usuario?.name }}</UiCardTitle>
             <UiCardDescription>
-              Aqui você pode gerenciar as permissões do sistema para sua escola
+              Aqui você pode gerenciar as permissões do sistema para sua cooperativa
             </UiCardDescription>
           </UiCardHeader>
         </UiCard>
@@ -34,8 +34,8 @@
                   <Icon name="lucide:circle-dollar-sign" class="h-5 w-5 text-primary" />
                   <h3 class="font-semibold">Café Arábica</h3>
                 </div>
-                <p class="mt-2 text-2xl font-bold">R$ {{ coffeePrices['Café Arábica CEPEA/ESALQ'].valorR$ }}</p>
-                <p class="text-sm text-muted-foreground">{{ coffeePrices['Café Arábica CEPEA/ESALQ'].data }}</p>
+                <p class="mt-2 text-2xl font-bold">R$ {{ latestCoffeePrices.arabica.toFixed(2) }}</p>
+                <p class="text-sm text-muted-foreground">{{ formatDate(latestCoffeePrices.date) }}</p>
               </div>
 
               <div class="rounded-lg border p-4">
@@ -43,25 +43,24 @@
                   <Icon name="lucide:circle-dollar-sign" class="h-5 w-5 text-primary" />
                   <h3 class="font-semibold">Café Robusta</h3>
                 </div>
-                <p class="mt-2 text-2xl font-bold">R$ {{ coffeePrices['Café Robusta CEPEA/ESALQ'].valorR$ }}</p>
-                <p class="text-sm text-muted-foreground">{{ coffeePrices['Café Robusta CEPEA/ESALQ'].data }}</p>
+                <p class="mt-2 text-2xl font-bold">R$ {{ latestCoffeePrices.robusta.toFixed(2) }}</p>
+                <p class="text-sm text-muted-foreground">{{ formatDate(latestCoffeePrices.date) }}</p>
               </div>
 
-              <!-- <div class="rounded-lg border p-4">
+              <div class="rounded-lg border p-4">
                 <div class="flex items-center gap-2">
-                  <Icon name="lucide:alert-circle" class="h-5 w-5 text-primary" />
-                  <h3 class="font-semibold">Ocorrências</h3>
+                  <Icon name="lucide:shopping-bag" class="h-5 w-5 text-primary" />
+                  <h3 class="font-semibold">Transações</h3>
                 </div>
-                <p class="mt-2 text-2xl font-bold">{{ ocorrenciasPendentes }}</p>
-                <p class="text-sm text-muted-foreground">ocorrências pendentes</p>
-              </div> -->
+                <p class="mt-2 text-2xl font-bold">{{ transacoesPendentes }}</p>
+                <p class="text-sm text-muted-foreground">transações pendentes</p>
+              </div>
             </div>
           </UiCardContent>
         </UiCard>
 
         <!-- Ações Rápidas -->
-        <div
-          v-if="usuario?.type === 'ADMINISTRADOR' || usuario?.type === 'COORDENADOR' || usuario?.type === 'PROFESSOR'">
+        <div v-if="usuario?.type === 'ADMINISTRADOR' || usuario?.type === 'COOPERATIVA' || usuario?.type === 'PRODUTOR' || usuario?.type === 'COMPRADOR'">
           <UiCard class="mb-6">
             <UiCardHeader>
               <UiCardTitle>Controle Climático</UiCardTitle>
@@ -124,16 +123,63 @@
 </template>
 
 <script lang="ts" setup>
-  import coffeePrices from '../../../data/coffee-prices.json';
+  import { ref, computed, onMounted } from 'vue';
+  import { useUsuarioStore } from '../../stores/UserStore';
   import { useWeatherStore } from '../../stores/WeatherStore';
 
   const usuarioStore = useUsuarioStore();
   const usuario = computed(() => usuarioStore.usuarioPreferences);
 
+  // Coffee prices state
+  const coffeePricesData = ref({
+    arabica: 0,
+    robusta: 0,
+    date: new Date()
+  });
+  const loadingPrices = ref(false);
+  const priceError = ref(null);
+
+  // Computed property for displaying prices
+  const latestCoffeePrices = computed(() => coffeePricesData.value);
+
+  // Format date for display
+  function formatDate(date) {
+    return new Date(date).toLocaleDateString('pt-BR');
+  }
+
+  // Fetch coffee prices
+  async function fetchCoffeePrices() {
+    loadingPrices.value = true;
+    priceError.value = null;
+
+    try {
+      const response = await $fetch('/api/coffee-prices', {
+        credentials: 'include'
+      });
+
+      if (response.success) {
+        coffeePricesData.value = response.data;
+      } else {
+        throw new Error(response.message || 'Failed to fetch coffee prices');
+      }
+    } catch (error) {
+      console.error('Error fetching coffee prices:', error);
+      priceError.value = error.message || 'Failed to fetch coffee prices';
+
+      // Use fallback prices
+      coffeePricesData.value = {
+        arabica: 31.20,
+        robusta: 25.59,
+        date: new Date()
+      };
+    } finally {
+      loadingPrices.value = false;
+    }
+  }
+
   // Mock data - replace with real data from your API
   const notificacoesPendentes = ref(5);
-  const atividadesPendentes = ref(3);
-  const ocorrenciasPendentes = ref(2);
+  const transacoesPendentes = ref(3);
 
   const atividadesRecentes = ref([
     {
@@ -160,7 +206,11 @@
   ]);
 
   const weatherStore = useWeatherStore();
-  weatherStore.fetchWeather().then(() => {
-    console.log(weatherStore.weatherData);
+
+  onMounted(async () => {
+    await Promise.all([
+      weatherStore.fetchWeather(),
+      fetchCoffeePrices()
+    ]);
   });
 </script>

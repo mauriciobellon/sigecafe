@@ -7,10 +7,10 @@ CREATE TYPE "MenuType" AS ENUM ('ROOT', 'PERFIL', 'DROPDOWN');
 -- CreateTable
 CREATE TABLE "Usuario" (
     "id" SERIAL NOT NULL,
-    "email" TEXT NOT NULL,
+    "email" TEXT,
     "name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "celular" TEXT,
+    "celular" TEXT NOT NULL,
     "type" "UsuarioType" NOT NULL DEFAULT 'AUTENTICADO',
     "cooperativaId" INTEGER,
     "produtorId" INTEGER,
@@ -61,12 +61,16 @@ CREATE TABLE "Comprador" (
 
 -- CreateTable
 CREATE TABLE "Transacao" (
-    "id" SERIAL NOT NULL,
-    "data" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "quantidade" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "data" TIMESTAMP(3) NOT NULL,
+    "quantidade" DOUBLE PRECISION NOT NULL,
     "precoUnitario" DOUBLE PRECISION NOT NULL,
-    "compradorId" INTEGER,
-    "produtorId" INTEGER,
+    "status" TEXT NOT NULL,
+    "observacoes" TEXT,
+    "compradorId" INTEGER NOT NULL,
+    "vendedorId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Transacao_pkey" PRIMARY KEY ("id")
 );
@@ -82,7 +86,7 @@ CREATE TABLE "PrecoCafe" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Usuario_email_key" ON "Usuario"("email");
+CREATE UNIQUE INDEX "Usuario_celular_key" ON "Usuario"("celular");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Permission_path_key" ON "Permission"("path");
@@ -97,7 +101,7 @@ ALTER TABLE "Usuario" ADD CONSTRAINT "Usuario_produtorId_fkey" FOREIGN KEY ("pro
 ALTER TABLE "Usuario" ADD CONSTRAINT "Usuario_compradorId_fkey" FOREIGN KEY ("compradorId") REFERENCES "Comprador"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Transacao" ADD CONSTRAINT "Transacao_compradorId_fkey" FOREIGN KEY ("compradorId") REFERENCES "Usuario"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Transacao" ADD CONSTRAINT "Transacao_compradorId_fkey" FOREIGN KEY ("compradorId") REFERENCES "Usuario"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Transacao" ADD CONSTRAINT "Transacao_produtorId_fkey" FOREIGN KEY ("produtorId") REFERENCES "Usuario"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Transacao" ADD CONSTRAINT "Transacao_vendedorId_fkey" FOREIGN KEY ("vendedorId") REFERENCES "Usuario"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

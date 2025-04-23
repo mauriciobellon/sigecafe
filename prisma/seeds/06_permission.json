@@ -10,10 +10,54 @@
     ]
   },
   {
-    "path": "/api/alunos",
+    "path": "/api/produtores",
     "usuarioType": [
       "COOPERATIVA",
-      "PRODUTOR"
+      "ADMINISTRADOR"
+    ]
+  },
+  {
+    "path": "/api/compradores",
+    "usuarioType": [
+      "COOPERATIVA",
+      "ADMINISTRADOR"
+    ]
+  },
+  {
+    "path": "/api/coffee-prices",
+    "usuarioType": [
+      "ADMINISTRADOR",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR"
+    ]
+  },
+  {
+    "path": "/api/transacoes",
+    "usuarioType": [
+      "ADMINISTRADOR",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR"
+    ]
+  },
+  {
+    "path": "/api/notificacao",
+    "usuarioType": [
+      "ADMINISTRADOR",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR"
+    ]
+  },
+  {
+    "path": "/api/preferences",
+    "usuarioType": [
+      "ADMINISTRADOR",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR",
+      "AUTENTICADO"
     ]
   },
   {
@@ -46,27 +90,30 @@
     ]
   },
   {
-    "path": "/api/PRODUTOR",
+    "path": "/api/produtor",
     "usuarioType": [
+      "COOPERATIVA",
+      "ADMINISTRADOR"
+    ]
+  },
+  {
+    "path": "/api/comprador",
+    "usuarioType": [
+      "COOPERATIVA",
+      "ADMINISTRADOR"
+    ]
+  },
+  {
+    "path": "/api/cooperativa",
+    "usuarioType": [
+      "ADMINISTRADOR"
+    ]
+  },
+  {
+    "path": "/api/cooperativa/usuarios",
+    "usuarioType": [
+      "ADMINISTRADOR",
       "COOPERATIVA"
-    ]
-  },
-  {
-    "path": "/api/colaborador/COOPERATIVA",
-    "usuarioType": [
-      "ADMINISTRADOR"
-    ]
-  },
-  {
-    "path": "/api/colaborador/PRODUTOR",
-    "usuarioType": [
-      "ADMINISTRADOR"
-    ]
-  },
-  {
-    "path": "/api/filhos",
-    "usuarioType": [
-      "COMPRADOR"
     ]
   },
   {
@@ -95,7 +142,7 @@
     "path": "/app",
     "title": "Inicio",
     "icon": "lets-icons:home-duotone",
-    "description": "Sistema Digital para Controle de Frequência e Desempenho de Alunos",
+    "description": "Sistema de Gestão para Cooperativas de Café",
     "menuType": [
       "ROOT",
       "PERFIL"
@@ -109,59 +156,51 @@
     ]
   },
   {
-    "path": "/app/PRODUTORes",
-    "title": "PRODUTORes",
-    "icon": "ph:chalkboard-teacher-duotone",
-    "description": "Gerencie os PRODUTORes da escola",
-    "menuType": [
-      "ROOT"
-    ],
-    "usuarioType": [
-      "COOPERATIVA"
-    ]
-  },
-  {
-    "path": "/app/disciplinas",
-    "title": "Disciplinas",
-    "icon": "icon-park-twotone:book-one",
-    "description": "Gerencie as disciplinas da escola",
-    "menuType": [
-      "ROOT"
-    ],
-    "usuarioType": [
-      "COOPERATIVA"
-    ]
-  },
-  {
-    "path": "/app/turmas",
-    "title": "Turmas",
-    "icon": "clarity:group-solid",
-    "description": "Gerencie as turmas da escola",
-    "menuType": [
-      "ROOT"
-    ],
-    "usuarioType": [
-      "COOPERATIVA"
-    ]
-  },
-  {
-    "path": "/app/alunos",
-    "title": "Alunos",
-    "icon": "ph:student-duotone",
-    "description": "Gerencie os alunos da escola",
+    "path": "/app/produtores",
+    "title": "Produtores",
+    "icon": "material-symbols-light:agriculture-outline",
+    "description": "Gerencie os produtores associados à cooperativa",
     "menuType": [
       "ROOT"
     ],
     "usuarioType": [
       "COOPERATIVA",
-      "PRODUTOR"
+      "ADMINISTRADOR"
     ]
   },
   {
-    "path": "/app/escola",
-    "title": "Escola",
-    "icon": "ph:solar-roof-duotone",
-    "description": "Gerencie as informações da escola",
+    "path": "/app/compradores",
+    "title": "Compradores",
+    "icon": "ph:shopping-cart-duotone",
+    "description": "Gerencie os compradores associados à cooperativa",
+    "menuType": [
+      "ROOT"
+    ],
+    "usuarioType": [
+      "COOPERATIVA",
+      "ADMINISTRADOR"
+    ]
+  },
+  {
+    "path": "/app/transacoes",
+    "title": "Transações",
+    "icon": "ph:swap-duotone",
+    "description": "Gerencie as transações de compra e venda de café",
+    "menuType": [
+      "ROOT"
+    ],
+    "usuarioType": [
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR",
+      "ADMINISTRADOR"
+    ]
+  },
+  {
+    "path": "/app/cooperativa",
+    "title": "Cooperativa",
+    "icon": "ph:buildings-duotone",
+    "description": "Gerencie as informações da cooperativa",
     "menuType": [
       "ROOT"
     ],
@@ -190,75 +229,72 @@
   {
     "path": "/app/colaboradores",
     "title": "Colaboradores",
-    "icon": "ph:lock-duotone",
-    "description": "Gerencie os colaboradores da escola",
+    "icon": "ph:users-duotone",
+    "description": "Gerencie os colaboradores da cooperativa",
     "menuType": [
       "ROOT"
     ],
     "usuarioType": [
-      "ADMINISTRADOR"
+      "ADMINISTRADOR",
+      "COOPERATIVA"
     ]
   },
   {
-    "path": "/app/ocorrencias",
-    "title": "Ocorrencias",
-    "icon": "material-symbols-light:event-list-outline",
-    "description": "Gerencie as ocorrências da escola",
+    "path": "/app/coffee-prices",
+    "title": "Preços do Café",
+    "icon": "ph:chart-line-duotone",
+    "description": "Acompanhe a cotação do café",
     "menuType": [
       "ROOT"
     ],
     "usuarioType": [
-      "PRODUTOR"
+      "ADMINISTRADOR",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR"
     ]
   },
   {
     "path": "/app/notificacoes",
     "title": "Notificações",
     "icon": "solar:notification-unread-lines-bold-duotone",
-    "description": "Gerencie as notificações da escola",
+    "description": "Gerencie as notificações do sistema",
     "menuType": [
       "ROOT"
     ],
     "usuarioType": [
       "COOPERATIVA",
-      "COMPRADOR"
-    ]
-  },
-  {
-    "path": "/app/atividades",
-    "title": "Atividades",
-    "icon": "subway:book",
-    "description": "Gerencie as atividades da escola",
-    "menuType": [
-      "ROOT"
-    ],
-    "usuarioType": [
-      "PRODUTOR"
-    ]
-  },
-  {
-    "path": "/app/desempenho",
-    "title": "Desempenho",
-    "icon": "ph:student-duotone",
-    "description": "Acompanhe o desempenho e compare com a média da turma",
-    "menuType": [
-      "ROOT"
-    ],
-    "usuarioType": [
-      "COMPRADOR"
-    ]
-  },
-  {
-    "path": "/app/frequencia",
-    "title": "Frequência",
-    "icon": "line-md:confirm-square-twotone",
-    "description": "Histórico de Frequência por Disciplina",
-    "menuType": [
-      "ROOT"
-    ],
-    "usuarioType": [
+      "COMPRADOR",
       "PRODUTOR",
-      "COMPRADOR"
+      "ADMINISTRADOR"
+    ]
+  },
+  {
+    "path": "/app/relatorios",
+    "title": "Relatórios",
+    "icon": "ph:file-text-duotone",
+    "description": "Acesse relatórios de transações e desempenho",
+    "menuType": [
+      "ROOT"
+    ],
+    "usuarioType": [
+      "COOPERATIVA",
+      "ADMINISTRADOR"
+    ]
+  },
+  {
+    "path": "/app/dashboard",
+    "title": "Dashboard",
+    "icon": "ph:chart-pie-duotone",
+    "description": "Acompanhe o desempenho e compare com indicadores do mercado",
+    "menuType": [
+      "ROOT"
+    ],
+    "usuarioType": [
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR",
+      "ADMINISTRADOR"
     ]
   },
   {

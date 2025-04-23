@@ -6,7 +6,8 @@
     <UiCardHeader class="header">
       <UiCardTitle class="title">Faça seu Login</UiCardTitle>
       <UiCardDescription>
-        <p v-if="auth.step === 'email'">Digite seu email para continuar.</p>
+        <p v-if="auth.step === 'celular'">Digite seu número de celular para continuar.</p>
+        <p v-if="auth.step === 'celular'" class="text-xs text-gray-500">Formato: (11) 9 9999-0001</p>
         <p v-if="auth.step === 'password'">Digite sua senha para Entrar.</p>
       </UiCardDescription>
     </UiCardHeader>
@@ -17,16 +18,15 @@
       <form @submit="auth.validateAndProceed">
         <div class="form-grid">
 
-
-          <AuthInput v-if="auth.step === 'email'" :key="'email-input'" v-model="auth.email" model-name="email"
-            placeholder="name@example.com" type="email" autocomplete="email" :disabled="auth.loading" />
-
+          <AuthInput v-if="auth.step === 'celular'" :key="'celular-input'" v-model="auth.celular" model-name="celular"
+            placeholder="(99) 9 9999-9999" type="tel" autocomplete="tel" maxlength="16" :disabled="auth.loading"
+            @input="auth.maskPhoneNumber" />
 
           <AuthInput v-if="auth.step === 'password'" :key="'password-input'" v-model="auth.password"
             model-name="password" placeholder="********" type="password" :disabled="auth.loading" />
           <UiButton type="submit" :disabled="auth.loading" class="submit-button">
             <Icon name="lucide:loader-2" color="white" v-if="auth.loading" class="loading-icon" />
-            <p v-if="auth.step === 'email'">Continuar</p>
+            <p v-if="auth.step === 'celular'">Continuar</p>
             <p v-if="auth.step === 'password'">Entrar</p>
           </UiButton>
         </div>

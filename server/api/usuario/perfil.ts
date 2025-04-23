@@ -4,7 +4,7 @@ import prisma from '~~/lib/prisma'
 export default defineEventHandler(async (event) => {
   // Get authenticated session
   const session = await getServerSession(event)
-  if (!session?.user?.email) {
+  if (!session?.user) {
     return {
       success: false,
       message: 'Não autorizado',
@@ -12,13 +12,36 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // Get the user ID from the session
+  const userEmail = session.user.email
+  if (!userEmail) {
+    return {
+      success: false,
+      message: 'Usuário não identificado',
+      status: 403
+    }
+  }
+
+  // Find the user in the database to get the ID
+  const dbUser = await prisma.usuario.findFirst({
+    where: { email: userEmail }
+  })
+
+  if (!dbUser) {
+    return {
+      success: false,
+      message: 'Usuário não encontrado',
+      status: 404
+    }
+  }
+
+  const userId = dbUser.id;
+
   // GET request to fetch user profile
   if (event.method === 'GET') {
     try {
       const usuario = await prisma.usuario.findUnique({
-        where: {
-          email: session.user.email
-        },
+        where: { id: userId },
         select: {
           name: true,
           email: true,
@@ -53,31 +76,34 @@ export default defineEventHandler(async (event) => {
       const body = await readBody(event)
       const { name, email, celular } = body
 
-      if (!name || !email) {
+      if (!name || !celular) {
         return {
           success: false,
-          message: 'Nome e email são obrigatórios'
+          message: 'Nome e número de celular são obrigatórios'
         }
       }
 
-      // Check if email already exists for another user
-      if (email !== session.user.email) {
-        const existingUser = await prisma.usuario.findUnique({
-          where: { email }
+      // Check if celular already exists for another user
+      if (celular && celular !== dbUser.celular) {
+        const existingUser = await prisma.usuario.findFirst({
+          where: {
+            celular,
+            NOT: {
+              id: userId
+            }
+          }
         })
 
         if (existingUser) {
           return {
             success: false,
-            message: 'Este email já está em uso'
+            message: 'Este número de celular já está em uso'
           }
         }
       }
 
       const updatedUser = await prisma.usuario.update({
-        where: {
-          email: session.user.email
-        },
+        where: { id: userId },
         data: {
           name,
           email,
@@ -108,9 +134,8 @@ export default defineEventHandler(async (event) => {
   if (event.method === 'DELETE') {
     try {
       await prisma.usuario.delete({
-        where: { email: session.user.email }
+        where: { id: userId }
       })
-
 
       return {
         success: true,

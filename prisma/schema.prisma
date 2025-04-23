@@ -10,10 +10,10 @@ datasource db {
 
 model Usuario {
   id       Int         @id @default(autoincrement())
-  email    String      @unique
+  email    String?
   name     String
   password String
-  celular  String?
+  celular  String      @unique
   type     UsuarioType @default(AUTENTICADO)
   cooperativa   Cooperativa?     @relation(fields: [cooperativaId], references: [id])
   cooperativaId Int?
@@ -21,8 +21,10 @@ model Usuario {
   produtorId    Int?
   comprador     Comprador?        @relation(fields: [compradorId], references: [id])
   compradorId    Int?
-  compras       Transacao[]      @relation("Comprador")
-  vendas        Transacao[]      @relation("Produtor")
+  compras       Transacao[]      @relation("CompraTransacoes")
+  vendas        Transacao[]      @relation("VendaTransacoes")
+  notificacoes  Notificacao[]
+  preference    UserPreference?
 }
 
 enum UsuarioType {
@@ -71,14 +73,21 @@ model Comprador {
 }
 
 model Transacao {
-  id            Int             @id @default(autoincrement())
-  data          DateTime        @default(now())
-  quantidade    Int
+  id            String   @id @default(uuid())
+  data          DateTime
+  quantidade    Float
   precoUnitario Float
-  comprador     Usuario?        @relation("Comprador", fields: [compradorId], references: [id])
-  compradorId   Int?
-  produtor      Usuario?        @relation("Produtor", fields: [produtorId], references: [id])
-  produtorId    Int?
+  status        String // PENDENTE, CONCLUIDA, CANCELADA
+  observacoes   String?
+
+  // Relações
+  comprador     Usuario  @relation("CompraTransacoes", fields: [compradorId], references: [id])
+  compradorId   Int
+  vendedor      Usuario  @relation("VendaTransacoes", fields: [vendedorId], references: [id])
+  vendedorId    Int
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model PrecoCafe {
@@ -86,4 +95,33 @@ model PrecoCafe {
   data              DateTime
   precoRobusta      Float?
   precoArabica      Float?
+}
+
+model Notificacao {
+  id         String   @id @default(uuid())
+  titulo     String
+  descricao  String
+  icon       String   @default("lucide:bell")
+  lida       Boolean  @default(false)
+  enviada    Boolean  @default(false)
+
+  // Relacionamento com o usuário destinatário
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId  Int
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model UserPreference {
+  id          Int      @id @default(autoincrement())
+  theme       String   @default("system")
+  fontSize    String   @default("medium")
+
+  // Relation with user
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId   Int      @unique
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

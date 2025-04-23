@@ -5,14 +5,14 @@ const usuarioRepository = new UsuarioRepository()
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
-    const { name, email, password } = body
+    const { name, celular, password } = body
 
-    if (!name || !email || !password) {
+    if (!name || !celular || !password) {
         return { success: false, message: 'Faltam campos obrigatórios' }
     }
 
     try {
-        const existingUsuario = await usuarioRepository.getUsuarioByEmail(email)
+        const existingUsuario = await usuarioRepository.getUsuarioByCelular(celular)
 
         if (existingUsuario) {
             return { success: false, errorCode: 'USER_EXISTS', message: 'Usuário já existe' }
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
         await usuarioRepository.createUsuario({
             name,
-            email,
+            celular,
             password: encodedPassword,
         })
 
@@ -31,4 +31,4 @@ export default defineEventHandler(async (event) => {
         console.error('Erro ao registrar:', error)
         return { success: false, message: 'Ocorreu um erro ao registrar' }
     }
-}) 
+})

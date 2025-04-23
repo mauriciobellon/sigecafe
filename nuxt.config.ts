@@ -42,7 +42,7 @@ export default defineNuxtConfig({
     pageTransition: { name: "fade", mode: "out-in" },
     layoutTransition: { name: "fade", mode: "out-in" },
     head: {
-      title: "SIGE | café |",
+      title: "SigeCafé",
       script: [
         {
           src: "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/pdfmake.min.js",

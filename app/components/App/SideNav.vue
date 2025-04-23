@@ -1,7 +1,6 @@
 <template>
   <nav class="sidenav">
     <div class="content">
-      <AppSideNavSelector />
       <div class="links-container">
         <AppSideNavLinks />
       </div>
