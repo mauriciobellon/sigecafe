@@ -20,12 +20,19 @@
 [x] Mudar nome do projeto para sigecafe
 [x] Mudar nome do banco de dados para sigecafe
 [x] Mudar API de autenticação para usar celular
-[ ] Adaptar outras APIs (coffee-prices, colaborador, usuario, cooperativa)
+[x] Adaptar outras APIs (coffee-prices, colaborador)
 [x] Adaptar Dashboard principal
 [ ] Adaptar outras páginas
 [x] Criar página de cooperativa (substituindo escola)
 [ ] Resolver problemas de tipagem (Cooperativa no CooperativaStore.ts)
 [x] Mudar Auth para usar telefone como chave primária
+
+## API em Andamento
+- [x] Implementar coffee-prices API (COMPLETO - com integração real à CEPEA/ESALQ)
+- [ ] Implementar colaborador API (precisa corrigir tipagem)
+- [ ] Implementar transações API
+- [ ] Implementar gerenciamento de Produtores
+- [ ] Implementar gerenciamento de Compradores
 
 ## Funcionalidades
 

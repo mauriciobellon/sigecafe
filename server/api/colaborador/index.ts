@@ -16,21 +16,44 @@ export default defineEventHandler(async (event) => {
 
   const usuarioRepository = new UsuarioRepository()
 
-  // GET - List coordenadores
+  // GET - List associates
   if (method === "GET") {
-    return await usuarioRepository.getUsuarioByCooperativaAndType(cooperativaId, UsuarioType.COOPERATIVA)
+    const query = getQuery(event)
+    const type = query.type as string
+
+    if (type === 'produtor') {
+      return await usuarioRepository.getUsuarioByCooperativaAndType(cooperativaId, UsuarioType.PRODUTOR)
+    } else if (type === 'comprador') {
+      return await usuarioRepository.getUsuarioByCooperativaAndType(cooperativaId, UsuarioType.COMPRADOR)
+    } else {
+      // Return all types of associates
+      const produtores = await usuarioRepository.getUsuarioByCooperativaAndType(cooperativaId, UsuarioType.PRODUTOR)
+      const compradores = await usuarioRepository.getUsuarioByCooperativaAndType(cooperativaId, UsuarioType.COMPRADOR)
+      const administradores = await usuarioRepository.getUsuarioByCooperativaAndType(cooperativaId, UsuarioType.COOPERATIVA)
+
+      return [...produtores, ...compradores, ...administradores]
+    }
   }
 
-  // POST - Create coordenador
+  // POST - Create associate
   if (method === "POST") {
     const body = await readBody(event)
     try {
+      const type = body.type || UsuarioType.PRODUTOR
+
       const usuario: Partial<Usuario> = {
-        type: UsuarioType.COORDENADOR,
+        type: type,
         email: body.email,
-        password: "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa", // password
+        celular: body.celular,
+        password: "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa", // default password
         name: body.name,
         cooperativaId: cooperativaId
+      }
+
+      if (type === UsuarioType.PRODUTOR && body.produtorId) {
+        usuario.produtorId = body.produtorId
+      } else if (type === UsuarioType.COMPRADOR && body.compradorId) {
+        usuario.compradorId = body.compradorId
       }
 
       return await usuarioRepository.createUsuario(usuario as Usuario)
@@ -43,12 +66,12 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // PUT - Update coordenador
+  // PUT - Update associate
   if (method === "PUT") {
     const body = await readBody(event)
-    const { name, email, password } = body
+    const { id, name, email, celular, type } = body
 
-    const usuario = await usuarioRepository.getUsuarioByEmail(email)
+    const usuario = await usuarioRepository.getUsuarioById(id)
     if (!usuario) {
       return {
         status: 404,
@@ -57,14 +80,27 @@ export default defineEventHandler(async (event) => {
     }
 
     usuario.name = name
-    usuario.password = password
+    usuario.email = email
+    usuario.celular = celular
+
+    if (type) {
+      usuario.type = type
+    }
+
     return await usuarioRepository.updateUsuario(usuario)
   }
 
-  // DELETE - Remove coordenador
+  // DELETE - Remove associate
   if (method === "DELETE") {
     const body = await readBody(event)
-    const id = body.usuario.id
+    const id = body.id || body.usuario?.id
+
+    if (!id) {
+      return {
+        status: 400,
+        body: "ID do usuário não fornecido",
+      }
+    }
 
     await usuarioRepository.deleteUsuarioById(id)
     return true
