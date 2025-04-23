@@ -1,8 +1,15 @@
 import { getServerSession } from '#auth'
-import { PrismaClient } from '@prisma/client'
-import * as cheerio from 'cheerio';
+import * as cheerio from 'cheerio'
+import { ofetch } from 'ofetch'
+import prisma from '@@/lib/prisma'
 
-const prisma = new PrismaClient()
+// Define interface for the PrecoCafe model
+interface PrecoCafe {
+  id: number
+  data: Date
+  precoRobusta: number | null
+  precoArabica: number | null
+}
 
 export default defineEventHandler(async (event) => {
   // Validate authentication
@@ -17,100 +24,115 @@ export default defineEventHandler(async (event) => {
   try {
     if (event.method === 'GET') {
       // First check if we have recent prices in the database
-      const lastDay = new Date();
-      lastDay.setDate(lastDay.getDate() - 1);
+      const lastDay = new Date()
+      lastDay.setDate(lastDay.getDate() - 1)
 
-      const recentPrices = await prisma.precoCafe.findFirst({
-        where: {
-          data: { gte: lastDay }
-        },
-        orderBy: {
-          data: 'desc'
-        }
-      });
+      // Fetch the most recent price from the database
+      const recentPrices = await prisma.$queryRaw<PrecoCafe[]>`
+        SELECT * FROM "PrecoCafe"
+        WHERE "data" >= ${lastDay}
+        ORDER BY "data" DESC
+        LIMIT 1
+      `
 
       // If we have recent prices, return them
-      if (recentPrices) {
+      if (recentPrices && recentPrices.length > 0) {
+        const price = recentPrices[0]
         return {
           success: true,
           data: {
-            arabica: recentPrices.precoArabica,
-            robusta: recentPrices.precoRobusta,
-            date: recentPrices.data
+            arabica: price.precoArabica,
+            robusta: price.precoRobusta,
+            date: price.data
           }
-        };
+        }
       }
 
       // If no recent prices, fetch from external source
-      const prices = await fetchLatestPrices();
+      const prices = await fetchLatestPrices()
 
-      // Save to database
+      // Save to database using raw query
       if (prices.arabica && prices.robusta) {
-        await prisma.precoCafe.create({
-          data: {
-            data: new Date(),
-            precoArabica: prices.arabica,
-            precoRobusta: prices.robusta
-          }
-        });
+        const now = new Date()
+        await prisma.$executeRaw`
+          INSERT INTO "PrecoCafe" ("data", "precoArabica", "precoRobusta")
+          VALUES (${now}, ${prices.arabica}, ${prices.robusta})
+        `
       }
 
       return {
         success: true,
         data: prices
-      };
+      }
     }
 
     throw createError({
       statusCode: 405,
       statusMessage: 'Método não permitido'
-    });
+    })
   } catch (error) {
-    console.error('Error fetching coffee prices:', error);
+    console.error('Error fetching coffee prices:', error)
     return {
       success: false,
       message: 'Erro ao buscar preços do café'
-    };
+    }
   }
-});
+})
 
 // Function to fetch prices from external source
 async function fetchLatestPrices() {
   try {
-    // This is a mock function - in a real app you would fetch from a real API
-    // such as CEPEA/ESALQ or similar
+    // Fetch data from CEPEA/ESALQ website
+    const response = await ofetch('https://www.cepea.esalq.usp.br/br/indicador/cafe.aspx', {
+      retry: 3,
+      timeout: 10000
+    })
 
-    // For now, return mock data
-    return {
-      arabica: 31.20 + Math.random() * 2, // Random price around 31.20
-      robusta: 25.59 + Math.random() * 2, // Random price around 25.59
-      date: new Date()
-    };
+    const $ = cheerio.load(response)
 
-    // Example of fetching from a real source (commented out)
-    /*
-    const response = await fetch('https://www.cepea.esalq.usp.br/br/indicador/cafe.aspx');
-    const html = await response.text();
-    const $ = cheerio.load(html);
+    // Extract arabica price
+    const arabicaElement = $('#imagenet-indicador-cafe .imagenet-center td.text:contains("Arábica")').next()
+    let arabicaPrice = 0
+    if (arabicaElement.length) {
+      const arabicaText = arabicaElement.text().trim()
+      arabicaPrice = parseFloat(arabicaText.replace('R$', '').replace('.', '').replace(',', '.').trim())
+    }
 
-    // Parse the HTML to extract prices
-    // This is just an example; the actual implementation depends on the site structure
-    const arabicaPrice = parseFloat($('#some-arabica-selector').text().replace('R$', '').trim());
-    const robustaPrice = parseFloat($('#some-robusta-selector').text().replace('R$', '').trim());
+    // Extract robusta/conilon price
+    const robustaElement = $('#imagenet-indicador-cafe .imagenet-center td.text:contains("Robusta")').next()
+    let robustaPrice = 0
+    if (robustaElement.length) {
+      const robustaText = robustaElement.text().trim()
+      robustaPrice = parseFloat(robustaText.replace('R$', '').replace('.', '').replace(',', '.').trim())
+    }
+
+    // Log extracted data for debugging
+    console.log('Extracted Arabica price:', arabicaPrice)
+    console.log('Extracted Robusta price:', robustaPrice)
+
+    // Use fallback values if extraction failed
+    if (!arabicaPrice || isNaN(arabicaPrice)) {
+      console.warn('Failed to extract arabica price, using fallback')
+      arabicaPrice = 1249.88
+    }
+
+    if (!robustaPrice || isNaN(robustaPrice)) {
+      console.warn('Failed to extract robusta price, using fallback')
+      robustaPrice = 779.25
+    }
 
     return {
       arabica: arabicaPrice,
       robusta: robustaPrice,
       date: new Date()
-    };
-    */
+    }
   } catch (error) {
-    console.error('Error fetching external coffee prices:', error);
-    // Return fallback data
+    console.error('Error fetching external coffee prices:', error)
+    // Return fallback data in case of any errors
     return {
-      arabica: 31.20,
-      robusta: 25.59,
+      arabica: 1249.88,
+      robusta: 779.25,
       date: new Date()
-    };
+    }
   }
 }

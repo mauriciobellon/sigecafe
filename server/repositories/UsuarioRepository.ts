@@ -34,20 +34,31 @@ export class UsuarioRepository {
     async getUsuarioByType(type: UsuarioType): Promise<Usuario[]> {
         return prisma.usuario.findMany({ where: { type } });
     }
+    async getUsuarioByCooperativaAndType(cooperativaId: number, type: UsuarioType): Promise<Usuario[]> {
+        return prisma.usuario.findMany({
+            where: {
+                cooperativaId,
+                type
+            }
+        });
+    }
     async createUsuario(usuario: Partial<Usuario>): Promise<Usuario> {
-        const { email, name, password, celular, type } = usuario;
+        const { email, name, password, celular, type, cooperativaId, produtorId, compradorId } = usuario;
         return prisma.usuario.create({
             data: {
                 email,
                 name: name!,
                 password: password!,
                 celular: celular!,
-                type
+                type,
+                cooperativaId,
+                produtorId,
+                compradorId
             }
         });
     }
     async updateUsuario(usuario: Partial<Usuario> & { id: number }): Promise<Usuario> {
-        const { id, email, name, password, celular, type } = usuario;
+        const { id, email, name, password, celular, type, cooperativaId, produtorId, compradorId } = usuario;
         return prisma.usuario.update({
             where: { id },
             data: {
@@ -55,7 +66,10 @@ export class UsuarioRepository {
                 name,
                 password,
                 celular,
-                type
+                type,
+                cooperativaId,
+                produtorId,
+                compradorId
             }
         });
     }
