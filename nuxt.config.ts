@@ -127,4 +127,12 @@ export default defineNuxtConfig({
       },
     ],
   },
+
+  postcss: {
+    plugins: {
+      'tailwindcss/nesting': {},
+      tailwindcss: {},
+      autoprefixer: {},
+    }
+  },
 });

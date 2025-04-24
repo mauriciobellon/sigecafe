@@ -1,19 +1,30 @@
 import { defineStore } from "pinia";
 import { nextTick } from "vue";
+import type { SignupDTO, AuthResponseDTO } from "~/types/api";
 
 // Add type definitions
 type FormType = "auth" | "signup";
 type StepType = "name" | "celular" | "password";
 
+interface AuthState {
+  name: string;
+  celular: string;
+  password: string;
+  loading: boolean;
+  error: string;
+  step: StepType;
+  formType: FormType;
+}
+
 export const useAuthStore = defineStore("Auth", {
-  state: () => ({
+  state: (): AuthState => ({
     name: "",
     celular: "",
     password: "",
     loading: false,
     error: "",
-    step: "name" as StepType,
-    formType: "auth" as FormType,
+    step: "name",
+    formType: "auth",
   }),
 
   actions: {
@@ -46,20 +57,22 @@ export const useAuthStore = defineStore("Auth", {
 
     async handleSignup() {
       try {
-        const response = await $fetch("/api/auth/signup", {
+        const signupData: SignupDTO = {
+          name: this.name,
+          celular: this.celular.replace(/\D/g, ''), // Send only digits
+          password: this.password,
+        };
+
+        const response = await $fetch<AuthResponseDTO>("/api/auth/signup", {
           method: "POST",
-          body: {
-            name: this.name,
-            celular: this.celular,
-            password: this.password,
-          },
+          body: signupData,
         });
 
         if (response.success) {
           const { signIn } = useAuth();
           const result = await signIn("credentials", {
             redirect: false,
-            celular: this.celular,
+            celular: signupData.celular,
             password: this.password,
           });
 
@@ -70,7 +83,6 @@ export const useAuthStore = defineStore("Auth", {
           return navigateTo("/app");
         }
 
-        // @ts-ignore
         if (response.errorCode === "USER_EXISTS") {
           this.setError(
             'Número de celular já cadastrado, <a href="/auth/login" class="login-link">clique aqui para fazer login</a>'

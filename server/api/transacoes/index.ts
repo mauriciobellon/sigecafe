@@ -1,5 +1,6 @@
 import { getServerSession } from '#auth'
-import { PrismaClient, UsuarioType } from '@prisma/client'
+import { PrismaClient, UsuarioType, TransacaoStatus } from '@prisma/client'
+import type { TransacaoDTO, CreateTransacaoDTO } from '~/types/api'
 
 const prisma = new PrismaClient()
 
@@ -39,13 +40,14 @@ export default defineEventHandler(async (event) => {
   }
 })
 
-// Interface para tipagem das transações
+// Interface para tipagem das transações com informações de usuários
 interface TransacaoWithUsers {
   id: string;
   data: Date;
   quantidade: number;
   precoUnitario: number;
-  status: string;
+  valorTotal: number;
+  status: TransacaoStatus;
   observacoes: string | null;
   compradorId: number;
   vendedorId: number;
@@ -58,7 +60,7 @@ interface TransacaoWithUsers {
 }
 
 // Função para obter as transações do usuário
-async function handleGetTransacoes(usuarioId: number) {
+async function handleGetTransacoes(usuarioId: number): Promise<TransacaoDTO[]> {
   try {
     // Buscar transações onde o usuário é comprador ou vendedor
     const transacoes = await prisma.transacao.findMany({
@@ -87,6 +89,7 @@ async function handleGetTransacoes(usuarioId: number) {
       vendedorId: t.vendedorId,
       quantidade: t.quantidade,
       precoUnitario: t.precoUnitario,
+      valorTotal: t.valorTotal,
       status: t.status,
       observacoes: t.observacoes || '',
     }))
@@ -100,9 +103,9 @@ async function handleGetTransacoes(usuarioId: number) {
 }
 
 // Função para criar uma nova transação
-async function handleCreateTransacao(event: any, usuarioId: number) {
+async function handleCreateTransacao(event: any, usuarioId: number): Promise<TransacaoDTO> {
   try {
-    const body = await readBody(event)
+    const body = await readBody(event) as CreateTransacaoDTO
 
     // Validar os dados necessários
     if (!body.quantidade || !body.precoUnitario || !body.data || !body.status) {
@@ -147,8 +150,9 @@ async function handleCreateTransacao(event: any, usuarioId: number) {
       data: {
         quantidade: body.quantidade,
         precoUnitario: body.precoUnitario,
+        valorTotal: body.valorTotal,
         data: new Date(body.data),
-        status: body.status,
+        status: body.status as TransacaoStatus,
         observacoes: body.observacoes,
         comprador: {
           connect: {
@@ -177,6 +181,7 @@ async function handleCreateTransacao(event: any, usuarioId: number) {
       vendedorId: transacao.vendedorId,
       quantidade: transacao.quantidade,
       precoUnitario: transacao.precoUnitario,
+      valorTotal: transacao.valorTotal,
       status: transacao.status,
       observacoes: transacao.observacoes || '',
     }
