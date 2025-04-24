@@ -20,20 +20,20 @@
             <div class="space-y-4 mt-4">
               <UiAccordion type="single" collapsible>
                 <UiAccordionItem value="item-1">
-                  <UiAccordionTrigger>O que é o Escola ON?</UiAccordionTrigger>
+                  <UiAccordionTrigger>O que é o SigeCafe?</UiAccordionTrigger>
                   <UiAccordionContent>
-                    Uma plataforma educacional que revoluciona a comunicação entre escolas e famílias,
-                    oferecendo um ecossistema digital completo que integra gestão acadêmica, comunicação
-                    instantânea e acompanhamento em tempo real do desempenho escolar.
+                    Uma plataforma de gerenciamento para o mercado de café que conecta compradores e produtores,
+                    oferecendo um ecossistema digital completo que integra controle de transações, acompanhamento
+                    de preços do café e geração de relatórios.
                   </UiAccordionContent>
                 </UiAccordionItem>
 
                 <UiAccordionItem value="item-2">
                   <UiAccordionTrigger>Como funciona o sistema de notificações?</UiAccordionTrigger>
                   <UiAccordionContent>
-                    O sistema envia notificações automáticas via WhatsApp sobre notas, frequência e
-                    ocorrências dos alunos. As notificações são personalizáveis e podem ser configuradas
-                    de acordo com as preferências de cada usuário.
+                    O sistema envia notificações automáticas sobre novas transações, mudanças nos preços do café e
+                    atividades relevantes para o seu perfil. As notificações são personalizáveis e podem ser
+                    configuradas de acordo com as preferências de cada usuário.
                   </UiAccordionContent>
                 </UiAccordionItem>
               </UiAccordion>
@@ -48,7 +48,7 @@
                   <UiAccordionContent>
                     <ol class="list-decimal pl-4 space-y-2">
                       <li>Acesse a página de login</li>
-                      <li>Digite seu email cadastrado</li>
+                      <li>Digite seu número de celular cadastrado</li>
                       <li>Digite sua senha</li>
                       <li>Clique em "Entrar"</li>
                     </ol>
@@ -59,7 +59,7 @@
                   <UiAccordionTrigger>Como recuperar minha senha?</UiAccordionTrigger>
                   <UiAccordionContent>
                     Na página de login, clique em "Esqueci minha senha" e siga as instruções
-                    enviadas para seu email cadastrado.
+                    enviadas para seu celular cadastrado.
                   </UiAccordionContent>
                 </UiAccordionItem>
               </UiAccordion>
@@ -73,10 +73,10 @@
                   <UiAccordionTrigger>Quais são os tipos de perfis disponíveis?</UiAccordionTrigger>
                   <UiAccordionContent>
                     <ul class="list-disc pl-4 space-y-2">
-                      <li>Administrador: Gerencia todas as configurações da escola</li>
-                      <li>Coordenador: Monitora indicadores e toma decisões</li>
-                      <li>Professor: Gerencia turmas e acompanha alunos</li>
-                      <li>Responsável: Acompanha o desempenho dos alunos</li>
+                      <li>Administrador: Gerencia todas as configurações da plataforma</li>
+                      <li>Cooperativa: Administra associados e transações</li>
+                      <li>Produtor: Gerencia vendas e acompanha preços</li>
+                      <li>Comprador: Realiza compras de café e gerencia transações</li>
                     </ul>
                   </UiAccordionContent>
                 </UiAccordionItem>

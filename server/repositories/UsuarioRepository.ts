@@ -1,5 +1,5 @@
 import prisma from '@@/lib/prisma'
-import type { Aluno, Usuario, UsuarioType } from '@prisma/client';
+import type { Usuario, UsuarioType } from '@prisma/client';
 
 export class UsuarioRepository {
     async getAllUsuarios(): Promise<Usuario[]> {
@@ -35,12 +35,24 @@ export class UsuarioRepository {
         return prisma.usuario.findMany({ where: { type } });
     }
     async getUsuarioByCooperativaAndType(cooperativaId: number, type: UsuarioType): Promise<Usuario[]> {
-        return prisma.usuario.findMany({
+        console.log(`Finding usuarios with cooperativaId=${cooperativaId} and type=${type}`);
+
+        // Check if there are any users for this cooperativa regardless of type
+        const allUsers = await prisma.usuario.findMany({
+            where: { cooperativaId }
+        });
+        console.log(`Total users for cooperativa ${cooperativaId}:`, allUsers.length);
+
+        // Now check with type filter
+        const typedUsers = await prisma.usuario.findMany({
             where: {
                 cooperativaId,
                 type
             }
         });
+        console.log(`Users with type ${type}:`, typedUsers.length);
+
+        return typedUsers;
     }
     async createUsuario(usuario: Partial<Usuario>): Promise<Usuario> {
         const { email, name, password, celular, type, cooperativaId, produtorId, compradorId } = usuario;

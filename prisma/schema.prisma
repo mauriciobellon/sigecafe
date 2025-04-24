@@ -9,22 +9,36 @@ datasource db {
 }
 
 model Usuario {
-  id       Int         @id @default(autoincrement())
-  email    String?
-  name     String
-  password String
-  celular  String      @unique
-  type     UsuarioType @default(AUTENTICADO)
-  cooperativa   Cooperativa?     @relation(fields: [cooperativaId], references: [id])
-  cooperativaId Int?
-  produtor      Produtor?        @relation(fields: [produtorId], references: [id])
-  produtorId    Int?
-  comprador     Comprador?        @relation(fields: [compradorId], references: [id])
-  compradorId    Int?
-  compras       Transacao[]      @relation("CompraTransacoes")
-  vendas        Transacao[]      @relation("VendaTransacoes")
-  notificacoes  Notificacao[]
-  preference    UserPreference?
+  id                Int           @id @default(autoincrement())
+  email             String?
+  name              String
+  password          String
+  celular           String        @unique
+  type              UsuarioType   @default(AUTENTICADO)
+
+  // Relações
+  cooperativa       Cooperativa?  @relation(fields: [cooperativaId], references: [id])
+  cooperativaId     Int?
+
+  // Relação com Associado (Produtor/Comprador)
+  associado         Associado?    @relation(fields: [associadoId], references: [id])
+  associadoId       Int?
+
+  // Colaborador (staff da cooperativa)
+  colaborador       Colaborador?  @relation(fields: [colaboradorId], references: [id])
+  colaboradorId     Int?
+
+  // Transações
+  compras           Transacao[]   @relation("CompraTransacoes")
+  vendas            Transacao[]   @relation("VendaTransacoes")
+
+  // Outros
+  notificacoes      Notificacao[]
+  preference        UserPreference?
+  resetTokens       PasswordResetToken[]
+
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 }
 
 enum UsuarioType {
@@ -33,6 +47,7 @@ enum UsuarioType {
   PRODUTOR
   COMPRADOR
   AUTENTICADO
+  COLABORADOR
 }
 
 enum MenuType {
@@ -52,49 +67,95 @@ model Permission {
 }
 
 model Cooperativa {
-  id            Int       @id @default(autoincrement())
+  id            Int           @id @default(autoincrement())
   nome          String
   celular       String?
-  colaboradores Usuario[]
+  cnpj          String?       @unique
+  endereco      String?
+  cidade        String?
+  estado        String?
+
+  // Relações
+  usuarios      Usuario[]
+  colaboradores Colaborador[]
+  associados    Associado[]
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
-model Produtor {
-  id            Int       @id @default(autoincrement())
+model Associado {
+  id            Int           @id @default(autoincrement())
   nome          String
   celular       String?
+  tipo          AssociadoTipo
+  documento     String?       // CPF ou CNPJ
+  endereco      String?
+  cidade        String?
+  estado        String?
+
+  // Relações
+  cooperativa   Cooperativa   @relation(fields: [cooperativaId], references: [id])
+  cooperativaId Int
   usuarios      Usuario[]
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
-model Comprador {
-  id            Int       @id @default(autoincrement())
+enum AssociadoTipo {
+  PRODUTOR
+  COMPRADOR
+}
+
+model Colaborador {
+  id            Int           @id @default(autoincrement())
   nome          String
   celular       String?
+  cargo         String?
+
+  // Relações
+  cooperativa   Cooperativa   @relation(fields: [cooperativaId], references: [id])
+  cooperativaId Int
   usuarios      Usuario[]
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
 model Transacao {
-  id            String   @id @default(uuid())
+  id            String        @id @default(uuid())
   data          DateTime
-  quantidade    Float
+  quantidade    Float         // Quantidade em sacas
   precoUnitario Float
-  status        String // PENDENTE, CONCLUIDA, CANCELADA
+  valorTotal    Float
+  status        TransacaoStatus
   observacoes   String?
 
   // Relações
-  comprador     Usuario  @relation("CompraTransacoes", fields: [compradorId], references: [id])
+  comprador     Usuario       @relation("CompraTransacoes", fields: [compradorId], references: [id])
   compradorId   Int
-  vendedor      Usuario  @relation("VendaTransacoes", fields: [vendedorId], references: [id])
+  vendedor      Usuario       @relation("VendaTransacoes", fields: [vendedorId], references: [id])
   vendedorId    Int
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
-model PrecoCafe {
+enum TransacaoStatus {
+  PENDENTE
+  CONCLUIDA
+  CANCELADA
+}
+
+model PrecoCafeHistorico {
   id                Int      @id @default(autoincrement())
   data              DateTime
   precoRobusta      Float?
   precoArabica      Float?
+  fonte             String?  // CEPEA/ESALQ ou outra fonte
+
+  createdAt         DateTime @default(now())
 }
 
 model Notificacao {
@@ -124,4 +185,13 @@ model UserPreference {
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId Int
+  createdAt DateTime @default(now())
+  expiresAt DateTime
 }

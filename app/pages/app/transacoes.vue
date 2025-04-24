@@ -27,9 +27,9 @@
               </div>
               <UiSelect v-model="statusFilter">
                 <option value="">Todos os status</option>
-                <option value="pendente">Pendente</option>
-                <option value="concluida">Concluída</option>
-                <option value="cancelada">Cancelada</option>
+                <option value="PENDENTE">Pendente</option>
+                <option value="CONCLUIDA">Concluída</option>
+                <option value="CANCELADA">Cancelada</option>
               </UiSelect>
             </div>
           </div>
@@ -82,9 +82,9 @@
                     <span
                       class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
                       :class="{
-                        'bg-green-100 text-green-800': transacao.status === 'concluida',
-                        'bg-yellow-100 text-yellow-800': transacao.status === 'pendente',
-                        'bg-red-100 text-red-800': transacao.status === 'cancelada'
+                        'bg-green-100 text-green-800': transacao.status === 'CONCLUIDA',
+                        'bg-yellow-100 text-yellow-800': transacao.status === 'PENDENTE',
+                        'bg-red-100 text-red-800': transacao.status === 'CANCELADA'
                       }">
                       {{ transacao.status }}
                     </span>
@@ -151,9 +151,9 @@
             <div>
               <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
               <select id="status" v-model="transacaoForm.status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                <option value="pendente">Pendente</option>
-                <option value="concluida">Concluída</option>
-                <option value="cancelada">Cancelada</option>
+                <option value="PENDENTE">Pendente</option>
+                <option value="CONCLUIDA">Concluída</option>
+                <option value="CANCELADA">Cancelada</option>
               </select>
             </div>
 
@@ -175,6 +175,7 @@
 <script setup lang="ts">
   import { ref, computed, reactive, onMounted } from 'vue';
   import { useUsuarioStore } from '~/stores/UserStore';
+  import type { TransacaoDTO } from '~/types/api';
 
   const usuarioStore = useUsuarioStore();
   const usuario = computed(() => usuarioStore.usuarioPreferences);
@@ -183,22 +184,22 @@
   const isNewTransactionOpen = ref(false);
   const filter = ref('');
   const statusFilter = ref('');
-  const editingTransacao = ref(null);
+  const editingTransacao = ref<TransacaoDTO | null>(null);
 
   // Dados de transações
-  const transacoes = ref([]);
+  const transacoes = ref<TransacaoDTO[]>([]);
   const loading = ref(false);
-  const error = ref(null);
+  const error = ref<string | null>(null);
 
   // Formulário para nova transação
   const transacaoForm = reactive({
-    id: null,
+    id: null as string | null,
     tipo: 'compra',
     contraparte: '',
     quantidade: 1,
     precoUnitario: 900,
     data: new Date().toISOString().split('T')[0],
-    status: 'pendente',
+    status: 'PENDENTE' as 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA',
     observacoes: ''
   });
 
@@ -213,46 +214,73 @@
     error.value = null;
 
     try {
-      // Implementar depois a chamada real à API
-      // const response = await $fetch('/api/transacoes');
-      // transacoes.value = response;
+      const response = await $fetch('/api/transacoes', {
+        credentials: 'include'
+      });
 
-      // Mock data temporário
-      transacoes.value = [
-        {
-          id: 1,
-          data: new Date(),
-          comprador: 'Empresa A',
-          vendedor: 'Produtor B',
-          quantidade: 10,
-          precoUnitario: 950.00,
-          status: 'concluida',
-          observacoes: 'Café arábica de qualidade superior'
-        },
-        {
-          id: 2,
-          data: new Date(Date.now() - 86400000), // ontem
-          comprador: 'Empresa C',
-          vendedor: 'Produtor A',
-          quantidade: 5,
-          precoUnitario: 920.50,
-          status: 'pendente',
-          observacoes: ''
-        },
-        {
-          id: 3,
-          data: new Date(Date.now() - 172800000), // 2 dias atrás
-          comprador: 'Empresa B',
-          vendedor: 'Produtor C',
-          quantidade: 15,
-          precoUnitario: 900.00,
-          status: 'cancelada',
-          observacoes: 'Cancelado por atraso na entrega'
-        }
-      ];
+      if (response && Array.isArray(response)) {
+        // Convert string dates to Date objects
+        transacoes.value = response.map(item => ({
+          ...item,
+          data: new Date(item.data),
+          createdAt: new Date(item.createdAt),
+          updatedAt: new Date(item.updatedAt)
+        })) as TransacaoDTO[];
+      } else {
+        throw new Error('Resposta inválida da API');
+      }
     } catch (e) {
       error.value = 'Erro ao carregar transações';
       console.error(e);
+
+      // Fallback para mock data em caso de erro (desenvolvimento)
+      transacoes.value = [
+        {
+          id: "1",
+          data: new Date(),
+          comprador: 'Empresa A',
+          compradorId: 1,
+          vendedor: 'Produtor B',
+          vendedorId: 2,
+          quantidade: 10,
+          precoUnitario: 950.00,
+          valorTotal: 9500.00,
+          status: 'CONCLUIDA' as 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA',
+          observacoes: 'Café arábica de qualidade superior',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: "2",
+          data: new Date(Date.now() - 86400000), // ontem
+          comprador: 'Empresa C',
+          compradorId: 3,
+          vendedor: 'Produtor A',
+          vendedorId: 4,
+          quantidade: 5,
+          precoUnitario: 920.50,
+          valorTotal: 4602.50,
+          status: 'PENDENTE' as 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA',
+          observacoes: '',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        },
+        {
+          id: "3",
+          data: new Date(Date.now() - 172800000), // 2 dias atrás
+          comprador: 'Empresa B',
+          compradorId: 5,
+          vendedor: 'Produtor C',
+          vendedorId: 6,
+          quantidade: 15,
+          precoUnitario: 900.00,
+          valorTotal: 13500.00,
+          status: 'CANCELADA' as 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA',
+          observacoes: 'Cancelado por atraso na entrega',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      ];
     } finally {
       loading.value = false;
     }
@@ -264,16 +292,16 @@
       const matchesFilter = filter.value === '' ||
         t.comprador.toLowerCase().includes(filter.value.toLowerCase()) ||
         t.vendedor.toLowerCase().includes(filter.value.toLowerCase()) ||
-        t.observacoes.toLowerCase().includes(filter.value.toLowerCase());
+        (t.observacoes && t.observacoes.toLowerCase().includes(filter.value.toLowerCase()));
 
-      const matchesStatus = statusFilter.value === '' || t.status === statusFilter.value;
+      const matchesStatus = statusFilter.value === '' || t.status === statusFilter.value.toUpperCase();
 
       return matchesFilter && matchesStatus;
     });
   });
 
   // Funções
-  function formatDate(date) {
+  function formatDate(date: Date): string {
     return new Date(date).toLocaleDateString('pt-BR');
   }
 
@@ -286,7 +314,7 @@
       quantidade: 1,
       precoUnitario: 900,
       data: new Date().toISOString().split('T')[0],
-      status: 'pendente',
+      status: 'PENDENTE' as 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA',
       observacoes: ''
     });
 
@@ -294,7 +322,7 @@
     isNewTransactionOpen.value = true;
   }
 
-  function editTransacao(transacao) {
+  function editTransacao(transacao: TransacaoDTO) {
     // Preencher formulário com dados da transação
     const tipo = usuario.value?.type === 'COMPRADOR' ? 'compra' : 'venda';
     const contraparte = tipo === 'compra' ? transacao.vendedor : transacao.comprador;
@@ -305,98 +333,92 @@
       contraparte,
       quantidade: transacao.quantidade,
       precoUnitario: transacao.precoUnitario,
-      data: new Date(transacao.data).toISOString().split('T')[0],
+      data: transacao.data instanceof Date
+        ? transacao.data.toISOString().split('T')[0]
+        : new Date(transacao.data).toISOString().split('T')[0],
       status: transacao.status,
-      observacoes: transacao.observacoes
+      observacoes: transacao.observacoes || ''
     });
 
     editingTransacao.value = transacao;
     isNewTransactionOpen.value = true;
   }
 
-  function deleteTransacao(transacao) {
+  function deleteTransacao(transacao: TransacaoDTO) {
     // Confirmar antes de excluir
     if (confirm(`Tem certeza que deseja excluir esta transação?`)) {
-      // Remover da lista local
-      transacoes.value = transacoes.value.filter(t => t.id !== transacao.id);
-
-      // Aqui você chamaria a API para excluir no servidor
-      // await $fetch(`/api/transacoes/${transacao.id}`, { method: 'DELETE' });
+      try {
+        // Chamar a API para excluir no servidor
+        $fetch(`/api/transacoes/${transacao.id}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        }).then(() => {
+          // Remover da lista local após sucesso
+          transacoes.value = transacoes.value.filter(t => t.id !== transacao.id);
+        }).catch(error => {
+          console.error('Erro ao excluir transação:', error);
+          alert('Não foi possível excluir a transação. Tente novamente.');
+        });
+      } catch (error) {
+        console.error('Erro ao excluir transação:', error);
+        alert('Não foi possível excluir a transação. Tente novamente.');
+      }
     }
   }
 
   async function saveTransacao() {
-    // Criar objeto transação baseado no formulário
-    const formData = { ...transacaoForm };
+    // Validação básica do formulário
+    if (!transacaoForm.contraparte || transacaoForm.quantidade <= 0 || transacaoForm.precoUnitario <= 0) {
+      alert('Por favor, preencha todos os campos obrigatórios corretamente.');
+      return;
+    }
+
+    // Calcular valor total
+    const valorTotal = transacaoForm.quantidade * transacaoForm.precoUnitario;
 
     try {
-      if (formData.id) {
+      if (transacaoForm.id) {
         // Atualizar transação existente
-        const index = transacoes.value.findIndex(t => t.id === formData.id);
-        if (index !== -1) {
-          // Atualizar transação no array local
-          const updatedTransacao = {
-            ...transacoes.value[index],
-            quantidade: formData.quantidade,
-            precoUnitario: formData.precoUnitario,
-            data: new Date(formData.data),
-            status: formData.status,
-            observacoes: formData.observacoes
-          };
-
-          // Se o tipo mudou, atualizar comprador/vendedor
-          if (formData.tipo === 'compra') {
-            updatedTransacao.vendedor = formData.contraparte;
-            updatedTransacao.comprador = usuario.value?.name || 'Usuário Atual';
-          } else {
-            updatedTransacao.comprador = formData.contraparte;
-            updatedTransacao.vendedor = usuario.value?.name || 'Usuário Atual';
-          }
-
-          transacoes.value[index] = updatedTransacao;
-
-          // Aqui você chamaria a API para atualizar no servidor
-          // await $fetch(`/api/transacoes/${formData.id}`, {
-          //   method: 'PUT',
-          //   body: formData
-          // });
-        }
+        const response = await $fetch(`/api/transacoes/${transacaoForm.id}`, {
+          method: 'PUT',
+          body: {
+            quantidade: transacaoForm.quantidade,
+            precoUnitario: transacaoForm.precoUnitario,
+            valorTotal: valorTotal,
+            data: transacaoForm.data ? new Date(transacaoForm.data) : new Date(),
+            status: transacaoForm.status,
+            observacoes: transacaoForm.observacoes,
+            tipo: transacaoForm.tipo,
+            contraparte: transacaoForm.contraparte
+          },
+          credentials: 'include'
+        });
       } else {
         // Criar nova transação
-        const newTransacao = {
-          id: Date.now().toString(), // Temporário até implementação da API
-          quantidade: formData.quantidade,
-          precoUnitario: formData.precoUnitario,
-          data: new Date(formData.data),
-          status: formData.status,
-          observacoes: formData.observacoes
-        };
-
-        // Definir comprador/vendedor baseado no tipo
-        if (formData.tipo === 'compra') {
-          newTransacao.vendedor = formData.contraparte;
-          newTransacao.comprador = usuario.value?.name || 'Usuário Atual';
-        } else {
-          newTransacao.comprador = formData.contraparte;
-          newTransacao.vendedor = usuario.value?.name || 'Usuário Atual';
-        }
-
-        transacoes.value.push(newTransacao);
-
-        // Aqui você chamaria a API para salvar no servidor
-        // const response = await $fetch('/api/transacoes', {
-        //   method: 'POST',
-        //   body: formData
-        // });
-        // if (response.success) {
-        //   await loadTransacoes(); // Recarregar transações após o salvamento
-        // }
+        const response = await $fetch('/api/transacoes', {
+          method: 'POST',
+          body: {
+            quantidade: transacaoForm.quantidade,
+            precoUnitario: transacaoForm.precoUnitario,
+            valorTotal: valorTotal,
+            data: transacaoForm.data ? new Date(transacaoForm.data) : new Date(),
+            status: transacaoForm.status,
+            observacoes: transacaoForm.observacoes,
+            tipo: transacaoForm.tipo,
+            contraparte: transacaoForm.contraparte
+          },
+          credentials: 'include'
+        });
       }
 
+      // Recarregar transações após sucesso
+      await loadTransacoes();
+
+      // Fechar modal após sucesso
       isNewTransactionOpen.value = false;
     } catch (error) {
       console.error('Erro ao salvar transação:', error);
-      // Implementar feedback de erro para o usuário
+      alert('Não foi possível salvar a transação. Verifique os dados e tente novamente.');
     }
   }
 </script>

@@ -3,12 +3,14 @@ import * as cheerio from 'cheerio'
 import { ofetch } from 'ofetch'
 import prisma from '@@/lib/prisma'
 
-// Define interface for the PrecoCafe model
-interface PrecoCafe {
+// Define interface for the PrecoCafeHistorico model
+interface PrecoCafeHistorico {
   id: number
   data: Date
   precoRobusta: number | null
   precoArabica: number | null
+  fonte: string | null
+  createdAt: Date
 }
 
 export default defineEventHandler(async (event) => {
@@ -28,8 +30,8 @@ export default defineEventHandler(async (event) => {
       lastDay.setDate(lastDay.getDate() - 1)
 
       // Fetch the most recent price from the database
-      const recentPrices = await prisma.$queryRaw<PrecoCafe[]>`
-        SELECT * FROM "PrecoCafe"
+      const recentPrices = await prisma.$queryRaw<PrecoCafeHistorico[]>`
+        SELECT * FROM "PrecoCafeHistorico"
         WHERE "data" >= ${lastDay}
         ORDER BY "data" DESC
         LIMIT 1
@@ -55,8 +57,8 @@ export default defineEventHandler(async (event) => {
       if (prices.arabica && prices.robusta) {
         const now = new Date()
         await prisma.$executeRaw`
-          INSERT INTO "PrecoCafe" ("data", "precoArabica", "precoRobusta")
-          VALUES (${now}, ${prices.arabica}, ${prices.robusta})
+          INSERT INTO "PrecoCafeHistorico" ("data", "precoArabica", "precoRobusta", "fonte")
+          VALUES (${now}, ${prices.arabica}, ${prices.robusta}, 'CEPEA/ESALQ')
         `
       }
 

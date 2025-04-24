@@ -1,13 +1,18 @@
 import { defineStore } from "pinia";
-import type { MenuType, Permission } from "@prisma/client";
+import type { MenuType } from "@prisma/client";
+import type { PermissionDTO } from "~/types/api";
+
+interface NavigationState {
+  pages: PermissionDTO[];
+}
 
 export const useNavigationStore = defineStore("navigation", {
-  state: () => ({
-    pages: [] as Permission[],
+  state: (): NavigationState => ({
+    pages: [],
   }),
 
   actions: {
-    movePagesToStart(pages: Permission[], priorityPaths: string[]) {
+    movePagesToStart(pages: PermissionDTO[], priorityPaths: string[]) {
       const result = [...pages];
 
       // Process paths in reverse to maintain correct order
@@ -24,11 +29,11 @@ export const useNavigationStore = defineStore("navigation", {
 
     async fetchPages() {
       try {
-        const allPagesFetched = await $fetch<Permission[]>("/api/navigation", {
+        const allPagesFetched = await $fetch<PermissionDTO[]>("/api/navigation", {
           credentials: "include",
         });
 
-        if (allPagesFetched) {
+        if (allPagesFetched && allPagesFetched.length > 0) {
           const sortedPages = [...allPagesFetched];
           sortedPages.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
 

@@ -1,9 +1,11 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
 
-export const useHeaderStore = defineStore("header", () => {
-  const mobileNav = ref(false);
-  return {
-    mobileNav,
-  };
+interface HeaderState {
+  mobileNav: boolean;
+}
+
+export const useHeaderStore = defineStore("header", {
+  state: (): HeaderState => ({
+    mobileNav: false
+  })
 });

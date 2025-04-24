@@ -1,8 +1,9 @@
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { Usuario } from '@prisma/client'
+import { Usuario, UsuarioType } from '@prisma/client'
 import { NuxtAuthHandler } from '#auth'
 import { verify } from '@@/server/utils/crypto'
 import { UsuarioRepository } from '@@/server/repositories/UsuarioRepository'
+import type { UsuarioDTO, LoginDTO } from '~/types/api'
 
 const usuarioRepository = new UsuarioRepository()
 const authSecret = process.env.AUTH_SECRET
@@ -21,7 +22,7 @@ export default NuxtAuthHandler({
         CredentialsProvider.default({
             name: 'Credentials',
             // @ts-ignore
-            async authorize(credentials) {
+            async authorize(credentials: LoginDTO) {
                 if (!credentials?.celular || !credentials?.password) {
                     throw new Error('Credenciais inválidas')
                 }
@@ -49,7 +50,7 @@ export default NuxtAuthHandler({
             if (token?.sub) {
                 const usuario: Usuario | null = await usuarioRepository.getUsuarioById(parseInt(token.sub))
                 if (usuario) {
-                    session.user = usuario
+                    session.user = usuario as unknown as UsuarioDTO
                 } else {
                     session.user = undefined
                 }
