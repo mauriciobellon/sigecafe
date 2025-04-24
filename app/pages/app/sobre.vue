@@ -2,15 +2,16 @@
   <div>
     <UiCard class="mt-10 mb-6">
       <UiCardHeader>
-        <UiCardTitle>O que é o Escola ON?</UiCardTitle>
+        <UiCardTitle>O que é o SIGE Café ?</UiCardTitle>
         <UiCardDescription>
-          Uma plataforma educacional que revoluciona a comunicação entre escolas e famílias
+          Uma plataforma moderna que conecta cafeicultores e cooperativas, unindo gestão de vendas, comunicação eficiente
+          e tecnologia para transformar o setor.
         </UiCardDescription>
       </UiCardHeader>
       <UiCardContent>
         <p class="mb-4">
-          Nossa solução oferece um ecossistema digital completo que integra gestão acadêmica,
-          comunicação instantânea e acompanhamento em tempo real do desempenho escolar.
+          Nossa solução oferece um ecossistema digital completo que integra a gestão de sacas de café, interação ágil e
+          acompanhamento em tempo real das operações entre cafecultores e cooperativas.
         </p>
 
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -20,7 +21,7 @@
               <h3 class="font-semibold">Comunicação Instantânea</h3>
             </div>
             <p class="text-sm text-muted-foreground">
-              Integração nativa com WhatsApp para notificações automáticas e personalizáveis
+              Integração com SMS para notificações automáticas e personalizáveis, acessíveis em qualquer dispositivo.
             </p>
           </div>
 
@@ -30,7 +31,7 @@
               <h3 class="font-semibold">Multi-perfil</h3>
             </div>
             <p class="text-sm text-muted-foreground">
-              Interfaces específicas para coordenadores, professores e responsáveis
+              Interfaces específicas para Cafeicultores, Cooperativas e Associados.
             </p>
           </div>
 
@@ -40,7 +41,7 @@
               <h3 class="font-semibold">Segurança</h3>
             </div>
             <p class="text-sm text-muted-foreground">
-              Autenticação robusta e controle granular de permissões
+              Autenticação robusta e controle granular de permissões.
             </p>
           </div>
         </div>
