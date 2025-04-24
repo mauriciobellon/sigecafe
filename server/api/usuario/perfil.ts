@@ -1,7 +1,8 @@
 import { getServerSession } from '#auth'
 import prisma from '~~/lib/prisma'
+import type { AuthResponseDTO, UsuarioPreferencesDTO } from '~/types/api'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
   // Get authenticated session
   const session = await getServerSession(event)
   if (!session?.user) {
@@ -57,9 +58,16 @@ export default defineEventHandler(async (event) => {
         }
       }
 
+      const usuarioDTO: UsuarioPreferencesDTO = {
+        name: usuario.name,
+        email: usuario.email || '',
+        celular: usuario.celular,
+        type: usuario.type
+      }
+
       return {
         success: true,
-        data: usuario
+        data: usuarioDTO
       }
     } catch (error) {
       console.error('Erro ao buscar perfil:', error)
@@ -73,7 +81,7 @@ export default defineEventHandler(async (event) => {
   // PUT request to update user profile
   if (event.method === 'PUT') {
     try {
-      const body = await readBody(event)
+      const body = await readBody(event) as UsuarioPreferencesDTO
       const { name, email, celular } = body
 
       if (!name || !celular) {
@@ -112,14 +120,22 @@ export default defineEventHandler(async (event) => {
         select: {
           name: true,
           email: true,
-          celular: true
+          celular: true,
+          type: true
         }
       })
+
+      const updatedDTO: UsuarioPreferencesDTO = {
+        name: updatedUser.name,
+        email: updatedUser.email || '',
+        celular: updatedUser.celular,
+        type: updatedUser.type
+      }
 
       return {
         success: true,
         message: 'Perfil atualizado com sucesso',
-        data: updatedUser
+        data: updatedDTO
       }
     } catch (error) {
       console.error('Erro ao atualizar perfil:', error)
@@ -148,5 +164,10 @@ export default defineEventHandler(async (event) => {
         message: 'Erro ao excluir perfil'
       }
     }
+  }
+
+  return {
+    success: false,
+    message: 'Método não suportado'
   }
 })

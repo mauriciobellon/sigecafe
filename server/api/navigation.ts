@@ -1,29 +1,39 @@
 import { defineEventHandler } from 'h3';
 import { getServerSession } from '#auth';
 import { getPermissions } from '../utils/permissions';
-import { Usuario, UsuarioType } from '@prisma/client';
+import { UsuarioType } from '@prisma/client';
+import type { PermissionDTO } from '~/types/api';
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<PermissionDTO[]> => {
   const session = await getServerSession(event);
 
   if (!session?.user) {
     return [];
   }
 
-  const usuarioType = (session.user as Usuario)?.type;
+  // Get user type safely
+  const user = session.user as any;
+  const userType = user.type as UsuarioType;
+
+  if (!userType) {
+    console.error('User type not found in session');
+    return [];
+  }
 
   const permissions = await getPermissions();
 
-  const allPagesWithShowInAndTitle = permissions.filter(page => page.menuType && page.title)
+  const allPagesWithShowInAndTitle = permissions.filter(page => page.menuType && page.title);
 
-  const filteredLinks = allPagesWithShowInAndTitle
-    .filter(route => route.usuarioType.includes(usuarioType as UsuarioType))
+  const filteredLinks: PermissionDTO[] = allPagesWithShowInAndTitle
+    .filter(route => route.usuarioType.includes(userType))
     .sort((a, b) => (a.title || '').localeCompare(b.title || ''))
     .map(route => ({
+      id: route.id,
       path: route.path,
       title: route.title,
       icon: route.icon,
       menuType: route.menuType,
+      usuarioType: route.usuarioType,
       description: route.description,
     }));
 

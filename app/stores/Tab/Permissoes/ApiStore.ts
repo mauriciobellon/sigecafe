@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
-import type { Usuario, UsuarioType } from "@prisma/client";
+import type { UsuarioType } from "@prisma/client";
+import type { PermissionDTO } from "~/types/api";
 
 interface ApiState {
-  permissions: any[];
+  permissions: PermissionDTO[];
   selectedRows: number;
   isEditing: boolean;
   modalState: boolean;
@@ -11,6 +12,10 @@ interface ApiState {
     id: number | null;
     path: string;
     usuarioType: UsuarioType[];
+    title?: string | null;
+    icon?: string | null;
+    description?: string | null;
+    menuType?: any[];
   };
 }
 
@@ -25,13 +30,17 @@ export const useApiStore = defineStore("Api", {
       id: null,
       path: "",
       usuarioType: [],
+      title: null,
+      icon: null,
+      description: null,
+      menuType: []
     },
   }),
 
   actions: {
     async fetch() {
       try {
-        const response = await $fetch<any[]>('/api/permissoes/api', {
+        const response = await $fetch<PermissionDTO[]>('/api/permissoes/api', {
           credentials: "include"
         });
         this.permissions = response;
@@ -43,7 +52,7 @@ export const useApiStore = defineStore("Api", {
 
     async create() {
       try {
-        const response = await $fetch('/api/permissoes/api', {
+        const response = await $fetch<PermissionDTO>('/api/permissoes/api', {
           method: "POST",
           body: this.newPermission,
           credentials: "include"
@@ -58,7 +67,7 @@ export const useApiStore = defineStore("Api", {
 
     async update() {
       try {
-        const response = await $fetch('/api/permissoes/api', {
+        const response = await $fetch<PermissionDTO>('/api/permissoes/api', {
           method: "PUT",
           body: this.newPermission,
           credentials: "include"
@@ -74,7 +83,7 @@ export const useApiStore = defineStore("Api", {
       }
     },
 
-    async remove(permission: any) {
+    async remove(permission: PermissionDTO) {
       try {
         await $fetch('/api/permissoes/api', {
           method: "DELETE",
@@ -100,12 +109,24 @@ export const useApiStore = defineStore("Api", {
         id: null,
         path: "",
         usuarioType: [],
+        title: null,
+        icon: null,
+        description: null,
+        menuType: []
       };
     },
 
-    setEditingPermission(permission: any) {
+    setEditingPermission(permission: PermissionDTO) {
       this.isEditing = true;
-      this.newPermission = { ...permission };
+      this.newPermission = {
+        id: permission.id,
+        path: permission.path,
+        title: permission.title,
+        icon: permission.icon,
+        description: permission.description,
+        usuarioType: permission.usuarioType,
+        menuType: permission.menuType
+      };
       this.editingRowIndex = this.permissions.findIndex((p) => p.id === permission.id);
       this.modalState = true;
     },

@@ -1,5 +1,5 @@
 import { getServerSession } from '#auth'
-import { defineEventHandler, createError } from 'h3'
+import { defineEventHandler, createError, getRequestURL } from 'h3'
 import { hasPermission } from '../utils/permissions'
 import type { Usuario } from '@prisma/client'
 
@@ -12,6 +12,7 @@ const PUBLIC_PATHS = [
     '/auth',
     '/api/_nuxt_icon',
     '/api/navigation',
+    '/api/coffee-prices',
     '/200.html',
     '/404.html',
     '/500.html',
@@ -74,31 +75,32 @@ function isPageRoute(path: string): boolean {
  * Main authentication middleware
  */
 export default defineEventHandler(async (event) => {
-    const session = await getServerSession(event)
-    const path = event.path
+    const url = getRequestURL(event).pathname;
 
-    // Allow public paths without authentication
-    if (isPublicPath(path)) {
-        return
+    // Skip authentication for public paths
+    if (isPublicPath(url)) {
+        return;
     }
 
-    // Require authentication for all other paths
-    if (!session?.user) {
+    // Check for authenticated session
+    const session = await getServerSession(event);
+    if (!session || !session.user) {
         throw createError({
             statusCode: 401,
-            statusMessage: 'Unauthenticated'
-        })
+            statusMessage: 'Unauthorized - Authentication required'
+        });
     }
 
     // Check permissions for page routes
-    if (isPageRoute(path)) {
-        const routePath = '/' + path.split('/').slice(1).join('/')
+    if (isPageRoute(url)) {
+        const routePath = '/' + url.split('/').slice(1).join('/');
+        const userType = (session.user as any).type;
 
-        if (!hasPermission(routePath, (session.user as Usuario).type)) {
+        if (!userType || !hasPermission(routePath, userType)) {
             throw createError({
                 statusCode: 403,
                 statusMessage: 'Acesso não autorizado'
-            })
+            });
         }
     }
-})
+});

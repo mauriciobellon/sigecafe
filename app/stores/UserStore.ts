@@ -1,17 +1,18 @@
 import { defineStore } from "pinia";
+import type { UsuarioPreferencesDTO, AuthResponseDTO } from "~/types/api";
 
-interface UsuarioPreferences {
-  name: string;
-  email: string;
-  celular?: string;
-  type: string;
+interface UserState {
+  usuarioPreferences: UsuarioPreferencesDTO | null;
+  loading: boolean;
+  error: string | null;
+  initialized: boolean;
 }
 
 export const useUsuarioStore = defineStore("usuario", {
-  state: () => ({
-    usuarioPreferences: null as UsuarioPreferences | null,
+  state: (): UserState => ({
+    usuarioPreferences: null,
     loading: false,
-    error: null as string | null,
+    error: null,
     initialized: false
   }),
   actions: {
@@ -22,7 +23,7 @@ export const useUsuarioStore = defineStore("usuario", {
 
       try {
         this.loading = true;
-        const response = await $fetch("/api/usuario/perfil", {
+        const response = await $fetch<AuthResponseDTO>("/api/usuario/perfil", {
           credentials: "include"
         });
 
@@ -43,7 +44,7 @@ export const useUsuarioStore = defineStore("usuario", {
     },
 
     async deleteUsuario() {
-      const response = await $fetch("/api/usuario/perfil", {
+      const response = await $fetch<AuthResponseDTO>("/api/usuario/perfil", {
         method: "DELETE",
         credentials: "include"
       });
@@ -51,7 +52,6 @@ export const useUsuarioStore = defineStore("usuario", {
       if (!response.success) {
         throw new Error(response.message);
       }
-
     },
 
     clearStore() {
