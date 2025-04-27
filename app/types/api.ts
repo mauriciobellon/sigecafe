@@ -90,6 +90,8 @@ export interface AssociadoDTO {
   endereco?: string | null;
   cidade?: string | null;
   estado?: string | null;
+  transacoes?: number;
+  volume?: number;
 }
 
 export interface ColaboradorDTO {

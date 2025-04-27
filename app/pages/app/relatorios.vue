@@ -25,42 +25,60 @@
 
               <div class="space-y-2">
                 <label class="text-sm font-medium">Data Inicial</label>
-                <input type="date" v-model="filters.startDate" class="h-10 w-full rounded-md border border-input bg-background px-3 py-2">
+                <input 
+                  type="date" 
+                  v-model="filters.startDate" 
+                  class="h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                >
               </div>
 
               <div class="space-y-2">
                 <label class="text-sm font-medium">Data Final</label>
-                <input type="date" v-model="filters.endDate" class="h-10 w-full rounded-md border border-input bg-background px-3 py-2">
-              </div>
-
-              <div v-if="reportType === 'transactions'" class="space-y-2">
-                <label class="text-sm font-medium">Status</label>
-                <UiSelect v-model="filters.status">
-                  <option value="">Todos</option>
-                  <option value="PENDENTE">Pendente</option>
-                  <option value="CONCLUIDA">Concluída</option>
-                  <option value="CANCELADA">Cancelada</option>
-                </UiSelect>
+                <input 
+                  type="date" 
+                  v-model="filters.endDate" 
+                  class="h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                >
               </div>
 
               <div v-if="reportType === 'transactions'" class="space-y-2">
                 <label class="text-sm font-medium">Valor Mínimo</label>
-                <input type="number" v-model="filters.minValue" placeholder="R$ 0,00" class="h-10 w-full rounded-md border border-input bg-background px-3 py-2">
+                <input 
+                  type="number" 
+                  v-model="filters.minValue" 
+                  placeholder="R$ 0,00" 
+                  class="h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                >
               </div>
 
               <div v-if="reportType === 'transactions'" class="space-y-2">
                 <label class="text-sm font-medium">Valor Máximo</label>
-                <input type="number" v-model="filters.maxValue" placeholder="R$ 0,00" class="h-10 w-full rounded-md border border-input bg-background px-3 py-2">
+                <input 
+                  type="number" 
+                  v-model="filters.maxValue" 
+                  placeholder="R$ 0,00" 
+                  class="h-10 w-full rounded-md border border-input bg-background px-3 py-2"
+                >
               </div>
 
               <div v-if="reportType !== 'transactions'" class="space-y-2">
                 <label class="text-sm font-medium">Cidade</label>
-                <input type="text" v-model="filters.city" placeholder="São Paulo" class="h-10 w-full rounded-md border border-input bg-background px-3 py-2">
+                <UiSelect v-model="filters.city">
+                  <option value="">Todas as cidades</option>
+                  <option v-for="city in availableCities" :key="city" :value="city">
+                    {{ city }}
+                  </option>
+                </UiSelect>
               </div>
 
               <div v-if="reportType !== 'transactions'" class="space-y-2">
                 <label class="text-sm font-medium">Estado</label>
-                <input type="text" v-model="filters.state" placeholder="SP" class="h-10 w-full rounded-md border border-input bg-background px-3 py-2">
+                <UiSelect v-model="filters.state">
+                  <option value="">Todos os estados</option>
+                  <option v-for="state in availableStates" :key="state" :value="state">
+                    {{ state }}
+                  </option>
+                </UiSelect>
               </div>
             </div>
 
@@ -79,165 +97,23 @@
 
           <!-- Report results -->
           <div v-else-if="reportData.length > 0">
-            <div class="flex justify-between mb-4">
-              <h3 class="text-lg font-medium">Resultados</h3>
-              <div class="flex gap-2">
-                <UiButton variant="outline" size="sm" @click="exportPDF" :disabled="exportLoading">
-                  <Icon v-if="exportLoading" name="lucide:loader-2" class="mr-2 h-4 w-4 animate-spin" />
-                  <Icon v-else name="lucide:file-type-pdf" class="mr-2 h-4 w-4" />
-                  Exportar PDF
-                </UiButton>
-                <UiButton variant="outline" size="sm" @click="exportCSV">
-                  <Icon name="lucide:file-type-csv" class="mr-2 h-4 w-4" />
-                  Exportar CSV
-                </UiButton>
-              </div>
-            </div>
-
+            <h3 class="text-lg font-medium mb-4">Resultados</h3>
+            
             <!-- Transaction report -->
-            <div v-if="reportType === 'transactions'" class="rounded-md border">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Data
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Comprador
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Vendedor
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Quantidade
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Valor Total
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="(item, index) in reportData" :key="item?.id || index">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {{ formatDate(item?.data) }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {{ item?.comprador }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {{ item?.vendedor }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {{ item?.quantidade }} sacas
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      R$ {{ item?.valorTotal ? item.valorTotal.toFixed(2) : '0.00' }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span
-                        class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                        :class="{
-                          'bg-green-100 text-green-800': item?.status === 'CONCLUIDA',
-                          'bg-yellow-100 text-yellow-800': item?.status === 'PENDENTE',
-                          'bg-red-100 text-red-800': item?.status === 'CANCELADA'
-                        }">
-                        {{ item?.status }}
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <Datatable
+              v-if="reportType === 'transactions'"
+              :columns="transactionColumns"
+              :data="reportData"
+              :loading="loading"
+            />
 
             <!-- Associados report -->
-            <div v-else class="rounded-md border">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Nome
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Contato
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Documento
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Localização
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Transações
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Volume Total
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <tr v-for="(item, index) in reportData" :key="item?.id || index">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {{ item?.nome }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {{ item?.celular || '-' }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {{ item?.documento || '-' }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {{ item?.cidade ? `${item.cidade}, ${item.estado || ''}` : '-' }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {{ item?.transacoes || 0 }}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {{ item?.volume ? `${item.volume} sacas` : '-' }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Report summary -->
-            <div class="mt-6 rounded-lg border p-4">
-              <h3 class="text-lg font-medium mb-4">Resumo</h3>
-
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div v-if="reportType === 'transactions'" class="space-y-1">
-                  <p class="text-sm text-muted-foreground">Total de Transações</p>
-                  <p class="text-2xl font-bold">{{ reportData.length }}</p>
-                </div>
-                <div v-if="reportType === 'transactions'" class="space-y-1">
-                  <p class="text-sm text-muted-foreground">Volume Total</p>
-                  <p class="text-2xl font-bold">{{ calculateTotalVolume() }} sacas</p>
-                </div>
-                <div v-if="reportType === 'transactions'" class="space-y-1">
-                  <p class="text-sm text-muted-foreground">Valor Total</p>
-                  <p class="text-2xl font-bold">R$ {{ calculateTotalValue().toFixed(2) }}</p>
-                </div>
-                <div v-if="reportType === 'transactions'" class="space-y-1">
-                  <p class="text-sm text-muted-foreground">Média por Transação</p>
-                  <p class="text-2xl font-bold">R$ {{ calculateAverageValue().toFixed(2) }}</p>
-                </div>
-
-                <div v-if="reportType !== 'transactions'" class="space-y-1">
-                  <p class="text-sm text-muted-foreground">Total de {{ reportType === 'producers' ? 'Produtores' : 'Compradores' }}</p>
-                  <p class="text-2xl font-bold">{{ reportData.length }}</p>
-                </div>
-                <div v-if="reportType !== 'transactions'" class="space-y-1">
-                  <p class="text-sm text-muted-foreground">Volume Total</p>
-                  <p class="text-2xl font-bold">{{ calculateTotalAssociadoVolume() }} sacas</p>
-                </div>
-                <div v-if="reportType !== 'transactions'" class="space-y-1">
-                  <p class="text-sm text-muted-foreground">Média de Transações</p>
-                  <p class="text-2xl font-bold">{{ calculateAverageTransactions() }}</p>
-                </div>
-              </div>
-            </div>
+            <Datatable
+              v-else
+              :columns="associadoColumns"
+              :data="reportData"
+              :loading="loading"
+            />
           </div>
 
           <!-- No results message -->
@@ -253,9 +129,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import type { TransacaoDTO, AssociadoDTO } from '~/types/api';
 import UiSelect from '~/components/Ui/select.vue';
+import Datatable from '~/components/Ui/Datatable.client.vue';
 
 // Report type
 const reportType = ref('transactions');
@@ -273,9 +150,48 @@ const filters = reactive({
 
 // State
 const loading = ref(false);
-const exportLoading = ref(false);
 const reportData = ref<any[]>([]);
 const hasSearched = ref(false);
+
+// Cidades e estados disponíveis
+const availableCities = ref<string[]>([]);
+const availableStates = ref<string[]>([]);
+
+// Buscar cidades e estados disponíveis
+async function fetchLocations() {
+  try {
+    const response = await $fetch<any>('/api/associado/locations');
+    availableCities.value = response.cidades || [];
+    availableStates.value = response.estados || [];
+  } catch (error) {
+    console.error('Erro ao buscar localizações:', error);
+  }
+}
+
+// Buscar dados ao montar o componente
+onMounted(() => {
+  fetchLocations();
+});
+
+// Columns for datatable
+const transactionColumns = [
+  { data: 'data', title: 'Data', orderable: true },
+  { data: 'comprador', title: 'Comprador', orderable: true },
+  { data: 'vendedor', title: 'Vendedor', orderable: true },
+  { data: 'quantidade', title: 'Quantidade', orderable: true },
+  { data: 'valorTotal', title: 'Valor Total', orderable: true },
+  { data: 'status', title: 'Status', orderable: true }
+];
+
+const associadoColumns = [
+  { data: 'nome', title: 'Nome', orderable: true },
+  { data: 'celular', title: 'Contato', orderable: true },
+  { data: 'documento', title: 'Documento', orderable: true },
+  { data: 'cidade', title: 'Cidade', orderable: true },
+  { data: 'estado', title: 'Estado', orderable: true },
+  { data: 'transacoes', title: 'Transações', orderable: true },
+  { data: 'volume', title: 'Volume', orderable: true }
+];
 
 // Format date for display
 function formatDate(date: string | Date) {
@@ -283,31 +199,10 @@ function formatDate(date: string | Date) {
   return new Date(date).toLocaleDateString('pt-BR');
 }
 
-// Generate report
-async function generateReport() {
-  loading.value = true;
-  hasSearched.value = true;
-
-  try {
-    if (reportType.value === 'transactions') {
-      await fetchTransactionsReport();
-    } else if (reportType.value === 'producers') {
-      await fetchAssociadosReport('PRODUTOR');
-    } else if (reportType.value === 'buyers') {
-      await fetchAssociadosReport('COMPRADOR');
-    }
-  } catch (error) {
-    console.error('Error generating report:', error);
-    reportData.value = [];
-  } finally {
-    loading.value = false;
-  }
-}
-
 // Fetch transactions report
 async function fetchTransactionsReport() {
   try {
-    // Build query parameters
+    console.log('Iniciando busca de transações...');
     const queryParams = new URLSearchParams();
 
     if (filters.startDate) {
@@ -322,11 +217,12 @@ async function fetchTransactionsReport() {
       queryParams.append('status', filters.status);
     }
 
-    // Normally we'd call a dedicated report API endpoint, but for demo we'll use the existing API
+    console.log('Parâmetros da busca:', queryParams.toString());
     const response = await $fetch<any>(`/api/transacoes?${queryParams.toString()}`);
+    console.log('Resposta da API:', response);
 
-    // Filter by value if specified
     let filteredData = response.data || [];
+    console.log('Dados filtrados:', filteredData);
 
     if (filters.minValue) {
       filteredData = filteredData.filter((item: TransacaoDTO) =>
@@ -340,17 +236,27 @@ async function fetchTransactionsReport() {
       );
     }
 
-    reportData.value = filteredData;
+    // Mapear os dados para o formato esperado pela tabela
+    reportData.value = filteredData.map((item: TransacaoDTO) => ({
+      data: item.data,
+      comprador: item.comprador,
+      vendedor: item.vendedor,
+      quantidade: item.quantidade,
+      valorTotal: item.valorTotal,
+      status: item.status
+    }));
+
+    console.log('Dados finais:', reportData.value);
   } catch (error) {
-    console.error('Error fetching transactions report:', error);
+    console.error('Erro ao buscar transações:', error);
     throw error;
   }
 }
 
-// Fetch associados report (producers or buyers)
+// Fetch associados report
 async function fetchAssociadosReport(tipo: 'PRODUTOR' | 'COMPRADOR') {
   try {
-    // Build query parameters
+    console.log(`Buscando relatório de ${tipo}...`);
     const queryParams = new URLSearchParams();
     queryParams.append('tipo', tipo);
 
@@ -362,118 +268,52 @@ async function fetchAssociadosReport(tipo: 'PRODUTOR' | 'COMPRADOR') {
       queryParams.append('estado', filters.state);
     }
 
+    console.log('Parâmetros da busca:', queryParams.toString());
     const response = await $fetch<any>(`/api/associado?${queryParams.toString()}`);
+    console.log('Resposta da API:', response);
 
-    // Enhance with transaction data (in a real app, we would have a dedicated API for this)
-    const data = (response.data || []).map((item: AssociadoDTO) => ({
-      ...item,
-      transacoes: Math.floor(Math.random() * 20), // Mock transaction count
-      volume: Math.floor(Math.random() * 100) * 10 // Mock volume
-    }));
+    // Mapear os dados para o formato esperado pela tabela
+    const data = (response.data || []).map((item: AssociadoDTO) => {
+      return {
+        nome: item.nome || '-',
+        celular: item.celular || '-',
+        documento: item.documento || '-',
+        cidade: item.cidade || '-',
+        estado: item.estado || '-',
+        transacoes: item.transacoes || 0,
+        volume: item.volume || 0
+      };
+    });
 
     reportData.value = data;
+    console.log('Dados finais:', reportData.value);
   } catch (error) {
-    console.error('Error fetching associados report:', error);
+    console.error(`Erro ao buscar relatório de ${tipo}:`, error);
     throw error;
   }
 }
 
-// Calculate total volume for transactions
-function calculateTotalVolume() {
-  if (reportType.value !== 'transactions' || !reportData.value.length) return 0;
+// Generate report
+async function generateReport() {
+  loading.value = true;
+  hasSearched.value = true;
+  console.log('Iniciando geração de relatório...');
+  console.log('Tipo de relatório:', reportType.value);
+  console.log('Filtros:', filters);
 
-  return reportData.value.reduce((total: number, item: any) =>
-    total + (item.quantidade || 0), 0
-  );
-}
-
-// Calculate total value for transactions
-function calculateTotalValue() {
-  if (reportType.value !== 'transactions' || !reportData.value.length) return 0;
-
-  return reportData.value.reduce((total: number, item: any) =>
-    total + (item.valorTotal || 0), 0
-  );
-}
-
-// Calculate average value per transaction
-function calculateAverageValue() {
-  if (reportType.value !== 'transactions' || !reportData.value.length) return 0;
-
-  const total = calculateTotalValue();
-  return total / reportData.value.length;
-}
-
-// Calculate total volume for associados
-function calculateTotalAssociadoVolume() {
-  if (reportType.value === 'transactions' || !reportData.value.length) return 0;
-
-  return reportData.value.reduce((total: number, item: any) =>
-    total + (item.volume || 0), 0
-  );
-}
-
-// Calculate average transactions for associados
-function calculateAverageTransactions() {
-  if (reportType.value === 'transactions' || !reportData.value.length) return 0;
-
-  const totalTransactions = reportData.value.reduce((total: number, item: any) =>
-    total + (item.transacoes || 0), 0
-  );
-
-  return (totalTransactions / reportData.value.length).toFixed(2);
-}
-
-// Export as PDF (mock function)
-async function exportPDF() {
-  exportLoading.value = true;
-
-  // In a real app, we would call a server API to generate PDF
-  setTimeout(() => {
-    // Simulate PDF generation
-    const reportTitle = {
-      'transactions': 'Relatório de Transações',
-      'producers': 'Relatório de Produtores',
-      'buyers': 'Relatório de Compradores'
-    }[reportType.value];
-
-    alert(`${reportTitle} exportado com sucesso! (Simulação)`);
-    exportLoading.value = false;
-  }, 1500);
-}
-
-// Export as CSV (mock function)
-function exportCSV() {
-  if (!reportData.value.length) return;
-
-  let csvContent = "";
-
-  // Add headers based on report type
-  if (reportType.value === 'transactions') {
-    csvContent = "Data,Comprador,Vendedor,Quantidade,Valor Total,Status\n";
-
-    // Add data rows
-    reportData.value.forEach((item: any) => {
-      csvContent += `${formatDate(item.data)},${item.comprador},${item.vendedor},${item.quantidade},${item.valorTotal},${item.status}\n`;
-    });
-  } else {
-    csvContent = "Nome,Contato,Documento,Cidade,Estado,Transações,Volume\n";
-
-    // Add data rows
-    reportData.value.forEach((item: any) => {
-      csvContent += `${item.nome},${item.celular || ''},${item.documento || ''},${item.cidade || ''},${item.estado || ''},${item.transacoes || 0},${item.volume || 0}\n`;
-    });
+  try {
+    if (reportType.value === 'transactions') {
+      await fetchTransactionsReport();
+    } else if (reportType.value === 'producers') {
+      await fetchAssociadosReport('PRODUTOR');
+    } else if (reportType.value === 'buyers') {
+      await fetchAssociadosReport('COMPRADOR');
+    }
+  } catch (error) {
+    console.error('Erro ao gerar relatório:', error);
+    reportData.value = [];
+  } finally {
+    loading.value = false;
   }
-
-  // Create download link
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-
-  link.setAttribute("href", url);
-  link.setAttribute("download", `relatorio_${reportType.value}_${new Date().toISOString().split('T')[0]}.csv`);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
 }
 </script>
