@@ -255,6 +255,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue';
 import type { TransacaoDTO, AssociadoDTO } from '~/types/api';
+import UiSelect from '~/components/Ui/select.vue';
 
 // Report type
 const reportType = ref('transactions');
