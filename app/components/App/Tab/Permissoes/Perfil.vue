@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-  import { usePerfilStore } from "@/stores/Tab/Permissoes/PerfilStore";
+  import { usePerfilStore } from "~/stores/PerfilStore";
   // @ts-ignore
   import languageBR from "datatables.net-plugins/i18n/pt-BR.mjs";
   import {

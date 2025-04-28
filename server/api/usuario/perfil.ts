@@ -41,13 +41,16 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
   // GET request to fetch user profile
   if (event.method === 'GET') {
     try {
+      // Fetch user profile including optional associations
       const usuario = await prisma.usuario.findUnique({
         where: { id: userId },
         select: {
           name: true,
           email: true,
           celular: true,
-          type: true
+          type: true,
+          cooperativaId: true,
+          associadoId: true
         }
       })
 
@@ -62,7 +65,9 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
         name: usuario.name,
         email: usuario.email || '',
         celular: usuario.celular,
-        type: usuario.type
+        type: usuario.type,
+        cooperativaId: usuario.cooperativaId,
+        associadoId: usuario.associadoId
       }
 
       return {

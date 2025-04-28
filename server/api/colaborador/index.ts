@@ -25,13 +25,16 @@ export default defineEventHandler(async (event) => {
       return await usuarioRepository.getUsuarioByCooperativaAndType(cooperativaId, UsuarioType.PRODUTOR)
     } else if (type === 'comprador') {
       return await usuarioRepository.getUsuarioByCooperativaAndType(cooperativaId, UsuarioType.COMPRADOR)
+    } else if (type === 'colaborador') {
+      return await usuarioRepository.getUsuarioByCooperativaAndType(cooperativaId, UsuarioType.COLABORADOR)
     } else {
       // Return all types of associates
       const produtores = await usuarioRepository.getUsuarioByCooperativaAndType(cooperativaId, UsuarioType.PRODUTOR)
       const compradores = await usuarioRepository.getUsuarioByCooperativaAndType(cooperativaId, UsuarioType.COMPRADOR)
       const administradores = await usuarioRepository.getUsuarioByCooperativaAndType(cooperativaId, UsuarioType.COOPERATIVA)
+      const colaboradores = await usuarioRepository.getUsuarioByCooperativaAndType(cooperativaId, UsuarioType.COLABORADOR)
 
-      return [...produtores, ...compradores, ...administradores]
+      return [...produtores, ...compradores, ...administradores, ...colaboradores]
     }
   }
 

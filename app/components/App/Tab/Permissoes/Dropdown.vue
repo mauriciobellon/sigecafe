@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useDropdownStore } from "@/stores/Tab/Permissoes/DropdownStore";
+  import { useDropdownStore } from "~/stores/DropdownStore";
   // @ts-ignore
   import languageBR from "datatables.net-plugins/i18n/pt-BR.mjs";
   import {

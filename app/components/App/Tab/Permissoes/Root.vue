@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useRootStore } from "@/stores/Tab/Permissoes/RootStore";
+  import { useRootStore } from "~/stores/RootStore";
   // @ts-ignore
   import languageBR from "datatables.net-plugins/i18n/pt-BR.mjs";
   import {

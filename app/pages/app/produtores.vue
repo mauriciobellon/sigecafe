@@ -353,8 +353,8 @@ async function handleSave() {
   height: 2.5rem;
   width: 100%;
   border-radius: 0.375rem;
-  border: 1px solid var(--input-border);
-  background-color: var(--background);
+  border: 1px solid #dadada;
+  background-color: #FFF;
   padding: 0.5rem 0.75rem;
   font-size: 1rem;
 }

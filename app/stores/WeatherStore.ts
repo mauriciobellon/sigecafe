@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia';
 import type { WeatherDataDTO } from '~/types/api';
+import { useUsuarioStore } from './UserStore';
+import { useCooperativaStore } from './CooperativaStore';
 
 interface WeatherState {
   weatherData: WeatherDataDTO | null;
@@ -30,9 +32,67 @@ export const useWeatherStore = defineStore('weather', {
       this.error = null;
 
       try {
-        // Use default coordinates for São Paulo, Brazil if not specified
-        const latitude = -23.55;
-        const longitude = -46.64;
+        // Determine user location: check associado -> cooperativa -> fallback to São Paulo
+        const usuarioStore = useUsuarioStore();
+        await usuarioStore.fetchUsuarioPreferences();
+        const { associadoId, cooperativaId } = usuarioStore.usuarioPreferences || {};
+
+        let latitude = -23.55;
+        let longitude = -46.64;
+        let city: string | undefined;
+        let state: string | undefined;
+
+        // Try to get associado location
+        if (associadoId) {
+          try {
+            const res = await fetch(`/api/associado/${associadoId}`, { credentials: 'include' });
+            if (res.ok) {
+              const json = await res.json();
+              if (json.success && json.data) {
+                city = json.data.cidade || undefined;
+                state = json.data.estado || undefined;
+                console.log(`[weather] Found associado location city=${city}, state=${state}`);
+              }
+            }
+          } catch (e) {
+            console.error('[weather] Error fetching associado for location:', e);
+          }
+        }
+
+        // Try cooperativa if no city from associado
+        if (!city && cooperativaId) {
+          const coopStore = useCooperativaStore();
+          try {
+            await coopStore.fetchCooperativa();
+            if (coopStore.cooperativa) {
+              city = coopStore.cooperativa.cidade || undefined;
+              state = coopStore.cooperativa.estado || undefined;
+              console.log(`[weather] Found cooperativa location city=${city}, state=${state}`);
+            }
+          } catch (e) {
+            console.error('[weather] Error fetching cooperativa for location:', e);
+          }
+        }
+
+        // Geocode city if available
+        if (city) {
+          try {
+            const query = encodeURIComponent(city) + (state ? `,%20${encodeURIComponent(state)}` : '');
+            const geoRes = await fetch(
+              `https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=1&language=pt`
+            );
+            if (geoRes.ok) {
+              const geoJson = await geoRes.json();
+              if (geoJson.results && geoJson.results.length > 0) {
+                latitude = geoJson.results[0].latitude;
+                longitude = geoJson.results[0].longitude;
+                console.log(`[weather] Geocoded to latitude=${latitude}, longitude=${longitude}`);
+              }
+            }
+          } catch (e) {
+            console.error('[weather] Error geocoding location:', e);
+          }
+        }
 
         // Real API endpoint with timeout of 5 seconds
         const controller = new AbortController();

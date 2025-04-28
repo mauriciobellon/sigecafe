@@ -3,7 +3,7 @@
     <UiDropdownMenu>
       <UiDropdownMenuTrigger as-child>
         <UiButton data-testid="dropdown-button" class="dropdown-button" variant="outline" size="icon">
-          <div class="flex flex-col space-y-1">
+          <div class="flex flex-col space-y-1 hidden lg:block">
             <p class="text-sm font-medium leading-none">{{ usuarioStore.usuarioPreferences?.name }}</p>
             <p class="text-xs leading-none text-muted-foreground">
               {{ usuarioStore.usuarioPreferences?.email }}
