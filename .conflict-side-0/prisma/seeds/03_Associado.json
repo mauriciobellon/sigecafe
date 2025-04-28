@@ -1,0 +1,22 @@
+[
+  {
+    "nome": "João da Silva",
+    "celular": "33333333333",
+    "tipo": "PRODUTOR",
+    "documento": "333.444.555-66",
+    "endereco": "Rua dos Cafezais, 123",
+    "cidade": "Ibatiba",
+    "estado": "ES",
+    "cooperativaId": 1
+  },
+  {
+    "nome": "Daniel de Oliveira",
+    "celular": "44444444444",
+    "tipo": "COMPRADOR",
+    "documento": "444.555.666-77",
+    "endereco": "Av. do Comércio, 789",
+    "cidade": "Ibatiba",
+    "estado": "ES",
+    "cooperativaId": 1
+  }
+]

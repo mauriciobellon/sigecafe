@@ -1,0 +1,3 @@
+ancestorEntries = ["package-lock.json", "prisma/seeds/02_Usuario.json"]
+ourEntries = ["package-lock.json", "prisma/seeds/02_Usuario.json"]
+theirEntries = ["package-lock.json", "prisma/seeds/02_Usuario.json"]

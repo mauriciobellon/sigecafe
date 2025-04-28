@@ -1,0 +1,26 @@
+[
+  {
+    "nome": "Antonio Ademir da Silva",
+    "celular": "11999990006",
+    "cargo": "Gerente",
+    "cooperativaId": 1
+  },
+  {
+    "nome": "Lucas Rodrigues",
+    "celular": "11999990012",
+    "cargo": "Técnico Agrícola",
+    "cooperativaId": 1
+  },
+  {
+    "nome": "Amanda Costa",
+    "celular": "11999990013",
+    "cargo": "Atendimento",
+    "cooperativaId": 1
+  },
+  {
+    "nome": "Roberta Fernandes",
+    "celular": "11999990014",
+    "cargo": "Financeiro",
+    "cooperativaId": 1
+  }
+]

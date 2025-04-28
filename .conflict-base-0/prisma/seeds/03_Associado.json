@@ -1,0 +1,52 @@
+[
+  {
+    "nome": "João da Silva",
+    "celular": "11999990007",
+    "tipo": "PRODUTOR",
+    "documento": "111.222.333-44",
+    "endereco": "Rua dos Cafezais, 123",
+    "cidade": "Ibatiba",
+    "estado": "ES",
+    "cooperativaId": 1
+  },
+  {
+    "nome": "Maria Oliveira",
+    "celular": "11999990009",
+    "tipo": "PRODUTOR",
+    "documento": "222.333.444-55",
+    "endereco": "Estrada do Café, 456",
+    "cidade": "Ibatiba",
+    "estado": "ES",
+    "cooperativaId": 1
+  },
+  {
+    "nome": "Pedro Santos",
+    "celular": "11999990010",
+    "tipo": "PRODUTOR",
+    "documento": "333.444.555-66",
+    "endereco": "Sítio Bela Vista, s/n",
+    "cidade": "Ibatiba",
+    "estado": "ES",
+    "cooperativaId": 1
+  },
+  {
+    "nome": "Daniel de Oliveira",
+    "celular": "11999990008",
+    "tipo": "COMPRADOR",
+    "documento": "444.555.666-77",
+    "endereco": "Av. do Comércio, 789",
+    "cidade": "Ibatiba",
+    "estado": "ES",
+    "cooperativaId": 1
+  },
+  {
+    "nome": "Carlos Ferreira",
+    "celular": "11999990011",
+    "tipo": "COMPRADOR",
+    "documento": "555.666.777-88",
+    "endereco": "Praça Central, 321",
+    "cidade": "Vitória",
+    "estado": "ES",
+    "cooperativaId": 1
+  }
+]
