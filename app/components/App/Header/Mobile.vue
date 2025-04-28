@@ -7,6 +7,7 @@
       <UiScrollArea class="scroll-area">
         <AppHeaderMobileHeader />
         <AppSideNav />
+        <br>
       </UiScrollArea>
     </UiSheetContent>
   </UiSheet>

@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useApiStore } from "@/stores/Tab/Permissoes/ApiStore";
+  import { useApiStore } from "~/stores/ApiStore";
   // @ts-ignore
   import languageBR from "datatables.net-plugins/i18n/pt-BR.mjs";
   import {

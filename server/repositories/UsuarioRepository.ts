@@ -88,9 +88,6 @@ export class UsuarioRepository {
     async deleteUsuarioById(id: number): Promise<void> {
         await prisma.usuario.delete({ where: { id } });
     }
-    async deleteUsuarioByEmail(email: string): Promise<void> {
-        await prisma.usuario.delete({ where: { email } });
-    }
     async deleteUsuarioByCelular(celular: string): Promise<void> {
         await prisma.usuario.delete({ where: { celular } });
     }

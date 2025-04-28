@@ -1,5 +1,5 @@
 <template>
-  <SharedLogo class="app-icon" />
+  <SharedLogo class="app-icon hidden md:flex" />
 </template>
 
 <script lang="ts" setup></script>

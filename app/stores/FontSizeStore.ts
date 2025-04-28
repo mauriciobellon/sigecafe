@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-export type FontSizePreference = "small" | "medium" | "large";
+export type FontSizePreference = "small" | "medium" | "large" | "xlarge";
 
 interface UserPreferences {
   theme?: "light" | "dark" | "system";
@@ -37,7 +37,7 @@ export const useFontSizeStore = defineStore("FontSize", {
     },
 
     cycleFontSize() {
-      const sizes: FontSizePreference[] = ["small", "medium", "large"];
+      const sizes: FontSizePreference[] = ["small", "medium", "large", "xlarge"];
       const currentIndex = sizes.indexOf(this.preference);
       const nextIndex = (currentIndex + 1) % sizes.length;
       const nextSize = sizes[nextIndex] || "medium"; // Ensure a valid default
@@ -49,7 +49,7 @@ export const useFontSizeStore = defineStore("FontSize", {
         const html = document.documentElement;
 
         // Remove existing font size classes
-        html.classList.remove("text-sm", "text-base", "text-lg");
+        html.classList.remove("text-sm", "text-base", "text-lg", "text-xl");
 
         // Add the new font size class
         switch (this.preference) {
@@ -61,6 +61,9 @@ export const useFontSizeStore = defineStore("FontSize", {
             break;
           case "large":
             html.classList.add("text-lg");
+            break;
+          case "xlarge":
+            html.classList.add("text-xl");
             break;
         }
       }
@@ -77,7 +80,7 @@ export const useFontSizeStore = defineStore("FontSize", {
           // Otherwise try localStorage
           const savedPreference = localStorage.getItem("font-size-preference") as FontSizePreference | null;
 
-          if (savedPreference && ["small", "medium", "large"].includes(savedPreference)) {
+          if (savedPreference && ["small", "medium", "large", "xlarge"].includes(savedPreference)) {
             this.preference = savedPreference;
           }
         }
@@ -86,7 +89,7 @@ export const useFontSizeStore = defineStore("FontSize", {
         if (process.client) {
           const savedPreference = localStorage.getItem("font-size-preference") as FontSizePreference | null;
 
-          if (savedPreference && ["small", "medium", "large"].includes(savedPreference)) {
+          if (savedPreference && ["small", "medium", "large", "xlarge"].includes(savedPreference)) {
             this.preference = savedPreference;
           }
         }
