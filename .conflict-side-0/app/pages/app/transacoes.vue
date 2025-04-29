@@ -38,40 +38,24 @@
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Data
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     {{ usuario?.type === 'COMPRADOR' ? 'Vendedor' : 'Comprador' }}
                   </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Quantidade
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Preço Unitário
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Ações
-                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço Unitário</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
                 <tr v-for="transacao in filteredTransacoes" :key="transacao.id">
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ formatDate(transacao.data) }}
-                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(transacao.data) }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {{ usuario?.type === 'COMPRADOR' ? transacao.vendedor : transacao.comprador }}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ transacao.quantidade }} sacas
-                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transacao.quantidade }} sacas</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     R$ {{ transacao.precoUnitario.toFixed(2) }}
                   </td>
@@ -85,7 +69,8 @@
                         'bg-green-100 text-green-800': transacao.status === 'CONCLUIDA',
                         'bg-yellow-100 text-yellow-800': transacao.status === 'PENDENTE',
                         'bg-red-100 text-red-800': transacao.status === 'CANCELADA'
-                      }">
+                      }"
+                    >
                       {{ transacao.status }}
                     </span>
                   </td>
@@ -110,67 +95,79 @@
       </UiCard>
     </AppPage>
 
-    <!-- Modal para nova transação -->
-    <UiSheet v-model:open="isNewTransactionOpen" side="right">
-      <div class="flex flex-col h-full w-80 sm:w-96">
-        <div class="p-4 border-b">
-          <h2 class="text-lg font-medium">{{ editingTransacao ? 'Editar Transação' : 'Nova Transação' }}</h2>
-        </div>
-        <div class="p-4 flex-1 overflow-auto">
-          <form @submit.prevent="saveTransacao" class="space-y-4">
-            <div>
-              <label for="tipo" class="block text-sm font-medium text-gray-700">Tipo</label>
-              <select id="tipo" v-model="transacaoForm.tipo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                <option value="compra">Compra</option>
-                <option value="venda">Venda</option>
-              </select>
-            </div>
+    <!-- Modal para nova/edição de transação -->
+    <AlertDialogRoot v-model:open="isNewTransactionOpen">
+      <AlertDialogPortal>
+        <AlertDialogOverlay
+          class="data-[state=open]:animate-overlayShow fixed inset-0 z-30 bg-background/80 backdrop-blur-sm"
+        >
+          <div
+            class="absolute h-full w-full bg-[radial-gradient(theme(colors.border)_1px,transparent_1px)] [background-size:15px_15px] [mask-image:radial-gradient(ellipse_600px_600px_at_50%_50%,#000_10%,transparent_100%)] dark:bg-[radial-gradient(theme(colors.border)_1px,transparent_1px)]"
+          />
+        </AlertDialogOverlay>
 
-            <div>
-              <label for="contraparte" class="block text-sm font-medium text-gray-700">
-                {{ transacaoForm.tipo === 'compra' ? 'Vendedor' : 'Comprador' }}
-              </label>
-              <input id="contraparte" v-model="transacaoForm.contraparte" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-            </div>
+        <AlertDialogContent
+          class="data-[state=open]:animate-contentShow fixed left-[50%] top-[50%] z-[100] max-h-[85vh] w-[90vw] max-w-[700px] translate-x-[-50%] translate-y-[-50%] rounded-lg border border-input bg-primary-foreground p-[25px] text-[15px] shadow-[0_0px_50px_-30px_rgba(0,0,0,0.5)] focus:outline-none dark:bg-black dark:shadow-[0_0px_80px_-50px_rgba(0,0,0,0.5)] dark:shadow-gray-500 sm:w-[700px]"
+        >
+          <AlertDialogTitle class="mb-4 text-xl font-semibold">
+            {{ editingTransacao ? "Editar Transação" : "Nova Transação" }}
+          </AlertDialogTitle>
 
-            <div>
-              <label for="quantidade" class="block text-sm font-medium text-gray-700">Quantidade (sacas)</label>
-              <input id="quantidade" v-model.number="transacaoForm.quantidade" type="number" min="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-            </div>
+          <AlertDialogDescription class="mb-5 mt-4 text-[15px] leading-normal">
+            <form @submit.prevent="saveTransacao">
+              <div class="grid w-full items-center gap-4">
+                <div class="flex flex-col space-y-1.5">
+                  <UiLabel for="tipo">Tipo</UiLabel>
+                  <select id="tipo" v-model="transacaoForm.tipo" class="alert-input">
+                    <option value="compra">Compra</option>
+                    <option value="venda">Venda</option>
+                  </select>
 
-            <div>
-              <label for="precoUnitario" class="block text-sm font-medium text-gray-700">Preço Unitário (R$)</label>
-              <input id="precoUnitario" v-model.number="transacaoForm.precoUnitario" type="number" min="0.01" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-            </div>
+                  <UiLabel for="contraparte">{{ transacaoForm.tipo === 'compra' ? 'Vendedor' : 'Comprador' }}</UiLabel>
+                  <input id="contraparte" v-model="transacaoForm.contraparte" type="text" class="alert-input" />
 
-            <div>
-              <label for="data" class="block text-sm font-medium text-gray-700">Data</label>
-              <input id="data" v-model="transacaoForm.data" type="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-            </div>
+                  <UiLabel for="quantidade">Quantidade (sacas)</UiLabel>
+                  <input id="quantidade" v-model.number="transacaoForm.quantidade" type="number" min="1" class="alert-input" />
 
-            <div>
-              <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-              <select id="status" v-model="transacaoForm.status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                <option value="PENDENTE">Pendente</option>
-                <option value="CONCLUIDA">Concluída</option>
-                <option value="CANCELADA">Cancelada</option>
-              </select>
-            </div>
+                  <UiLabel for="precoUnitario">Preço Unitário (R$)</UiLabel>
+                  <input id="precoUnitario" v-model.number="transacaoForm.precoUnitario" type="number" min="0.01" step="0.01" class="alert-input" />
 
-            <div>
-              <label for="observacoes" class="block text-sm font-medium text-gray-700">Observações</label>
-              <textarea id="observacoes" v-model="transacaoForm.observacoes" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="p-4 border-t flex justify-end space-x-2">
-          <UiButton variant="outline" @click="isNewTransactionOpen = false">Cancelar</UiButton>
-          <UiButton @click="saveTransacao">Salvar</UiButton>
-        </div>
-      </div>
-    </UiSheet>
+                  <UiLabel for="data">Data</UiLabel>
+                  <input id="data" v-model="transacaoForm.data" type="date" class="alert-input" />
+
+                  <UiLabel for="status">Status</UiLabel>
+                  <select id="status" v-model="transacaoForm.status" class="alert-input">
+                    <option value="PENDENTE">Pendente</option>
+                    <option value="CONCLUIDA">Concluída</option>
+                    <option value="CANCELADA">Cancelada</option>
+                  </select>
+
+                  <UiLabel for="observacoes">Observações</UiLabel>
+                  <textarea id="observacoes" v-model="transacaoForm.observacoes" rows="3" class="alert-input"></textarea>
+                </div>
+              </div>
+            </form>
+          </AlertDialogDescription>
+
+          <div class="flex justify-end gap-[25px]">
+            <AlertDialogCancel
+              class="text-mauve11 bg-mauve4 hover:bg-mauve5 focus:shadow-mauve7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none outline-none focus:shadow-[0_0_0_2px]"
+            >
+              Voltar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              class="text-red11 bg-red4 hover:bg-red5 focus:shadow-red7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none outline-none focus:shadow-[0_0_0_2px]"
+              @click="saveTransacao"
+            >
+              {{ editingTransacao ? "Atualizar" : "Salvar" }}
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialogPortal>
+    </AlertDialogRoot>
   </div>
 </template>
+
 
 <script setup lang="ts">
   import { ref, computed, reactive, onMounted } from 'vue';

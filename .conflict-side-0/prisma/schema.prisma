@@ -94,11 +94,13 @@ model Transacao {
   observacoes   String?
   compradorId   Int
   vendedorId    Int
+  tipo          String
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   comprador     Usuario         @relation("CompraTransacoes", fields: [compradorId], references: [id])
   vendedor      Usuario         @relation("VendaTransacoes", fields: [vendedorId], references: [id])
 }
+
 
 model PrecoCafeHistorico {
   id           Int      @id @default(autoincrement())
