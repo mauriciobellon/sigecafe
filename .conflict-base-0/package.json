@@ -35,10 +35,10 @@
     "@iconify-json/solar": "^1.2.1",
     "@iconify-json/subway": "^1.2.0",
     "@morev/vue-transitions": "^3.0.5",
-    "@nuxt/fonts": "^0.10.2",
+    "@nuxt/fonts": "^0.11.2",
     "@pinia/nuxt": "^0.7.0",
     "@prisma/nuxt": "^0.0.35",
-    "@sidebase/nuxt-auth": "^0.9.4",
+    "@sidebase/nuxt-auth": "^0.6.7",
     "@types/bcrypt": "^5.0.2",
     "@unovis/ts": "^1.5.1",
     "@unovis/vue": "^1.5.1",
@@ -56,7 +56,7 @@
     "next-auth": "4.21.1",
     "nuxt": "^3.14.159",
     "openmeteo": "^1.2.0",
-    "pinia": "^2.2.6",
+    "pinia": "^2.3.1",
     "puppeteer": "^24.4.0",
     "radix-vue": "^1.9.9",
     "tailwind-variants": "^0.2.1",
@@ -82,7 +82,7 @@
     "prisma": "5.22.0",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.6.3",
-    "vitest": "^2.1.4",
+    "vitest": "^3.1.2",
     "vitest-environment-nuxt": "^1.0.1"
   }
 }

@@ -157,9 +157,9 @@
             </AlertDialogCancel>
             <AlertDialogAction
               class="text-red11 bg-red4 hover:bg-red5 focus:shadow-red7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none outline-none focus:shadow-[0_0_0_2px]"
-              @click="saveTransacao"
+              type="submit"
             >
-              {{ editingTransacao ? "Atualizar" : "Salvar" }}
+              Salvar
             </AlertDialogAction>
           </div>
         </AlertDialogContent>
@@ -169,253 +169,90 @@
 </template>
 
 
-<script setup lang="ts">
-  import { ref, computed, reactive, onMounted } from 'vue';
-  import { useUsuarioStore } from '~/stores/UserStore';
-  import type { TransacaoDTO } from '~/types/api';
+<script setup>
+import { ref, computed } from 'vue';
 
-  const usuarioStore = useUsuarioStore();
-  const usuario = computed(() => usuarioStore.usuarioPreferences);
+const filter = ref('');
+const statusFilter = ref('');
+const isNewTransactionOpen = ref(false);
+const transacaoForm = ref({
+  tipo: 'compra',
+  contraparte: '',
+  quantidade: 1,
+  precoUnitario: 0,
+  data: '',
+  status: 'PENDENTE',
+  observacoes: '',
+});
+const editingTransacao = ref(false);
 
-  // Estado local
-  const isNewTransactionOpen = ref(false);
-  const filter = ref('');
-  const statusFilter = ref('');
-  const editingTransacao = ref<TransacaoDTO | null>(null);
+const transacoes = ref([
+  // Exemplo de transação
+  { id: 1, data: '2025-04-27', comprador: 'Cafeicultor A', vendedor: 'Comerciante B', quantidade: 10, precoUnitario: 300, status: 'CONCLUIDA' },
+  
+  // Exemplo de outra transação
+  { id: 2, data: '2025-04-25', comprador: 'Cafeicultor C', vendedor: 'Comerciante D', quantidade: 15, precoUnitario: 280, status: 'PENDENTE' },
+  
+  // Exemplo de transação com status "CANCELADA"
+  { id: 3, data: '2025-04-22', comprador: 'Cafeicultor E', vendedor: 'Comerciante F', quantidade: 8, precoUnitario: 290, status: 'CANCELADA' },
+  
+  // Outra transação de compra
+  { id: 4, data: '2025-04-20', comprador: 'Cafeicultor G', vendedor: 'Comerciante H', quantidade: 20, precoUnitario: 310, status: 'CONCLUIDA' },
+  
+  // Transação com quantidade maior e preço diferente
+  { id: 5, data: '2025-04-18', comprador: 'Cafeicultor I', vendedor: 'Comerciante J', quantidade: 25, precoUnitario: 330, status: 'PENDENTE' }
+]);
 
-  // Dados de transações
-  const transacoes = ref<TransacaoDTO[]>([]);
-  const loading = ref(false);
-  const error = ref<string | null>(null);
 
-  // Formulário para nova transação
-  const transacaoForm = reactive({
-    id: null as string | null,
+const filteredTransacoes = computed(() => {
+  return transacoes.value.filter(transacao => {
+    const statusMatch = statusFilter.value ? transacao.status === statusFilter.value : true;
+    const filterMatch = transacao.comprador.toLowerCase().includes(filter.value.toLowerCase()) ||
+      transacao.vendedor.toLowerCase().includes(filter.value.toLowerCase());
+    return statusMatch && filterMatch;
+  });
+});
+
+const openNewTransactionModal = () => {
+  transacaoForm.value = {
     tipo: 'compra',
     contraparte: '',
     quantidade: 1,
-    precoUnitario: 900,
-    data: new Date().toISOString().split('T')[0],
-    status: 'PENDENTE' as 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA',
-    observacoes: ''
-  });
+    precoUnitario: 0,
+    data: '',
+    status: 'PENDENTE',
+    observacoes: '',
+  };
+  editingTransacao.value = false;
+  isNewTransactionOpen.value = true;
+};
 
-  // Carregar transações ao montar o componente
-  onMounted(async () => {
-    await loadTransacoes();
-  });
-
-  // Carregar transações da API
-  async function loadTransacoes() {
-    loading.value = true;
-    error.value = null;
-
-    try {
-      const response = await $fetch('/api/transacoes', {
-        credentials: 'include'
-      });
-
-      if (response && Array.isArray(response)) {
-        // Convert string dates to Date objects
-        transacoes.value = response.map(item => ({
-          ...item,
-          data: new Date(item.data),
-          createdAt: new Date(item.createdAt),
-          updatedAt: new Date(item.updatedAt)
-        })) as TransacaoDTO[];
-      } else {
-        throw new Error('Resposta inválida da API');
-      }
-    } catch (e) {
-      error.value = 'Erro ao carregar transações';
-      console.error(e);
-
-      // Fallback para mock data em caso de erro (desenvolvimento)
-      transacoes.value = [
-        {
-          id: "1",
-          data: new Date(),
-          comprador: 'Empresa A',
-          compradorId: 1,
-          vendedor: 'Produtor B',
-          vendedorId: 2,
-          quantidade: 10,
-          precoUnitario: 950.00,
-          valorTotal: 9500.00,
-          status: 'CONCLUIDA' as 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA',
-          observacoes: 'Café arábica de qualidade superior',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          id: "2",
-          data: new Date(Date.now() - 86400000), // ontem
-          comprador: 'Empresa C',
-          compradorId: 3,
-          vendedor: 'Produtor A',
-          vendedorId: 4,
-          quantidade: 5,
-          precoUnitario: 920.50,
-          valorTotal: 4602.50,
-          status: 'PENDENTE' as 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA',
-          observacoes: '',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          id: "3",
-          data: new Date(Date.now() - 172800000), // 2 dias atrás
-          comprador: 'Empresa B',
-          compradorId: 5,
-          vendedor: 'Produtor C',
-          vendedorId: 6,
-          quantidade: 15,
-          precoUnitario: 900.00,
-          valorTotal: 13500.00,
-          status: 'CANCELADA' as 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA',
-          observacoes: 'Cancelado por atraso na entrega',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      ];
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  // Filtragem de transações
-  const filteredTransacoes = computed(() => {
-    return transacoes.value.filter(t => {
-      const matchesFilter = filter.value === '' ||
-        t.comprador.toLowerCase().includes(filter.value.toLowerCase()) ||
-        t.vendedor.toLowerCase().includes(filter.value.toLowerCase()) ||
-        (t.observacoes && t.observacoes.toLowerCase().includes(filter.value.toLowerCase()));
-
-      const matchesStatus = statusFilter.value === '' || t.status === statusFilter.value.toUpperCase();
-
-      return matchesFilter && matchesStatus;
+const saveTransacao = () => {
+  if (editingTransacao.value) {
+    // Atualizar a transação existente
+  } else {
+    // Adicionar nova transação
+    transacoes.value.push({
+      ...transacaoForm.value,
+      id: Date.now(), // Gerar um ID único para a nova transação
     });
-  });
-
-  // Funções
-  function formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('pt-BR');
   }
+  isNewTransactionOpen.value = false;
+};
 
-  function openNewTransactionModal() {
-    // Reset form
-    Object.assign(transacaoForm, {
-      id: null,
-      tipo: 'compra',
-      contraparte: '',
-      quantidade: 1,
-      precoUnitario: 900,
-      data: new Date().toISOString().split('T')[0],
-      status: 'PENDENTE' as 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA',
-      observacoes: ''
-    });
+const editTransacao = (transacao) => {
+  transacaoForm.value = { ...transacao };
+  editingTransacao.value = true;
+  isNewTransactionOpen.value = true;
+};
 
-    editingTransacao.value = null;
-    isNewTransactionOpen.value = true;
-  }
+const deleteTransacao = (transacao) => {
+  transacoes.value = transacoes.value.filter(t => t.id !== transacao.id);
+};
 
-  function editTransacao(transacao: TransacaoDTO) {
-    // Preencher formulário com dados da transação
-    const tipo = usuario.value?.type === 'COMPRADOR' ? 'compra' : 'venda';
-    const contraparte = tipo === 'compra' ? transacao.vendedor : transacao.comprador;
-
-    Object.assign(transacaoForm, {
-      id: transacao.id,
-      tipo,
-      contraparte,
-      quantidade: transacao.quantidade,
-      precoUnitario: transacao.precoUnitario,
-      data: transacao.data instanceof Date
-        ? transacao.data.toISOString().split('T')[0]
-        : new Date(transacao.data).toISOString().split('T')[0],
-      status: transacao.status,
-      observacoes: transacao.observacoes || ''
-    });
-
-    editingTransacao.value = transacao;
-    isNewTransactionOpen.value = true;
-  }
-
-  function deleteTransacao(transacao: TransacaoDTO) {
-    // Confirmar antes de excluir
-    if (confirm(`Tem certeza que deseja excluir esta transação?`)) {
-      try {
-        // Chamar a API para excluir no servidor
-        $fetch(`/api/transacoes/${transacao.id}`, {
-          method: 'DELETE',
-          credentials: 'include'
-        }).then(() => {
-          // Remover da lista local após sucesso
-          transacoes.value = transacoes.value.filter(t => t.id !== transacao.id);
-        }).catch(error => {
-          console.error('Erro ao excluir transação:', error);
-          alert('Não foi possível excluir a transação. Tente novamente.');
-        });
-      } catch (error) {
-        console.error('Erro ao excluir transação:', error);
-        alert('Não foi possível excluir a transação. Tente novamente.');
-      }
-    }
-  }
-
-  async function saveTransacao() {
-    // Validação básica do formulário
-    if (!transacaoForm.contraparte || transacaoForm.quantidade <= 0 || transacaoForm.precoUnitario <= 0) {
-      alert('Por favor, preencha todos os campos obrigatórios corretamente.');
-      return;
-    }
-
-    // Calcular valor total
-    const valorTotal = transacaoForm.quantidade * transacaoForm.precoUnitario;
-
-    try {
-      if (transacaoForm.id) {
-        // Atualizar transação existente
-        const response = await $fetch(`/api/transacoes/${transacaoForm.id}`, {
-          method: 'PUT',
-          body: {
-            quantidade: transacaoForm.quantidade,
-            precoUnitario: transacaoForm.precoUnitario,
-            valorTotal: valorTotal,
-            data: transacaoForm.data ? new Date(transacaoForm.data) : new Date(),
-            status: transacaoForm.status,
-            observacoes: transacaoForm.observacoes,
-            tipo: transacaoForm.tipo,
-            contraparte: transacaoForm.contraparte
-          },
-          credentials: 'include'
-        });
-      } else {
-        // Criar nova transação
-        const response = await $fetch('/api/transacoes', {
-          method: 'POST',
-          body: {
-            quantidade: transacaoForm.quantidade,
-            precoUnitario: transacaoForm.precoUnitario,
-            valorTotal: valorTotal,
-            data: transacaoForm.data ? new Date(transacaoForm.data) : new Date(),
-            status: transacaoForm.status,
-            observacoes: transacaoForm.observacoes,
-            tipo: transacaoForm.tipo,
-            contraparte: transacaoForm.contraparte
-          },
-          credentials: 'include'
-        });
-      }
-
-      // Recarregar transações após sucesso
-      await loadTransacoes();
-
-      // Fechar modal após sucesso
-      isNewTransactionOpen.value = false;
-    } catch (error) {
-      console.error('Erro ao salvar transação:', error);
-      alert('Não foi possível salvar a transação. Verifique os dados e tente novamente.');
-    }
-  }
+const formatDate = (dateString) => {
+  const options = { year: 'numeric', month: 'short', day: 'numeric' };
+  const date = new Date(dateString);
+  return date.toLocaleDateString('pt-BR', options);
+};
 </script>
