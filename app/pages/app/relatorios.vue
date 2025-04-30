@@ -129,13 +129,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 import type { TransacaoDTO, AssociadoDTO } from '~/types/api';
 import UiSelect from '~/components/Ui/select.vue';
 import Datatable from '~/components/Ui/Datatable.client.vue';
 
 // Report type
 const reportType = ref('transactions');
+
+// Watch report type changes
+watch(reportType, () => {
+  reportData.value = [];
+  hasSearched.value = false;
+});
 
 // Filters
 const filters = reactive({
@@ -202,7 +208,6 @@ function formatDate(date: string | Date) {
 // Fetch transactions report
 async function fetchTransactionsReport() {
   try {
-    console.log('Iniciando busca de transações...');
     const queryParams = new URLSearchParams();
 
     if (filters.startDate) {
@@ -217,12 +222,8 @@ async function fetchTransactionsReport() {
       queryParams.append('status', filters.status);
     }
 
-    console.log('Parâmetros da busca:', queryParams.toString());
-    const response = await $fetch<any>(`/api/transacoes?${queryParams.toString()}`);
-    console.log('Resposta da API:', response);
-
-    let filteredData = response.data || [];
-    console.log('Dados filtrados:', filteredData);
+    const response = await $fetch<TransacaoDTO[]>(`/api/transacoes?${queryParams.toString()}`);
+    let filteredData = response || [];
 
     if (filters.minValue) {
       filteredData = filteredData.filter((item: TransacaoDTO) =>
@@ -236,19 +237,15 @@ async function fetchTransactionsReport() {
       );
     }
 
-    // Mapear os dados para o formato esperado pela tabela
     reportData.value = filteredData.map((item: TransacaoDTO) => ({
-      data: item.data,
+      data: formatDate(item.data),
       comprador: item.comprador,
       vendedor: item.vendedor,
       quantidade: item.quantidade,
-      valorTotal: item.valorTotal,
+      valorTotal: item.valorTotal?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00',
       status: item.status
     }));
-
-    console.log('Dados finais:', reportData.value);
   } catch (error) {
-    console.error('Erro ao buscar transações:', error);
     throw error;
   }
 }
@@ -256,7 +253,6 @@ async function fetchTransactionsReport() {
 // Fetch associados report
 async function fetchAssociadosReport(tipo: 'PRODUTOR' | 'COMPRADOR') {
   try {
-    console.log(`Buscando relatório de ${tipo}...`);
     const queryParams = new URLSearchParams();
     queryParams.append('tipo', tipo);
 
@@ -268,27 +264,19 @@ async function fetchAssociadosReport(tipo: 'PRODUTOR' | 'COMPRADOR') {
       queryParams.append('estado', filters.state);
     }
 
-    console.log('Parâmetros da busca:', queryParams.toString());
     const response = await $fetch<any>(`/api/associado?${queryParams.toString()}`);
-    console.log('Resposta da API:', response);
-
-    // Mapear os dados para o formato esperado pela tabela
-    const data = (response.data || []).map((item: AssociadoDTO) => {
-      return {
-        nome: item.nome || '-',
-        celular: item.celular || '-',
-        documento: item.documento || '-',
-        cidade: item.cidade || '-',
-        estado: item.estado || '-',
-        transacoes: item.transacoes || 0,
-        volume: item.volume || 0
-      };
-    });
+    const data = (response.data || []).map((item: AssociadoDTO) => ({
+      nome: item.nome || '-',
+      celular: item.celular || '-',
+      documento: item.documento || '-',
+      cidade: item.cidade || '-',
+      estado: item.estado || '-',
+      transacoes: item.transacoes || 0,
+      volume: item.volume || 0
+    }));
 
     reportData.value = data;
-    console.log('Dados finais:', reportData.value);
   } catch (error) {
-    console.error(`Erro ao buscar relatório de ${tipo}:`, error);
     throw error;
   }
 }
@@ -297,9 +285,6 @@ async function fetchAssociadosReport(tipo: 'PRODUTOR' | 'COMPRADOR') {
 async function generateReport() {
   loading.value = true;
   hasSearched.value = true;
-  console.log('Iniciando geração de relatório...');
-  console.log('Tipo de relatório:', reportType.value);
-  console.log('Filtros:', filters);
 
   try {
     if (reportType.value === 'transactions') {
@@ -310,7 +295,6 @@ async function generateReport() {
       await fetchAssociadosReport('COMPRADOR');
     }
   } catch (error) {
-    console.error('Erro ao gerar relatório:', error);
     reportData.value = [];
   } finally {
     loading.value = false;

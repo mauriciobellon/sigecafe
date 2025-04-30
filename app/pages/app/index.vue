@@ -127,46 +127,61 @@
   import { useUsuarioStore } from '../../stores/UserStore';
   import { useWeatherStore } from '../../stores/WeatherStore';
 
+  interface CoffeePriceData {
+    arabica: number;
+    robusta: number;
+    date: Date;
+  }
+
+  interface CoffeePriceResponse {
+    success: boolean;
+    data?: CoffeePriceData;
+    message?: string;
+  }
+
+  interface Atividade {
+    id: number;
+    icon: string;
+    titulo: string;
+    descricao: string;
+    data: string;
+  }
+
   const usuarioStore = useUsuarioStore();
   const usuario = computed(() => usuarioStore.usuarioPreferences);
 
-  // Coffee prices state
-  const coffeePricesData = ref({
+  const coffeePricesData = ref<CoffeePriceData>({
     arabica: 0,
     robusta: 0,
     date: new Date()
   });
   const loadingPrices = ref(false);
-  const priceError = ref(null);
+  const priceError = ref<string | null>(null);
 
-  // Computed property for displaying prices
   const latestCoffeePrices = computed(() => coffeePricesData.value);
 
-  // Format date for display
-  function formatDate(date) {
+  function formatDate(date: string | Date): string {
     return new Date(date).toLocaleDateString('pt-BR');
   }
 
-  // Fetch coffee prices
   async function fetchCoffeePrices() {
     loadingPrices.value = true;
     priceError.value = null;
 
     try {
-      const response = await $fetch('/api/coffee-prices', {
+      const response = await $fetch<CoffeePriceResponse>('/api/coffee-prices', {
         credentials: 'include'
       });
 
-      if (response.success) {
+      if (response.success && response.data) {
         coffeePricesData.value = response.data;
       } else {
-        throw new Error(response.message || 'Failed to fetch coffee prices');
+        throw new Error(response.message || 'Falha ao buscar preços do café');
       }
-    } catch (error) {
-      console.error('Error fetching coffee prices:', error);
-      priceError.value = error.message || 'Failed to fetch coffee prices';
+    } catch (error: unknown) {
+      console.error('Erro ao buscar preços do café:', error);
+      priceError.value = error instanceof Error ? error.message : 'Falha ao buscar preços do café';
 
-      // Use fallback prices
       coffeePricesData.value = {
         arabica: 31.20,
         robusta: 25.59,
@@ -177,11 +192,10 @@
     }
   }
 
-  // Mock data - replace with real data from your API
   const notificacoesPendentes = ref(5);
   const transacoesPendentes = ref(3);
 
-  const atividadesRecentes = ref([
+  const atividadesRecentes = ref<Atividade[]>([
     {
       id: 1,
       icon: 'lucide:move-up',
