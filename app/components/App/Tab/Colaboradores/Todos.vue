@@ -69,7 +69,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from "vue";
 import { useToast } from "~/composables/useToast";
-import { useColaboradorStore } from "~/stores/Tab/Colaboradores/ColaboradorStore";
+import { useColaboradorStore } from "~/stores/ColaboradorStore";
 import { useTabName } from "~/composables/useTabName";
 // @ts-ignore
 import languageBR from "datatables.net-plugins/i18n/pt-BR.mjs";

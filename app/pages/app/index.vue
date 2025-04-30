@@ -7,18 +7,6 @@
 
     <div v-else>
 
-      <div v-if="usuario?.type === 'ADMINISTRADOR'">
-        <UiCard class="mt-10 mb-6">
-          <UiCardHeader>
-            <UiCardTitle>Bem-vindo {{ usuario?.name }}</UiCardTitle>
-            <UiCardDescription>
-              Aqui você pode gerenciar as permissões do sistema para sua cooperativa
-            </UiCardDescription>
-          </UiCardHeader>
-        </UiCard>
-      </div>
-
-      <div v-else>
         <UiCard class="mt-10 mb-6">
           <UiCardHeader>
             <UiCardTitle>Bem-vindo {{ usuario?.name }}</UiCardTitle>
@@ -63,7 +51,7 @@
         <div v-if="usuario?.type === 'ADMINISTRADOR' || usuario?.type === 'COOPERATIVA' || usuario?.type === 'PRODUTOR' || usuario?.type === 'COMPRADOR'">
           <UiCard class="mb-6">
             <UiCardHeader>
-              <UiCardTitle>Controle Climático</UiCardTitle>
+              <UiCardTitle>Clima em {{ cidadeCooperativa }}</UiCardTitle>
             </UiCardHeader>
             <UiCardContent>
               <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -82,7 +70,7 @@
                 <UiButton variant="outline" class="h-32 flex-col gap-2 text-center whitespace-nowrap items-center justify-center">
                   <Icon name="lucide:cloud-hail" class="h-6 w-6" />
                   <span class="text-sm">Precipitação</span>
-                  <span class="text-sm">{{ weatherStore.weatherData?.hourly?.precipitation }} %</span>
+                  <span class="text-sm">{{ weatherStore.weatherData?.hourly?.precipitation }} mm</span>
                 </UiButton>
 
                 <UiButton variant="outline" class="h-32 flex-col gap-2 text-center whitespace-nowrap items-center justify-center">
@@ -119,7 +107,7 @@
         </UiCard>
       </div>
     </div>
-  </div>
+
 </template>
 
 <script lang="ts" setup>
@@ -148,9 +136,79 @@
   }
 
   const usuarioStore = useUsuarioStore();
+  const weatherStore = useWeatherStore();
   const usuario = computed(() => usuarioStore.usuarioPreferences);
 
-  const coffeePricesData = ref<CoffeePriceData>({
+  // City data
+  const cidade = ref('São Paulo');
+
+  // Fetch location data
+  async function fetchCidadeInfo() {
+    console.log('Fetching location data...');
+    try {
+      const { associadoId, cooperativaId } = usuario.value || {};
+      console.log('User data:', { associadoId, cooperativaId });
+
+      // Try to get associado location first
+      if (associadoId) {
+        try {
+          console.log('Fetching associado data...');
+          const res = await fetch(`/api/associado/${associadoId}`, { credentials: 'include' });
+          if (res.ok) {
+            const json = await res.json();
+            console.log('Received associado data:', json);
+            if (json.success && json.data && json.data.cidade) {
+              cidade.value = json.data.cidade;
+              console.log('Updated city to:', cidade.value, 'from associado');
+              localStorage.setItem('userCidade', cidade.value);
+              return;
+            }
+          }
+        } catch (e) {
+          console.error('Error fetching associado data:', e);
+        }
+      }
+
+      // Try cooperativa if no city from associado
+      if (cooperativaId) {
+        try {
+          console.log('Fetching cooperativa data...');
+          const res = await fetch(`/api/cooperativa/${cooperativaId}`, { credentials: 'include' });
+          if (res.ok) {
+            const json = await res.json();
+            console.log('Received cooperativa data:', json);
+            if (json.success && json.data && json.data.cidade) {
+              cidade.value = json.data.cidade;
+              console.log('Updated city to:', cidade.value, 'from cooperativa');
+              localStorage.setItem('userCidade', cidade.value);
+              return;
+            }
+          }
+        } catch (e) {
+          console.error('Error fetching cooperativa data:', e);
+        }
+      }
+    } catch (e) {
+      console.error('Error determining location:', e);
+    }
+  }
+
+  // Use computed for display with localStorage fallback
+  const cidadeCooperativa = computed(() => {
+    if (cidade.value !== 'São Paulo') {
+      return cidade.value;
+    }
+    // Try to get from localStorage if initial value hasn't changed
+    const storedCity = localStorage.getItem('userCidade');
+    if (storedCity) {
+      cidade.value = storedCity;
+      return storedCity;
+    }
+    return cidade.value;
+  });
+
+  // Coffee prices state
+  const coffeePricesData = ref({
     arabica: 0,
     robusta: 0,
     date: new Date()
@@ -160,7 +218,8 @@
 
   const latestCoffeePrices = computed(() => coffeePricesData.value);
 
-  function formatDate(date: string | Date): string {
+  // Format date for display
+  function formatDate(date: Date | string): string {
     return new Date(date).toLocaleDateString('pt-BR');
   }
 
@@ -169,18 +228,23 @@
     priceError.value = null;
 
     try {
-      const response = await $fetch<CoffeePriceResponse>('/api/coffee-prices', {
+      const response: any = await $fetch('/api/coffee-prices', {
         credentials: 'include'
       });
 
-      if (response.success && response.data) {
-        coffeePricesData.value = response.data;
+      if (response?.success && response?.data) {
+        // Ensure we have valid numbers
+        coffeePricesData.value = {
+          arabica: Number(response.data.arabica) || 0,
+          robusta: Number(response.data.robusta) || 0,
+          date: new Date(response.data.date)
+        };
       } else {
-        throw new Error(response.message || 'Falha ao buscar preços do café');
+        throw new Error(response?.message || 'Failed to fetch coffee prices');
       }
     } catch (error: unknown) {
-      console.error('Erro ao buscar preços do café:', error);
-      priceError.value = error instanceof Error ? error.message : 'Falha ao buscar preços do café';
+      console.error('Error fetching coffee prices:', error);
+      priceError.value = error instanceof Error ? error.message : 'Failed to fetch coffee prices';
 
       coffeePricesData.value = {
         arabica: 31.20,
@@ -219,12 +283,21 @@
     }
   ]);
 
-  const weatherStore = useWeatherStore();
-
   onMounted(async () => {
-    await Promise.all([
-      weatherStore.fetchWeather(),
-      fetchCoffeePrices()
-    ]);
+    // Try to get from localStorage first
+    const storedCity = localStorage.getItem('userCidade');
+    if (storedCity) {
+      cidade.value = storedCity;
+      console.log('Loaded city from localStorage:', cidade.value);
+    }
+
+    // Then fetch data as needed
+    try {
+      await weatherStore.fetchWeather();
+      await fetchCoffeePrices();
+      await fetchCidadeInfo();
+    } catch (error) {
+      console.error('Error in onMounted:', error);
+    }
   });
 </script>

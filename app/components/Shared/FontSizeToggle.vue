@@ -24,6 +24,7 @@
       case 'small': return 'Pequeno';
       case 'medium': return 'Médio';
       case 'large': return 'Grande';
+      case 'xlarge': return 'Muito Grande';
       default: return 'Médio';
     }
   });
@@ -33,6 +34,7 @@
       case 'small': return 'P';
       case 'medium': return 'M';
       case 'large': return 'G';
+      case 'xlarge': return 'XG';
       default: return 'M';
     }
   });

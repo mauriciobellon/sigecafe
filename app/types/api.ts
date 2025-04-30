@@ -128,6 +128,9 @@ export interface UsuarioPreferencesDTO {
   email: string;
   celular?: string;
   type: string;
+  // Optional associations for fetching location
+  cooperativaId?: number | null;
+  associadoId?: number | null;
 }
 
 export interface LoginDTO {
@@ -157,6 +160,29 @@ export interface WeatherDataDTO {
     precipitationProbability: number;
     precipitation: number;
   }
+}
+
+// Order book offer types
+export interface OfferDTO {
+  id: number;
+  userId: number;
+  user: string; // user name
+  side: 'BUY' | 'SELL';
+  price: number;
+  quantity: number;
+  status: 'OPEN' | 'FILLED' | 'CANCELLED';
+  createdAt: Date;
+}
+
+export interface CreateOfferDTO {
+  side: 'BUY' | 'SELL';
+  price: number;
+  quantity: number;
+}
+
+export interface OfferBookDTO {
+  bids: OfferDTO[];
+  asks: OfferDTO[];
 }
 
 // Password recovery related DTOs

@@ -4,7 +4,7 @@
       <template #trigger>
         <UiTooltipTrigger as-child>
           <NuxtLink :data-testid="`nav-link-${page.title}`" class="nav-link" exact-active-class="nav-link-active"
-            :to="page.path">
+            :to="page.path" @click="closeMobileNav">
             <Icon v-if="page.icon" :name="page.icon" class="nav-icon" />
             {{ page.title }}
           </NuxtLink>
@@ -21,8 +21,15 @@
 </template>
 
 <script lang="ts" setup>
+  import { useHeaderStore } from "~/stores/HeaderStore";
+
   const navigationStore = useNavigationStore();
+  const headerStore = useHeaderStore();
   const pages = computed(() => navigationStore.filterPages());
+
+  function closeMobileNav() {
+    headerStore.mobileNav = false;
+  }
 </script>
 
 <style scoped>

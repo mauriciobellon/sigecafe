@@ -117,6 +117,15 @@
     ]
   },
   {
+    "path": "/api/offers",
+    "usuarioType": [
+      "ADMINISTRADOR",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR"
+    ]
+  },
+  {
     "path": "/app/sobre",
     "title": "Sobre",
     "usuarioType": [
@@ -255,6 +264,21 @@
     ]
   },
   {
+    "path": "/app/offers",
+    "title": "Livro de Ofertas",
+    "icon": "ph:book-duotone",
+    "description": "Acompanhe as ofertas do livro",
+    "menuType": [
+      "ROOT"
+    ],
+    "usuarioType": [
+      "ADMINISTRADOR",
+      "COOPERATIVA",
+      "PRODUTOR",
+      "COMPRADOR"
+    ]
+  },
+  {
     "path": "/app/notificacoes",
     "title": "Notificações",
     "icon": "solar:notification-unread-lines-bold-duotone",
@@ -279,21 +303,6 @@
     ],
     "usuarioType": [
       "COOPERATIVA",
-      "ADMINISTRADOR"
-    ]
-  },
-  {
-    "path": "/app/dashboard",
-    "title": "Dashboard",
-    "icon": "ph:chart-pie-duotone",
-    "description": "Acompanhe o desempenho e compare com indicadores do mercado",
-    "menuType": [
-      "ROOT"
-    ],
-    "usuarioType": [
-      "COOPERATIVA",
-      "PRODUTOR",
-      "COMPRADOR",
       "ADMINISTRADOR"
     ]
   },
