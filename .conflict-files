@@ -1,3 +1,0 @@
-ancestorEntries = ["prisma/seeds/02_Usuario.json"]
-ourEntries = ["prisma/seeds/02_Usuario.json"]
-theirEntries = ["prisma/seeds/02_Usuario.json"]
