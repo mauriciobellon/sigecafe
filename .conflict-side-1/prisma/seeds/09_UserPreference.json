@@ -1,0 +1,42 @@
+[
+  {
+    "theme": "light",
+    "fontSize": "medium",
+    "usuarioId": 1
+  },
+  {
+    "theme": "system",
+    "fontSize": "medium",
+    "usuarioId": 2
+  },
+  {
+    "theme": "dark",
+    "fontSize": "large",
+    "usuarioId": 3
+  },
+  {
+    "theme": "light",
+    "fontSize": "small",
+    "usuarioId": 4
+  },
+  {
+    "theme": "system",
+    "fontSize": "medium",
+    "usuarioId": 5
+  },
+  {
+    "theme": "dark",
+    "fontSize": "medium",
+    "usuarioId": 6
+  },
+  {
+    "theme": "light",
+    "fontSize": "medium",
+    "usuarioId": 7
+  },
+  {
+    "theme": "system",
+    "fontSize": "medium",
+    "usuarioId": 8
+  }
+]
