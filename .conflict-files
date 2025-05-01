@@ -1,0 +1,3 @@
+ancestorEntries = ["server/api/transacoes/index.ts"]
+ourEntries = ["server/api/transacoes/index.ts"]
+theirEntries = ["server/api/transacoes/index.ts"]
