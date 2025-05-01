@@ -17,6 +17,7 @@ WORKDIR /nuxtapp
 COPY --from=build-stage /nuxtapp/.output/ ./.output/
 COPY --from=build-stage /nuxtapp/package.json ./package.json
 COPY --from=build-stage /nuxtapp/prisma/ ./prisma/
+COPY --from=build-stage /nuxtapp/scripts/ ./scripts/
 
 # Create entrypoint script
 RUN echo '#!/bin/sh\n\
