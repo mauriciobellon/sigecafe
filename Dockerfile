@@ -18,4 +18,12 @@ COPY --from=build-stage /nuxtapp/.output/ ./.output/
 COPY --from=build-stage /nuxtapp/package.json ./package.json
 COPY --from=build-stage /nuxtapp/prisma/ ./prisma/
 
-CMD [ "node", ".output/server/index.mjs" ]
+# Create entrypoint script
+RUN echo '#!/bin/sh\n\
+npm install prisma@5.22.0\n\
+npx prisma migrate deploy\n\
+npm run db:seed\n\
+exec node .output/server/index.mjs' > /nuxtapp/entrypoint.sh && \
+chmod +x /nuxtapp/entrypoint.sh
+
+ENTRYPOINT ["/nuxtapp/entrypoint.sh"]
