@@ -5,7 +5,7 @@
     </div>
 
     <!-- Offer form -->
-    <Card class="p-4">
+    <Card v-if="!isAdminOrStaff" class="p-4">
       <div class="flex flex-col md:flex-row md:items-end gap-4">
         <div class="w-full md:w-1/4">
           <label class="block text-sm font-medium mb-1">Lado</label>
@@ -104,7 +104,7 @@
                 <td class="px-4 py-2">{{ formatDate(offer.createdAt) }}</td>
                 <td class="px-4 py-2">
                   <button
-                    v-if="isCurrentUserOffer(offer)"
+                    v-if="isCurrentUserOffer(offer) || isAdminOrStaff"
                     @click="cancelOffer(offer)"
                     class="text-gray-500 hover:text-red-600 transition-colors focus:outline-none"
                     title="Cancelar oferta"
@@ -131,7 +131,7 @@
                 <td class="px-4 py-2">{{ formatDate(offer.createdAt) }}</td>
                 <td class="px-4 py-2">
                   <button
-                    v-if="isCurrentUserOffer(offer)"
+                    v-if="isCurrentUserOffer(offer) || isAdminOrStaff"
                     @click="cancelOffer(offer)"
                     class="text-gray-500 hover:text-red-600 transition-colors focus:outline-none"
                     title="Cancelar oferta"
@@ -168,6 +168,12 @@ const priceError = ref<string>('')
 const quantityError = ref<string>('')
 const canChooseSide = ref(true)
 const isSubmitting = ref(false)
+
+// Check if user is admin or staff (ADMINISTRADOR, COOPERATIVA, COLABORADOR)
+const isAdminOrStaff = computed(() => {
+  const userType = usuarioStore.usuarioPreferences?.type
+  return userType === 'ADMINISTRADOR' || userType === 'COOPERATIVA' || userType === 'COLABORADOR'
+})
 
 // Sort asks (sell offers) by price descending (highest price first - same as bids)
 const sortedAsks = computed(() =>
