@@ -10,7 +10,8 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       - NODE_ENV=production
       - BASE_URL=https://sigecafe.bellon.dev
@@ -18,7 +19,6 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/sigecafe
       - SESSION_REFRESH_SECONDS=10
       - SESSION_MAX_AGE_SECONDS=600
-
     networks:
       - app-network
 
@@ -40,23 +40,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-  migration:
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    container_name: sigecafe-migration
-    depends_on:
-      postgres:
-        condition: service_healthy
-    command: >
-      sh -c "npm install prisma@5.22.0 &&
-             npx prisma migrate deploy &&
-             npm run db:seed"
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/sigecafe
-    networks:
-      - app-network
 
 networks:
   app-network:
