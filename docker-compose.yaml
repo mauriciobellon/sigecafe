@@ -27,7 +27,7 @@ services:
     container_name: sigecafe-postgres
     restart: always
     ports:
-      - "5432:5432"
+      - "54321:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=shfalkQHhjhHJ
