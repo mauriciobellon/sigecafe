@@ -79,12 +79,39 @@ export class AssociadoRepository {
         skip,
         take: limit,
         orderBy: { nome: 'asc' },
+        include: {
+          usuarios: {
+            include: {
+              compras: true,
+              vendas: true
+            }
+          }
+        }
       }),
       this.prisma.associado.count({ where }),
     ]);
 
+    // Mapear os dados para incluir transações e volume
+    const mappedData = data.map(associado => {
+      const transacoes = associado.usuarios.reduce((total: number, usuario) => {
+        return total + usuario.compras.length + usuario.vendas.length;
+      }, 0);
+
+      const volume = associado.usuarios.reduce((total: number, usuario) => {
+        const compraVolume = usuario.compras.reduce((sum: number, transacao) => sum + transacao.quantidade, 0);
+        const vendaVolume = usuario.vendas.reduce((sum: number, transacao) => sum + transacao.quantidade, 0);
+        return total + compraVolume + vendaVolume;
+      }, 0);
+
+      return {
+        ...associado,
+        transacoes,
+        volume
+      };
+    });
+
     return {
-      data,
+      data: mappedData,
       meta: {
         total,
         page,

@@ -57,19 +57,36 @@ interface TransacaoWithUsers {
   vendedor: {
     name: string;
   };
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Função para obter as transações do usuário
 async function handleGetTransacoes(usuarioId: number): Promise<TransacaoDTO[]> {
   try {
-    // Buscar transações onde o usuário é comprador ou vendedor
+    // Buscar o usuário para verificar se é administrador
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: usuarioId }
+    });
+
+    if (!usuario) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: 'Usuário não encontrado',
+      });
+    }
+
+    // Se for administrador, buscar todas as transações
+    // Se não, buscar apenas as transações onde o usuário é comprador ou vendedor
     const transacoes = await prisma.transacao.findMany({
-      where: {
-        OR: [
-          { compradorId: usuarioId },
-          { vendedorId: usuarioId },
-        ],
-      },
+      where: usuario.type === UsuarioType.ADMINISTRADOR
+        ? {}  // Sem filtros para administrador
+        : {
+            OR: [
+              { compradorId: usuarioId },
+              { vendedorId: usuarioId },
+            ],
+          },
       include: {
         comprador: true,
         vendedor: true,
@@ -92,6 +109,8 @@ async function handleGetTransacoes(usuarioId: number): Promise<TransacaoDTO[]> {
       valorTotal: t.valorTotal,
       status: t.status,
       observacoes: t.observacoes || '',
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt
     }))
   } catch (error) {
     console.error('Erro ao buscar transações:', error)
@@ -115,33 +134,11 @@ async function handleCreateTransacao(event: any, usuarioId: number): Promise<Tra
       })
     }
 
-    // Se o usuário é comprador ou vendedor na transação
-    const isComprador = body.tipo === 'compra'
-
-    // Verificar se a contraparte existe
-    let contraparte
-    if (isComprador) {
-      // Buscar vendedor pelo nome
-      contraparte = await prisma.usuario.findFirst({
-        where: {
-          name: { contains: body.contraparte },
-          type: UsuarioType.PRODUTOR
-        }
-      })
-    } else {
-      // Buscar comprador pelo nome
-      contraparte = await prisma.usuario.findFirst({
-        where: {
-          name: { contains: body.contraparte },
-          type: UsuarioType.COMPRADOR
-        }
-      })
-    }
-
-    if (!contraparte) {
+    // Verificar se os IDs do comprador e vendedor foram fornecidos
+    if (!body.compradorId || !body.vendedorId) {
       throw createError({
-        statusCode: 404,
-        statusMessage: `${isComprador ? 'Vendedor' : 'Comprador'} não encontrado`,
+        statusCode: 400,
+        statusMessage: 'IDs do comprador e vendedor são obrigatórios',
       })
     }
 
@@ -156,12 +153,12 @@ async function handleCreateTransacao(event: any, usuarioId: number): Promise<Tra
         observacoes: body.observacoes,
         comprador: {
           connect: {
-            id: isComprador ? usuarioId : contraparte.id,
+            id: body.compradorId,
           },
         },
         vendedor: {
           connect: {
-            id: isComprador ? contraparte.id : usuarioId,
+            id: body.vendedorId,
           },
         },
       },
@@ -184,6 +181,8 @@ async function handleCreateTransacao(event: any, usuarioId: number): Promise<Tra
       valorTotal: transacao.valorTotal,
       status: transacao.status,
       observacoes: transacao.observacoes || '',
+      createdAt: transacao.createdAt,
+      updatedAt: transacao.updatedAt
     }
   } catch (error: unknown) {
     console.error('Erro ao criar transação:', error)

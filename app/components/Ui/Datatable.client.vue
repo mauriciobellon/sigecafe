@@ -14,8 +14,8 @@
 </template>
 
 <script lang="ts" setup generic="T extends Record<string, any>">
-  import type DataTableRef from "datatables.net";
   import type { Config } from "datatables.net";
+  import type { Api } from "datatables.net";
 
   export type DataTablesNamedSlotProps<T> = {
     /** The data to show in the cell (from the `columns.data` configuration) */
@@ -30,7 +30,7 @@
     type: string;
   };
 
-  const table = shallowRef<{ dt: InstanceType<typeof DataTableRef<T[]>> } | null>(null);
+  const table = shallowRef<{ dt: Api } | null>(null);
 
   const props = withDefaults(
     defineProps<{
@@ -43,7 +43,38 @@
     {
       data: () => [],
       class: "nowrap hover order-column row-border stripe display",
-      options: () => ({}),
+      options: () => ({
+        dom: "<'flex flex-col lg:flex-row w-full lg:items-start lg:justify-between gap-5 mb-5 lg:pr-1'Bf><'border rounded-lg't><'flex flex-col lg:flex-row gap-5 items-center lg:justify-between w-full pt-3 p-5 m-auto'lp>",
+        searching: true,
+        paging: true,
+        ordering: true,
+        responsive: true,
+        autoWidth: true,
+        language: {
+          decimal: "",
+          emptyTable: "Nenhum dado disponível na tabela",
+          info: "Mostrando _START_ até _END_ de _TOTAL_ registros",
+          infoEmpty: "Mostrando 0 até 0 de 0 registros",
+          infoFiltered: "(filtrado de _MAX_ registros no total)",
+          infoPostFix: "",
+          thousands: ".",
+          lengthMenu: "Mostrar _MENU_ registros",
+          loadingRecords: "Carregando...",
+          processing: "Processando...",
+          search: "Buscar:",
+          zeroRecords: "Nenhum registro encontrado",
+          paginate: {
+            first: "Primeiro",
+            last: "Último",
+            next: "Próximo",
+            previous: "Anterior"
+          },
+          aria: {
+            sortAscending: ": ativar para ordenar a coluna em ordem crescente",
+            sortDescending: ": ativar para ordenar a coluna em ordem decrescente"
+          }
+        }
+      }),
     }
   );
 
@@ -886,11 +917,7 @@
     max-width: 20em;
     color: inherit;
   }
-  div.dtsb-searchBuilder
-    div.dtsb-group
-    div.dtsb-criteria
-    select.dtsb-dropDown
-    option.dtsb-notItalic,
+  div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria select.dtsb-dropDown,
   div.dtsb-searchBuilder div.dtsb-group div.dtsb-criteria input.dtsb-input option.dtsb-notItalic {
     font-style: normal;
   }

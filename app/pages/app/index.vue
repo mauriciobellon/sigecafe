@@ -115,6 +115,26 @@
   import { useUsuarioStore } from '../../stores/UserStore';
   import { useWeatherStore } from '../../stores/WeatherStore';
 
+  interface CoffeePriceData {
+    arabica: number;
+    robusta: number;
+    date: Date;
+  }
+
+  interface CoffeePriceResponse {
+    success: boolean;
+    data?: CoffeePriceData;
+    message?: string;
+  }
+
+  interface Atividade {
+    id: number;
+    icon: string;
+    titulo: string;
+    descricao: string;
+    data: string;
+  }
+
   const usuarioStore = useUsuarioStore();
   const weatherStore = useWeatherStore();
   const usuario = computed(() => usuarioStore.usuarioPreferences);
@@ -196,7 +216,6 @@
   const loadingPrices = ref(false);
   const priceError = ref<string | null>(null);
 
-  // Computed property for displaying prices
   const latestCoffeePrices = computed(() => coffeePricesData.value);
 
   // Format date for display
@@ -204,7 +223,6 @@
     return new Date(date).toLocaleDateString('pt-BR');
   }
 
-  // Fetch coffee prices
   async function fetchCoffeePrices() {
     loadingPrices.value = true;
     priceError.value = null;
@@ -228,7 +246,6 @@
       console.error('Error fetching coffee prices:', error);
       priceError.value = error instanceof Error ? error.message : 'Failed to fetch coffee prices';
 
-      // Use fallback prices
       coffeePricesData.value = {
         arabica: 31.20,
         robusta: 25.59,
@@ -239,11 +256,10 @@
     }
   }
 
-  // Mock data - replace with real data from your API
   const notificacoesPendentes = ref(5);
   const transacoesPendentes = ref(3);
 
-  const atividadesRecentes = ref([
+  const atividadesRecentes = ref<Atividade[]>([
     {
       id: 1,
       icon: 'lucide:move-up',
