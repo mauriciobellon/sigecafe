@@ -110,7 +110,7 @@ async function handleGetTransacoes(usuarioId: number): Promise<TransacaoDTO[]> {
       status: t.status,
       observacoes: t.observacoes || '',
       createdAt: t.createdAt,
-      updatedAt: t.updatedAt
+      updatedAt: t.updatedAt,
     }))
   } catch (error) {
     console.error('Erro ao buscar transações:', error)

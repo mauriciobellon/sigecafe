@@ -168,34 +168,6 @@
           console.error('Error fetching associado data:', e);
         }
       }
-
-  // Fetch location data
-  async function fetchCidadeInfo() {
-    console.log('Fetching location data...');
-    try {
-      const { associadoId, cooperativaId } = usuario.value || {};
-      console.log('User data:', { associadoId, cooperativaId });
-
-      // Try to get associado location first
-      if (associadoId) {
-        try {
-          console.log('Fetching associado data...');
-          const res = await fetch(`/api/associado/${associadoId}`, { credentials: 'include' });
-          if (res.ok) {
-            const json = await res.json();
-            console.log('Received associado data:', json);
-            if (json.success && json.data && json.data.cidade) {
-              cidade.value = json.data.cidade;
-              console.log('Updated city to:', cidade.value, 'from associado');
-              localStorage.setItem('userCidade', cidade.value);
-              return;
-            }
-          }
-        } catch (e) {
-          console.error('Error fetching associado data:', e);
-        }
-      }
-
       // Try cooperativa if no city from associado
       if (cooperativaId) {
         try {
