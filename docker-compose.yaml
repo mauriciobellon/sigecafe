@@ -13,12 +13,12 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      - NODE_ENV=production
-      - BASE_URL=https://sigecafe.bellon.dev
-      - AUTH_SECRET=secret
-      - DATABASE_URL=postgresql://postgres:shfalkQHhjhHJ@postgres:5432/sigecafe
-      - SESSION_REFRESH_SECONDS=10
-      - SESSION_MAX_AGE_SECONDS=600
+      - NODE_ENV
+      - BASE_URL
+      - AUTH_SECRET
+      - DATABASE_URL
+      - SESSION_REFRESH_SECONDS
+      - SESSION_MAX_AGE_SECONDS
     networks:
       - app-network
 
@@ -29,9 +29,9 @@ services:
     ports:
       - "54321:5432"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=shfalkQHhjhHJ
-      - POSTGRES_DB=sigecafe
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
