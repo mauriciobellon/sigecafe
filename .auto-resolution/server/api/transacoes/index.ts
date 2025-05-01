@@ -1,42 +1,144 @@
 import { getServerSession } from '#auth'
 import { PrismaClient, UsuarioType, TransacaoStatus } from '@prisma/client'
-import type { TransacaoDTO, CreateTransacaoDTO } from '~/types/api'
+import { TransacaoDTO, CreateTransacaoDTO } from '~/types/api'
 
 const prisma = new PrismaClient()
 
 export default defineEventHandler(async (event) => {
+  console.log('Método HTTP:', event.method)
+  
+  // Verificar se é uma requisição GET
+  if (event.method !== 'GET') {
+    throw createError({
+      statusCode: 405,
+      statusMessage: 'Método não permitido',
+    })
+  }
+
   // Verificar autenticação
   const session = await getServerSession(event)
-  if (!session || !session.user) {
+  if (!session?.user) {
     throw createError({
       statusCode: 401,
       statusMessage: 'Você precisa estar autenticado para acessar esta funcionalidade',
     })
   }
 
-  // Buscar o usuário pelo email (considerando que o email é usado como login)
-  const usuario = await prisma.usuario.findFirst({
-    where: { email: session.user.email }
-  })
-
-  if (!usuario) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Usuário não encontrado',
+  try {
+    console.log('Buscando transações para usuário:', session.user.email)
+    
+    // Buscar o usuário atual
+    const usuario = await prisma.usuario.findFirst({
+      where: { email: session.user.email }
     })
-  }
 
-  // Processar as requisições de acordo com o método
-  switch (event.method) {
-    case 'GET':
-      return handleGetTransacoes(usuario.id)
-    case 'POST':
-      return handleCreateTransacao(event, usuario.id)
-    default:
+    if (!usuario) {
       throw createError({
-        statusCode: 405,
-        statusMessage: 'Método não permitido',
+        statusCode: 404,
+        statusMessage: 'Usuário não encontrado',
       })
+    }
+
+    console.log('Usuário encontrado:', usuario)
+
+    // Se o usuário é administrador, buscar todas as transações
+    if (usuario.type === UsuarioType.ADMINISTRADOR) {
+      console.log('Usuário é administrador, buscando todas as transações')
+      
+      const transacoes = await prisma.transacao.findMany({
+        include: {
+          comprador: {
+            select: {
+              name: true
+            }
+          },
+          vendedor: {
+            select: {
+              name: true
+            }
+          }
+        },
+        orderBy: {
+          data: 'desc'
+        }
+      })
+
+      console.log('Transações encontradas:', transacoes)
+
+      // Formatar as transações para o frontend
+      const transacoesFormatadas = transacoes.map(transacao => ({
+        id: transacao.id,
+        data: transacao.data,
+        comprador: transacao.comprador.name,
+        compradorId: transacao.compradorId,
+        vendedor: transacao.vendedor.name,
+        vendedorId: transacao.vendedorId,
+        quantidade: transacao.quantidade,
+        precoUnitario: transacao.precoUnitario,
+        valorTotal: transacao.valorTotal,
+        status: transacao.status,
+        observacoes: transacao.observacoes,
+        createdAt: transacao.createdAt,
+        updatedAt: transacao.updatedAt
+      }))
+
+      console.log('Transações formatadas:', transacoesFormatadas)
+      return transacoesFormatadas
+    }
+
+    // Para outros usuários, buscar apenas suas transações
+    console.log('Usuário não é administrador, buscando apenas suas transações')
+    const transacoes = await prisma.transacao.findMany({
+      where: {
+        OR: [
+          { compradorId: usuario.id },
+          { vendedorId: usuario.id }
+        ]
+      },
+      include: {
+        comprador: {
+          select: {
+            name: true
+          }
+        },
+        vendedor: {
+          select: {
+            name: true
+          }
+        }
+      },
+      orderBy: {
+        data: 'desc'
+      }
+    })
+
+    console.log('Transações encontradas:', transacoes)
+
+    // Formatar as transações para o frontend
+    const transacoesFormatadas = transacoes.map(transacao => ({
+      id: transacao.id,
+      data: transacao.data,
+      comprador: transacao.comprador.name,
+      compradorId: transacao.compradorId,
+      vendedor: transacao.vendedor.name,
+      vendedorId: transacao.vendedorId,
+      quantidade: transacao.quantidade,
+      precoUnitario: transacao.precoUnitario,
+      valorTotal: transacao.valorTotal,
+      status: transacao.status,
+      observacoes: transacao.observacoes,
+      createdAt: transacao.createdAt,
+      updatedAt: transacao.updatedAt
+    }))
+
+    console.log('Transações formatadas:', transacoesFormatadas)
+    return transacoesFormatadas
+  } catch (error) {
+    console.error('Erro ao buscar transações:', error)
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Erro ao buscar transações',
+    })
   }
 })
 

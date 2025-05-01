@@ -40,7 +40,10 @@
                 <tr>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {{ usuario?.type === 'COMPRADOR' ? 'Vendedor' : 'Comprador' }}
+                    {{ usuario?.type === 'ADMINISTRADOR' ? 'Comprador' : (usuario?.type === 'COMPRADOR' ? 'Vendedor' : 'Comprador') }}
+                  </th>
+                  <th v-if="usuario?.type === 'ADMINISTRADOR'" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Vendedor
                   </th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantidade</th>
                   <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço Unitário</th>
@@ -53,7 +56,10 @@
                 <tr v-for="transacao in filteredTransacoes" :key="transacao.id">
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(transacao.data) }}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ usuario?.type === 'COMPRADOR' ? transacao.vendedor : transacao.comprador }}
+                    {{ usuario?.type === 'ADMINISTRADOR' ? transacao.comprador : (usuario?.type === 'COMPRADOR' ? transacao.vendedor : transacao.comprador) }}
+                  </td>
+                  <td v-if="usuario?.type === 'ADMINISTRADOR'" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ transacao.vendedor }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ transacao.quantidade }} sacas</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -84,7 +90,7 @@
                   </td>
                 </tr>
                 <tr v-if="filteredTransacoes.length === 0">
-                  <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+                  <td :colspan="usuario?.type === 'ADMINISTRADOR' ? 8 : 7" class="px-6 py-4 text-center text-sm text-gray-500">
                     Nenhuma transação encontrada
                   </td>
                 </tr>
@@ -117,33 +123,102 @@
             <form @submit.prevent="saveTransacao">
               <div class="grid w-full items-center gap-4">
                 <div class="flex flex-col space-y-1.5">
-                  <UiLabel for="tipo">Tipo</UiLabel>
-                  <select id="tipo" v-model="transacaoForm.tipo" class="alert-input">
-                    <option value="compra">Compra</option>
-                    <option value="venda">Venda</option>
-                  </select>
+                  <template v-if="usuario?.type === 'ADMINISTRADOR'">
+                    <UiLabel for="comprador">Comprador</UiLabel>
+                    <select 
+                      id="comprador" 
+                      v-model="transacaoForm.compradorId" 
+                      class="alert-input"
+                    >
+                      <option value="">Selecione o comprador</option>
+                      <option 
+                        v-for="contraparte in contrapartes.filter(c => c.type === 'COMPRADOR')" 
+                        :key="contraparte.id" 
+                        :value="contraparte.id"
+                      >
+                        {{ contraparte.name }}
+                      </option>
+                    </select>
 
-                  <UiLabel for="contraparte">{{ transacaoForm.tipo === 'compra' ? 'Vendedor' : 'Comprador' }}</UiLabel>
-                  <input id="contraparte" v-model="transacaoForm.contraparte" type="text" placeholder="Insira o nome" class="alert-input" />
+                    <UiLabel for="vendedor">Vendedor</UiLabel>
+                    <select 
+                      id="vendedor" 
+                      v-model="transacaoForm.vendedorId" 
+                      class="alert-input"
+                    >
+                      <option value="">Selecione o vendedor</option>
+                      <option 
+                        v-for="contraparte in contrapartes.filter(c => c.type === 'PRODUTOR')" 
+                        :key="contraparte.id" 
+                        :value="contraparte.id"
+                      >
+                        {{ contraparte.name }}
+                      </option>
+                    </select>
+                  </template>
+                  <template v-else>
+                    <UiLabel for="contraparte">{{ usuario?.type === 'COMPRADOR' ? 'Vendedor' : 'Comprador' }}</UiLabel>
+                    <select 
+                      id="contraparte" 
+                      v-model="contraparteId" 
+                      class="alert-input"
+                    >
+                      <option value="">Selecione uma opção</option>
+                      <option 
+                        v-for="contraparte in contrapartes" 
+                        :key="contraparte.id" 
+                        :value="contraparte.id"
+                      >
+                        {{ contraparte.name }}
+                      </option>
+                    </select>
+                  </template>
 
                   <UiLabel for="quantidade">Quantidade (sacas)</UiLabel>
-                  <input id="quantidade" v-model.number="transacaoForm.quantidade" type="number" min="1" class="alert-input" />
+                  <input 
+                    id="quantidade" 
+                    v-model.number="transacaoForm.quantidade" 
+                    type="number" 
+                    min="1" 
+                    class="alert-input" 
+                  />
 
                   <UiLabel for="precoUnitario">Preço Unitário (R$)</UiLabel>
-                  <input id="precoUnitario" v-model.number="transacaoForm.precoUnitario" type="number" min="0.01" step="0.01" class="alert-input" />
+                  <input 
+                    id="precoUnitario" 
+                    v-model.number="transacaoForm.precoUnitario" 
+                    type="number" 
+                    min="0.01" 
+                    step="0.01" 
+                    class="alert-input" 
+                  />
 
                   <UiLabel for="data">Data</UiLabel>
-                  <input id="data" v-model="transacaoForm.data" type="date" class="alert-input" />
+                  <input 
+                    id="data" 
+                    v-model="transacaoForm.data" 
+                    type="date" 
+                    class="alert-input" 
+                  />
 
                   <UiLabel for="status">Status</UiLabel>
-                  <select id="status" v-model="transacaoForm.status" class="alert-input">
+                  <select 
+                    id="status" 
+                    v-model="transacaoForm.status" 
+                    class="alert-input"
+                  >
                     <option value="PENDENTE">Pendente</option>
                     <option value="CONCLUIDA">Concluída</option>
                     <option value="CANCELADA">Cancelada</option>
                   </select>
 
                   <UiLabel for="observacoes">Observações</UiLabel>
-                  <textarea id="observacoes" v-model="transacaoForm.observacoes" rows="3" class="alert-input"></textarea>
+                  <textarea 
+                    id="observacoes" 
+                    v-model="transacaoForm.observacoes" 
+                    rows="3" 
+                    class="alert-input"
+                  ></textarea>
                 </div>
               </div>
             </form>
@@ -169,74 +244,156 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 
 const filter = ref('');
 const statusFilter = ref('');
 const isNewTransactionOpen = ref(false);
 const transacaoForm = ref({
-  tipo: 'compra',
-  contraparte: '',
   quantidade: 1,
   precoUnitario: 0,
+  valorTotal: 0,
   data: '',
   status: 'PENDENTE',
   observacoes: '',
+  compradorId: 0,
+  vendedorId: 0,
 });
 const editingTransacao = ref(false);
+const transacoes = ref([]);
+const usuario = ref(null);
+const contrapartes = ref([]);
 
-const transacoes = ref([
-  // Exemplo de transação
-  { id: 1, data: '2025-04-27', comprador: 'Cafeicultor A', vendedor: 'Comerciante B', quantidade: 10, precoUnitario: 300, status: 'CONCLUIDA' },
-  
-  // Exemplo de outra transação
-  { id: 2, data: '2025-04-25', comprador: 'Cafeicultor C', vendedor: 'Comerciante D', quantidade: 15, precoUnitario: 280, status: 'PENDENTE' },
-  
-  // Exemplo de transação com status "CANCELADA"
-  { id: 3, data: '2025-04-22', comprador: 'Cafeicultor E', vendedor: 'Comerciante F', quantidade: 8, precoUnitario: 290, status: 'CANCELADA' },
-  
-  // Outra transação de compra
-  { id: 4, data: '2025-04-20', comprador: 'Cafeicultor G', vendedor: 'Comerciante H', quantidade: 20, precoUnitario: 310, status: 'CONCLUIDA' },
-  
-  // Transação com quantidade maior e preço diferente
-  { id: 5, data: '2025-04-18', comprador: 'Cafeicultor I', vendedor: 'Comerciante J', quantidade: 25, precoUnitario: 330, status: 'PENDENTE' }
-]);
+const contraparteId = computed({
+  get: () => usuario.value?.type === 'COMPRADOR' ? transacaoForm.value.vendedorId : transacaoForm.value.compradorId,
+  set: (value) => {
+    if (usuario.value?.type === 'COMPRADOR') {
+      transacaoForm.value.vendedorId = value;
+    } else {
+      transacaoForm.value.compradorId = value;
+    }
+  }
+});
 
+// Buscar transações ao carregar a página
+onMounted(async () => {
+  console.log('Iniciando carregamento...');
+  await fetchUsuario();
+  await fetchTransacoes();
+});
+
+// Buscar transações da API
+async function fetchTransacoes() {
+  try {
+    console.log('Buscando transações...');
+    const response = await fetch('/api/transacoes', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    
+    console.log('Status da resposta:', response.status);
+    console.log('Status text:', response.statusText);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Erro na resposta:', errorText);
+      throw new Error('Erro ao buscar transações');
+    }
+    
+    const data = await response.json();
+    console.log('Transações recebidas:', data);
+    transacoes.value = data;
+  } catch (error) {
+    console.error('Erro ao buscar transações:', error);
+  }
+}
+
+// Buscar informações do usuário
+async function fetchUsuario() {
+  try {
+    console.log('Buscando usuário...');
+    const response = await fetch('/api/auth/session');
+    if (!response.ok) throw new Error('Erro ao buscar usuário');
+    const data = await response.json();
+    console.log('Usuário recebido:', data);
+    usuario.value = data.user;
+    // Após buscar o usuário, buscar as contrapartes
+    await fetchContrapartes();
+  } catch (error) {
+    console.error('Erro ao buscar usuário:', error);
+  }
+}
+
+// Buscar contrapartes (compradores ou vendedores)
+async function fetchContrapartes() {
+  try {
+    console.log('Buscando contrapartes...');
+    const response = await fetch('/api/transacoes/contrapartes');
+    if (!response.ok) throw new Error('Erro ao buscar contrapartes');
+    const data = await response.json();
+    console.log('Contrapartes recebidas:', data);
+    contrapartes.value = data;
+  } catch (error) {
+    console.error('Erro ao buscar contrapartes:', error);
+  }
+}
 
 const filteredTransacoes = computed(() => {
-  return transacoes.value.filter(transacao => {
+  console.log('Filtrando transações...');
+  console.log('Transações disponíveis:', transacoes.value);
+  console.log('Filtro de status:', statusFilter.value);
+  console.log('Filtro de texto:', filter.value);
+  
+  const filtered = transacoes.value.filter(transacao => {
     const statusMatch = statusFilter.value ? transacao.status === statusFilter.value : true;
     const filterMatch = transacao.comprador.toLowerCase().includes(filter.value.toLowerCase()) ||
       transacao.vendedor.toLowerCase().includes(filter.value.toLowerCase());
     return statusMatch && filterMatch;
   });
+  
+  console.log('Transações filtradas:', filtered);
+  return filtered;
 });
 
 const openNewTransactionModal = () => {
+  console.log('Abrindo modal, usuário:', usuario.value);
+  console.log('Contrapartes disponíveis:', contrapartes.value);
   transacaoForm.value = {
-    tipo: 'compra',
-    contraparte: '',
     quantidade: 1,
     precoUnitario: 0,
-    data: '',
+    valorTotal: 0,
+    data: new Date().toISOString().split('T')[0],
     status: 'PENDENTE',
     observacoes: '',
+    compradorId: usuario.value?.type === 'COMPRADOR' ? usuario.value.id : 0,
+    vendedorId: usuario.value?.type === 'PRODUTOR' ? usuario.value.id : 0,
   };
   editingTransacao.value = false;
   isNewTransactionOpen.value = true;
 };
 
-const saveTransacao = () => {
-  if (editingTransacao.value) {
-    // Atualizar a transação existente
-  } else {
-    // Adicionar nova transação
-    transacoes.value.push({
-      ...transacaoForm.value,
-      id: Date.now(), // Gerar um ID único para a nova transação
+const saveTransacao = async () => {
+  try {
+    // Calcular valor total
+    transacaoForm.value.valorTotal = transacaoForm.value.quantidade * transacaoForm.value.precoUnitario;
+
+    const response = await fetch('/api/transacoes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(transacaoForm.value),
     });
+
+    if (!response.ok) throw new Error('Erro ao salvar transação');
+
+    await fetchTransacoes(); // Atualizar lista de transações
+    isNewTransactionOpen.value = false;
+  } catch (error) {
+    console.error('Erro ao salvar transação:', error);
   }
-  isNewTransactionOpen.value = false;
 };
 
 const editTransacao = (transacao) => {
@@ -245,8 +402,18 @@ const editTransacao = (transacao) => {
   isNewTransactionOpen.value = true;
 };
 
-const deleteTransacao = (transacao) => {
-  transacoes.value = transacoes.value.filter(t => t.id !== transacao.id);
+const deleteTransacao = async (transacao) => {
+  try {
+    const response = await fetch(`/api/transacoes/${transacao.id}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) throw new Error('Erro ao deletar transação');
+
+    await fetchTransacoes(); // Atualizar lista de transações
+  } catch (error) {
+    console.error('Erro ao deletar transação:', error);
+  }
 };
 
 const formatDate = (dateString) => {

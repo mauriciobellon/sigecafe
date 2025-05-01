@@ -51,6 +51,8 @@ interface TransacaoWithUsers {
   observacoes: string | null;
   compradorId: number;
   vendedorId: number;
+  createdAt: Date;
+  updatedAt: Date;
   comprador: {
     name: string;
   };

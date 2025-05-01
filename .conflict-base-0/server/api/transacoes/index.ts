@@ -51,6 +51,8 @@ interface TransacaoWithUsers {
   observacoes: string | null;
   compradorId: number;
   vendedorId: number;
+  createdAt: Date;
+  updatedAt: Date;
   comprador: {
     name: string;
   };
@@ -92,6 +94,8 @@ async function handleGetTransacoes(usuarioId: number): Promise<TransacaoDTO[]> {
       valorTotal: t.valorTotal,
       status: t.status,
       observacoes: t.observacoes || '',
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt,
     }))
   } catch (error) {
     console.error('Erro ao buscar transações:', error)
@@ -116,23 +120,23 @@ async function handleCreateTransacao(event: any, usuarioId: number): Promise<Tra
     }
 
     // Se o usuário é comprador ou vendedor na transação
-    const isComprador = body.tipo === 'compra'
+    const isComprador = body.compradorId === usuarioId
 
     // Verificar se a contraparte existe
     let contraparte
     if (isComprador) {
-      // Buscar vendedor pelo nome
+      // Buscar vendedor pelo ID
       contraparte = await prisma.usuario.findFirst({
         where: {
-          name: { contains: body.contraparte },
+          id: body.vendedorId,
           type: UsuarioType.PRODUTOR
         }
       })
     } else {
-      // Buscar comprador pelo nome
+      // Buscar comprador pelo ID
       contraparte = await prisma.usuario.findFirst({
         where: {
-          name: { contains: body.contraparte },
+          id: body.compradorId,
           type: UsuarioType.COMPRADOR
         }
       })
@@ -184,6 +188,8 @@ async function handleCreateTransacao(event: any, usuarioId: number): Promise<Tra
       valorTotal: transacao.valorTotal,
       status: transacao.status,
       observacoes: transacao.observacoes || '',
+      createdAt: transacao.createdAt,
+      updatedAt: transacao.updatedAt,
     }
   } catch (error: unknown) {
     console.error('Erro ao criar transação:', error)
