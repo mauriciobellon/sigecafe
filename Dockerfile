@@ -8,10 +8,6 @@ ENV NODE_OPTIONS="--max-old-space-size=4096"
 
 RUN npm install
 
-RUN npm run db:migrate
-
-RUN npm run db:seed
-
 RUN npm run build
 
 FROM node:lts as prod-stage
@@ -19,5 +15,26 @@ FROM node:lts as prod-stage
 WORKDIR /nuxtapp
 
 COPY --from=build-stage /nuxtapp/.output/ ./.output/
+COPY --from=build-stage /nuxtapp/prisma/ ./prisma/
+COPY --from=build-stage /nuxtapp/package.json ./package.json
+COPY --from=build-stage /nuxtapp/package-lock.json ./package-lock.json
+COPY --from=build-stage /nuxtapp/scripts/ ./scripts/
+COPY --from=build-stage /nuxtapp/.env ./.env
 
-CMD [ "node", ".output/server/index.mjs" ]
+# Install only production dependencies and Prisma
+RUN npm install --only=production && \
+    npm install -g prisma
+
+# Create an entrypoint script
+RUN echo '#!/bin/sh\n\
+echo "Waiting for database to be ready..."\n\
+sleep 5\n\
+echo "Running database migrations..."\n\
+prisma migrate deploy\n\
+echo "Running database seeds..."\n\
+node scripts/db-seed.mjs\n\
+echo "Starting application..."\n\
+node .output/server/index.mjs\n\
+' > /nuxtapp/entrypoint.sh && chmod +x /nuxtapp/entrypoint.sh
+
+CMD ["/nuxtapp/entrypoint.sh"]
