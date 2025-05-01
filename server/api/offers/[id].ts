@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const userId = user.id
+  const userType = user.type
 
   // Parse and validate the offer ID
   const offerId = parseInt(event.context.params?.id ?? '0', 10)
@@ -49,8 +50,10 @@ export default defineEventHandler(async (event) => {
 
       const offer = offers[0]
 
-      // Check if offer belongs to user
-      if (offer.userId !== userId) {
+      // Check if user is admin/staff or offer belongs to user
+      const isAdminOrStaff = userType === 'ADMINISTRADOR' || userType === 'COOPERATIVA' || userType === 'COLABORADOR'
+
+      if (!isAdminOrStaff && offer.userId !== userId) {
         console.log(`Unauthorized: Offer belongs to user ${offer.userId}, not ${userId}`)
         throw createError({
           statusCode: 403,
