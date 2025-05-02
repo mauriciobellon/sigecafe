@@ -7,8 +7,8 @@
     "valorTotal": 79037.50,
     "status": "CONCLUIDA",
     "observacoes": "Café Arábica, safra 2025",
-    "compradorId": 8,
-    "vendedorId": 7
+    "compradorId": 5,
+    "vendedorId": 4
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440001",
@@ -18,8 +18,8 @@
     "valorTotal": 47707.50,
     "status": "CONCLUIDA",
     "observacoes": "Café Arábica, qualidade premium",
-    "compradorId": 8,
-    "vendedorId": 7
+    "compradorId": 5,
+    "vendedorId": 4
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440002",
@@ -29,8 +29,8 @@
     "valorTotal": 39681.25,
     "status": "PENDENTE",
     "observacoes": "Aguardando confirmação de entrega",
-    "compradorId": 8,
-    "vendedorId": 7
+    "compradorId": 5,
+    "vendedorId": 4
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440003",
@@ -40,8 +40,8 @@
     "valorTotal": 63580.00,
     "status": "PENDENTE",
     "observacoes": "Entrega prevista para 15/04/2025",
-    "compradorId": 8,
-    "vendedorId": 7
+    "compradorId": 5,
+    "vendedorId": 4
   },
   {
     "id": "550e8400-e29b-41d4-a716-446655440004",
@@ -51,7 +51,7 @@
     "valorTotal": 31710.00,
     "status": "CANCELADA",
     "observacoes": "Cancelada pelo vendedor",
-    "compradorId": 8,
-    "vendedorId": 7
+    "compradorId": 5,
+    "vendedorId": 4
   }
 ]

@@ -1,82 +1,37 @@
 [
   {
-    "name": "Mauricio Faria Bellon",
-    "email": "mauricio@sigecafe.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+    "name": "Sige Café",
+    "email": "sige@sigecafe.com",
+    "password": "password",
     "type": "ADMINISTRADOR",
-    "celular": "11999990001"
-  },
-  {
-    "name": "Larissa Machado",
-    "email": "larissa@sigecafe.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "ADMINISTRADOR",
-    "celular": "11999990002"
-  },
-  {
-    "name": "Vitor Miura",
-    "email": "vitor@sigecafe.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "ADMINISTRADOR",
-    "celular": "11999990003"
-  },
-  {
-    "name": "Ingrid Hayumi",
-    "email": "ingrid@sigecafe.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "ADMINISTRADOR",
-    "celular": "11999990004"
-  },
-  {
-    "name": "Gustavo Bittencourt",
-    "email": "gustavo@sigecafe.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "ADMINISTRADOR",
-    "celular": "11999990005"
+    "celular": "00000000000"
   },
   {
     "name": "Antonio Ademir da Silva",
-    "email": "antonio@cce.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+    "email": "antonio@gmail.com",
+    "password": "password",
     "type": "COOPERATIVA",
-    "celular": "11999990006"
+    "celular": "11111111111"
+  },
+  {
+    "name": "Carlos Oliveira",
+    "email": "carlos@gmail.com",
+    "password": "password",
+    "type": "COLABORADOR",
+    "celular": "22222222222"
   },
   {
     "name": "João da Silva",
     "email": "joao@gmail.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+    "password": "password",
     "type": "PRODUTOR",
-    "celular": "11999990007"
+    "celular": "33333333333"
   },
   {
     "name": "Daniel de Oliveira",
     "email": "daniel@gmail.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
+    "password": "password",
     "type": "COMPRADOR",
-    "celular": "11999990008"
-  },
-  {
-    "name": "Carlos Oliveira",
-    "email": "carlos@cce.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "COLABORADOR",
-    "celular": "11999990009",
-    "cooperativaId": 1
-  },
-  {
-    "name": "Maria Santos",
-    "email": "maria@cce.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "COLABORADOR",
-    "celular": "11999990010",
-    "cooperativaId": 1
-  },
-  {
-    "name": "Paulo Ferreira",
-    "email": "paulo@cce.com",
-    "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
-    "type": "COLABORADOR",
-    "celular": "11999990011",
-    "cooperativaId": 1
+    "celular": "44444444444"
   }
 ]
