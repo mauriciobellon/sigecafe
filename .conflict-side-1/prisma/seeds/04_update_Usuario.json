@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "cooperativa": {
+      "connect": {
+        "id": 1
+      }
+    }
+  },
+  {
+    "id": 2,
+    "cooperativa": {
+      "connect": {
+        "id": 1
+      }
+    }
+  },
+  {
+    "id": 3,
+    "cooperativa": {
+      "connect": {
+        "id": 1
+      }
+    }
+  },
+  {
+    "id": 4,
+    "cooperativa": {
+      "connect": {
+        "id": 1
+      }
+    },
+    "associado": {
+      "connect": {
+        "id": 1
+      }
+    }
+  },
+  {
+    "id": 5,
+    "cooperativa": {
+      "connect": {
+        "id": 1
+      }
+    },
+    "associado": {
+      "connect": {
+        "id": 2
+      }
+    }
+  }
+]
