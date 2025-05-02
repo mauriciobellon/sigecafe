@@ -7,14 +7,6 @@ const prisma = new PrismaClient()
 export default defineEventHandler(async (event) => {
   console.log('Método HTTP:', event.method)
   
-  // Verificar se é uma requisição GET
-  if (event.method !== 'GET') {
-    throw createError({
-      statusCode: 405,
-      statusMessage: 'Método não permitido',
-    })
-  }
-
   // Verificar autenticação
   const session = await getServerSession(event)
   if (!session?.user) {
@@ -24,28 +16,77 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  try {
-    console.log('Buscando transações para usuário:', session.user.email)
-    
-    // Buscar o usuário atual
-    const usuario = await prisma.usuario.findFirst({
-      where: { email: session.user.email }
+  // Buscar o usuário atual
+  const usuario = await prisma.usuario.findFirst({
+    where: { email: session.user.email }
+  })
+
+  if (!usuario) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Usuário não encontrado',
     })
+  }
 
-    if (!usuario) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Usuário não encontrado',
-      })
-    }
-
-    console.log('Usuário encontrado:', usuario)
-
-    // Se o usuário é administrador, buscar todas as transações
-    if (usuario.type === UsuarioType.ADMINISTRADOR) {
-      console.log('Usuário é administrador, buscando todas as transações')
+  try {
+    if (event.method === 'GET') {
+      // Listar transações
+      console.log('Buscando transações para usuário:', session.user.email)
       
+      // Se o usuário é administrador, buscar todas as transações
+      if (usuario.type === UsuarioType.ADMINISTRADOR) {
+        console.log('Usuário é administrador, buscando todas as transações')
+        
+        const transacoes = await prisma.transacao.findMany({
+          include: {
+            comprador: {
+              select: {
+                name: true
+              }
+            },
+            vendedor: {
+              select: {
+                name: true
+              }
+            }
+          },
+          orderBy: {
+            data: 'desc'
+          }
+        })
+
+        console.log('Transações encontradas:', transacoes)
+
+        // Formatar as transações para o frontend
+        const transacoesFormatadas = transacoes.map(transacao => ({
+          id: transacao.id,
+          data: transacao.data,
+          comprador: transacao.comprador.name,
+          compradorId: transacao.compradorId,
+          vendedor: transacao.vendedor.name,
+          vendedorId: transacao.vendedorId,
+          quantidade: transacao.quantidade,
+          precoUnitario: transacao.precoUnitario,
+          valorTotal: transacao.valorTotal,
+          status: transacao.status,
+          observacoes: transacao.observacoes,
+          createdAt: transacao.createdAt,
+          updatedAt: transacao.updatedAt
+        }))
+
+        console.log('Transações formatadas:', transacoesFormatadas)
+        return transacoesFormatadas
+      }
+
+      // Para outros usuários, buscar apenas suas transações
+      console.log('Usuário não é administrador, buscando apenas suas transações')
       const transacoes = await prisma.transacao.findMany({
+        where: {
+          OR: [
+            { compradorId: usuario.id },
+            { vendedorId: usuario.id }
+          ]
+        },
         include: {
           comprador: {
             select: {
@@ -84,60 +125,20 @@ export default defineEventHandler(async (event) => {
 
       console.log('Transações formatadas:', transacoesFormatadas)
       return transacoesFormatadas
+    } else if (event.method === 'POST') {
+      // Criar nova transação
+      return await handleCreateTransacao(event, usuario.id)
+    } else {
+      throw createError({
+        statusCode: 405,
+        statusMessage: 'Método não permitido',
+      })
     }
-
-    // Para outros usuários, buscar apenas suas transações
-    console.log('Usuário não é administrador, buscando apenas suas transações')
-    const transacoes = await prisma.transacao.findMany({
-      where: {
-        OR: [
-          { compradorId: usuario.id },
-          { vendedorId: usuario.id }
-        ]
-      },
-      include: {
-        comprador: {
-          select: {
-            name: true
-          }
-        },
-        vendedor: {
-          select: {
-            name: true
-          }
-        }
-      },
-      orderBy: {
-        data: 'desc'
-      }
-    })
-
-    console.log('Transações encontradas:', transacoes)
-
-    // Formatar as transações para o frontend
-    const transacoesFormatadas = transacoes.map(transacao => ({
-      id: transacao.id,
-      data: transacao.data,
-      comprador: transacao.comprador.name,
-      compradorId: transacao.compradorId,
-      vendedor: transacao.vendedor.name,
-      vendedorId: transacao.vendedorId,
-      quantidade: transacao.quantidade,
-      precoUnitario: transacao.precoUnitario,
-      valorTotal: transacao.valorTotal,
-      status: transacao.status,
-      observacoes: transacao.observacoes,
-      createdAt: transacao.createdAt,
-      updatedAt: transacao.updatedAt
-    }))
-
-    console.log('Transações formatadas:', transacoesFormatadas)
-    return transacoesFormatadas
   } catch (error) {
-    console.error('Erro ao buscar transações:', error)
+    console.error('Erro ao processar transações:', error)
     throw createError({
       statusCode: 500,
-      statusMessage: 'Erro ao buscar transações',
+      statusMessage: 'Erro ao processar transações',
     })
   }
 })

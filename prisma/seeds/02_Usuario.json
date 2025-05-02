@@ -18,7 +18,9 @@
     "email": "vitor@sigecafe.com",
     "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
     "type": "ADMINISTRADOR",
-    "celular": "11999990003"
+    "celular": "11999990003",
+    "cooperativaId": 1,
+    "associadoId": null
   },
   {
     "name": "Ingrid Hayuni",
@@ -46,14 +48,16 @@
     "email": "joao@gmail.com",
     "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
     "type": "PRODUTOR",
-    "celular": "11999990007"
+    "celular": "11999990007",
+    "cooperativaId": 1
   },
   {
     "name": "Daniel de Oliveira",
     "email": "daniel@gmail.com",
     "password": "$2b$10$PmI51SqJpTJ4stgWqPZIyefKyeIckhIixW2QQmzDBG5L464jNYnKa",
     "type": "COMPRADOR",
-    "celular": "11999990008"
+    "celular": "11999990008",
+    "cooperativaId": 1
   },
   {
     "name": "Carlos Oliveira",

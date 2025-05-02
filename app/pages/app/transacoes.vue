@@ -16,16 +16,19 @@
             </UiButton>
 
             <div class="flex items-center space-x-2">
-              <div>
+              <div class="relative w-72">
                 <label for="filter" class="sr-only">Filtrar</label>
                 <input
                   id="filter"
                   v-model="filter"
-                  placeholder="Filtrar transações..."
-                  class="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  placeholder="Buscar transações..."
+                  class="h-12 w-full pl-10 pr-3 rounded-lg border border-input bg-background text-base shadow-md transition-colors file:border-0 file:bg-transparent file:text-base file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50"
                 />
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                  <Icon name="lucide:search" class="h-5 w-5" />
+                </span>
               </div>
-              <UiSelect v-model="statusFilter">
+              <UiSelect v-model="statusFilter" class="w-72 h-12 text-base rounded-lg shadow-md">
                 <option value="">Todos os status</option>
                 <option value="PENDENTE">Pendente</option>
                 <option value="CONCLUIDA">Concluída</option>
@@ -123,122 +126,92 @@
 
           <AlertDialogDescription class="mb-5 mt-4 text-[15px] leading-normal">
             <form @submit.prevent="saveTransacao">
+              <div v-if="errorMessage" class="mb-4 p-2 rounded bg-red-100 text-red-800 border border-red-300">
+                {{ errorMessage }}
+              </div>
               <div class="grid w-full items-center gap-4">
                 <div class="flex flex-col space-y-1.5">
                   <template v-if="usuario?.type === 'ADMINISTRADOR'">
                     <UiLabel for="comprador">Comprador</UiLabel>
-                    <select 
-                      id="comprador" 
-                      v-model="transacaoForm.compradorId" 
-                      class="alert-input"
-                    >
+                    <UiSelect v-model="transacaoForm.compradorId" id="comprador">
                       <option value="">Selecione o comprador</option>
-                      <option 
-                        v-for="contraparte in contrapartes.filter(c => c.type === 'COMPRADOR')" 
-                        :key="contraparte.id" 
-                        :value="contraparte.id"
-                      >
+                      <option v-for="contraparte in contrapartes.filter(c => c.type === 'COMPRADOR')" :key="contraparte.id" :value="String(contraparte.id)">
                         {{ contraparte.name }}
                       </option>
-                    </select>
+                    </UiSelect>
 
                     <UiLabel for="vendedor">Vendedor</UiLabel>
-                    <select 
-                      id="vendedor" 
-                      v-model="transacaoForm.vendedorId" 
-                      class="alert-input"
-                    >
+                    <UiSelect v-model="transacaoForm.vendedorId" id="vendedor">
                       <option value="">Selecione o vendedor</option>
-                      <option 
-                        v-for="contraparte in contrapartes.filter(c => c.type === 'PRODUTOR')" 
-                        :key="contraparte.id" 
-                        :value="contraparte.id"
-                      >
+                      <option v-for="contraparte in contrapartes.filter(c => c.type === 'PRODUTOR')" :key="contraparte.id" :value="String(contraparte.id)">
                         {{ contraparte.name }}
                       </option>
-                    </select>
+                    </UiSelect>
                   </template>
-                  <template v-else>
-                    <UiLabel for="contraparte">{{ usuario?.type === 'COMPRADOR' ? 'Vendedor' : 'Comprador' }}</UiLabel>
-                    <select 
-                      id="contraparte" 
-                      v-model="contraparteId" 
-                      class="alert-input"
-                    >
-                      <option value="">Selecione uma opção</option>
-                      <option 
-                        v-for="contraparte in contrapartes" 
-                        :key="contraparte.id" 
-                        :value="contraparte.id"
-                      >
+                  <template v-else-if="usuario?.type === 'COMPRADOR'">
+                    <UiLabel for="comprador">Comprador</UiLabel>
+                    <UiSelect v-model="transacaoForm.compradorId" id="comprador" disabled>
+                      <option :value="usuario.id">{{ usuario.name }}</option>
+                    </UiSelect>
+
+                    <UiLabel for="vendedor">Vendedor</UiLabel>
+                    <UiSelect v-model="transacaoForm.vendedorId" id="vendedor">
+                      <option value="">Selecione o vendedor</option>
+                      <option v-for="contraparte in contrapartes" :key="contraparte.id" :value="String(contraparte.id)">
                         {{ contraparte.name }}
                       </option>
-                    </select>
+                    </UiSelect>
+                  </template>
+                  <template v-else-if="usuario?.type === 'PRODUTOR'">
+                    <UiLabel for="comprador">Comprador</UiLabel>
+                    <UiSelect v-model="transacaoForm.compradorId" id="comprador">
+                      <option value="">Selecione o comprador</option>
+                      <option v-for="contraparte in contrapartes" :key="contraparte.id" :value="String(contraparte.id)">
+                        {{ contraparte.name }}
+                      </option>
+                    </UiSelect>
+
+                    <UiLabel for="vendedor">Vendedor</UiLabel>
+                    <UiSelect v-model="transacaoForm.vendedorId" id="vendedor" disabled>
+                      <option :value="usuario.id">{{ usuario.name }}</option>
+                    </UiSelect>
                   </template>
 
                   <UiLabel for="quantidade">Quantidade (sacas)</UiLabel>
-                  <input 
-                    id="quantidade" 
-                    v-model.number="transacaoForm.quantidade" 
-                    type="number" 
-                    min="1" 
-                    class="alert-input" 
-                  />
+                  <UiInput id="quantidade" v-model.number="transacaoForm.quantidade" type="number" min="1" />
 
                   <UiLabel for="precoUnitario">Preço Unitário (R$)</UiLabel>
-                  <input 
-                    id="precoUnitario" 
-                    v-model.number="transacaoForm.precoUnitario" 
-                    type="number" 
-                    min="0.01" 
-                    step="0.01" 
-                    class="alert-input" 
-                  />
+                  <UiInput id="precoUnitario" v-model.number="transacaoForm.precoUnitario" type="number" min="0.01" step="0.01" />
 
                   <UiLabel for="data">Data</UiLabel>
-                  <input 
-                    id="data" 
-                    v-model="transacaoForm.data" 
-                    type="date" 
-                    class="alert-input" 
-                  />
+                  <UiInput id="data" v-model="transacaoForm.data" type="date" />
 
                   <UiLabel for="status">Status</UiLabel>
-                  <select 
-                    id="status" 
-                    v-model="transacaoForm.status" 
-                    class="alert-input"
-                  >
+                  <UiSelect v-model="transacaoForm.status" id="status">
                     <option value="PENDENTE">Pendente</option>
                     <option value="CONCLUIDA">Concluída</option>
                     <option value="CANCELADA">Cancelada</option>
-                  </select>
+                  </UiSelect>
 
                   <UiLabel for="observacoes">Observações</UiLabel>
-                  <textarea 
-                    id="observacoes" 
-                    v-model="transacaoForm.observacoes" 
-                    rows="3" 
-                    class="alert-input"
-                  ></textarea>
+                  <textarea id="observacoes" v-model="transacaoForm.observacoes" rows="3" class="form-input h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus:border-input focus:ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:[color-scheme:dark] sm:text-sm" />
                 </div>
+              </div>
+              <div class="flex justify-end gap-[25px] mt-6">
+                <AlertDialogCancel
+                  class="text-mauve11 bg-mauve4 hover:bg-mauve5 focus:shadow-mauve7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none outline-none focus:shadow-[0_0_0_2px]"
+                >
+                  Voltar
+                </AlertDialogCancel>
+                <button
+                  class="text-red11 bg-red4 hover:bg-red5 focus:shadow-red7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none outline-none focus:shadow-[0_0_0_2px]"
+                  type="submit"
+                >
+                  Salvar
+                </button>
               </div>
             </form>
           </AlertDialogDescription>
-
-          <div class="flex justify-end gap-[25px]">
-            <AlertDialogCancel
-              class="text-mauve11 bg-mauve4 hover:bg-mauve5 focus:shadow-mauve7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none outline-none focus:shadow-[0_0_0_2px]"
-            >
-              Voltar
-            </AlertDialogCancel>
-            <AlertDialogAction
-              class="text-red11 bg-red4 hover:bg-red5 focus:shadow-red7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none outline-none focus:shadow-[0_0_0_2px]"
-              type="submit"
-            >
-              Salvar
-            </AlertDialogAction>
-          </div>
         </AlertDialogContent>
       </AlertDialogPortal>
     </AlertDialogRoot>
@@ -247,6 +220,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import UiSelect from '@/components/Ui/select.vue';
+import UiSelectTrigger from '@/components/Ui/Select/Trigger.vue';
+import UiSelectContent from '@/components/Ui/Select/Content.vue';
+import UiSelectItem from '@/components/Ui/Select/Item.vue';
 
 const filter = ref('');
 const statusFilter = ref('');
@@ -258,13 +235,14 @@ const transacaoForm = ref({
   data: '',
   status: 'PENDENTE',
   observacoes: '',
-  compradorId: 0,
-  vendedorId: 0,
+  compradorId: '',
+  vendedorId: '',
 });
 const editingTransacao = ref(false);
 const transacoes = ref([]);
 const usuario = ref(null);
 const contrapartes = ref([]);
+const errorMessage = ref("");
 
 const contraparteId = computed({
   get: () => usuario.value?.type === 'COMPRADOR' ? transacaoForm.value.vendedorId : transacaoForm.value.compradorId,
@@ -279,7 +257,6 @@ const contraparteId = computed({
 
 // Buscar transações ao carregar a página
 onMounted(async () => {
-  console.log('Iniciando carregamento...');
   await fetchUsuario();
   await fetchTransacoes();
 });
@@ -287,25 +264,17 @@ onMounted(async () => {
 // Buscar transações da API
 async function fetchTransacoes() {
   try {
-    console.log('Buscando transações...');
     const response = await fetch('/api/transacoes', {
       method: 'GET',
       headers: {
         'Accept': 'application/json'
       }
     });
-    
-    console.log('Status da resposta:', response.status);
-    console.log('Status text:', response.statusText);
-    
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Erro na resposta:', errorText);
       throw new Error('Erro ao buscar transações');
     }
-    
     const data = await response.json();
-    console.log('Transações recebidas:', data);
     transacoes.value = data;
   } catch (error) {
     console.error('Erro ao buscar transações:', error);
@@ -315,11 +284,9 @@ async function fetchTransacoes() {
 // Buscar informações do usuário
 async function fetchUsuario() {
   try {
-    console.log('Buscando usuário...');
     const response = await fetch('/api/auth/session');
     if (!response.ok) throw new Error('Erro ao buscar usuário');
     const data = await response.json();
-    console.log('Usuário recebido:', data);
     usuario.value = data.user;
     // Após buscar o usuário, buscar as contrapartes
     await fetchContrapartes();
@@ -331,11 +298,9 @@ async function fetchUsuario() {
 // Buscar contrapartes (compradores ou vendedores)
 async function fetchContrapartes() {
   try {
-    console.log('Buscando contrapartes...');
     const response = await fetch('/api/transacoes/contrapartes');
     if (!response.ok) throw new Error('Erro ao buscar contrapartes');
     const data = await response.json();
-    console.log('Contrapartes recebidas:', data);
     contrapartes.value = data;
   } catch (error) {
     console.error('Erro ao buscar contrapartes:', error);
@@ -343,25 +308,26 @@ async function fetchContrapartes() {
 }
 
 const filteredTransacoes = computed(() => {
-  console.log('Filtrando transações...');
-  console.log('Transações disponíveis:', transacoes.value);
-  console.log('Filtro de status:', statusFilter.value);
-  console.log('Filtro de texto:', filter.value);
-  
-  const filtered = transacoes.value.filter(transacao => {
+  return transacoes.value.filter(transacao => {
     const statusMatch = statusFilter.value ? transacao.status === statusFilter.value : true;
-    const filterMatch = transacao.comprador.toLowerCase().includes(filter.value.toLowerCase()) ||
-      transacao.vendedor.toLowerCase().includes(filter.value.toLowerCase());
+    let filterMatch = true;
+    if (filter.value.trim() !== '') {
+      const comprador = (transacao.comprador || '').toLowerCase();
+      const vendedor = (transacao.vendedor || '').toLowerCase();
+      const quantidade = String(transacao.quantidade || '').toLowerCase();
+      const precoUnitario = String(transacao.precoUnitario || '').toLowerCase();
+      const filtro = filter.value.toLowerCase();
+      filterMatch =
+        comprador.includes(filtro) ||
+        vendedor.includes(filtro) ||
+        quantidade.includes(filtro) ||
+        precoUnitario.includes(filtro);
+    }
     return statusMatch && filterMatch;
   });
-  
-  console.log('Transações filtradas:', filtered);
-  return filtered;
 });
 
 const openNewTransactionModal = () => {
-  console.log('Abrindo modal, usuário:', usuario.value);
-  console.log('Contrapartes disponíveis:', contrapartes.value);
   transacaoForm.value = {
     quantidade: 1,
     precoUnitario: 0,
@@ -369,21 +335,27 @@ const openNewTransactionModal = () => {
     data: new Date().toISOString().split('T')[0],
     status: 'PENDENTE',
     observacoes: '',
-    compradorId: usuario.value?.type === 'COMPRADOR' ? usuario.value.id : 0,
-    vendedorId: usuario.value?.type === 'PRODUTOR' ? usuario.value.id : 0,
+    compradorId: usuario.value?.type === 'COMPRADOR' ? String(usuario.value.id) : '',
+    vendedorId: usuario.value?.type === 'PRODUTOR' ? String(usuario.value.id) : '',
   };
   editingTransacao.value = false;
   isNewTransactionOpen.value = true;
 };
 
 const saveTransacao = async () => {
+  errorMessage.value = "";
   try {
     // Calcular valor total
     transacaoForm.value.valorTotal = transacaoForm.value.quantidade * transacaoForm.value.precoUnitario;
 
+    // Converter IDs para número
+    transacaoForm.value.compradorId = Number(transacaoForm.value.compradorId);
+    transacaoForm.value.vendedorId = Number(transacaoForm.value.vendedorId);
+
     let response;
     if (editingTransacao.value && transacaoForm.value.id) {
       // Edição: PUT
+      console.log('Enviando PUT para /api/transacoes/' + transacaoForm.value.id, transacaoForm.value);
       response = await fetch(`/api/transacoes/${transacaoForm.value.id}`, {
         method: 'PUT',
         headers: {
@@ -393,6 +365,7 @@ const saveTransacao = async () => {
       });
     } else {
       // Criação: POST
+      console.log('Enviando POST para /api/transacoes', transacaoForm.value);
       response = await fetch('/api/transacoes', {
         method: 'POST',
         headers: {
@@ -402,12 +375,21 @@ const saveTransacao = async () => {
       });
     }
 
-    if (!response.ok) throw new Error('Erro ao salvar transação');
+    if (!response.ok) {
+      let msg = 'Erro ao salvar transação';
+      try {
+        const data = await response.json();
+        msg = data.statusMessage || data.message || msg;
+      } catch {}
+      errorMessage.value = msg;
+      return;
+    }
 
     await fetchTransacoes(); // Atualizar lista de transações
     isNewTransactionOpen.value = false;
   } catch (error) {
     console.error('Erro ao salvar transação:', error);
+    errorMessage.value = error?.message || 'Erro desconhecido ao salvar transação';
   }
 };
 
