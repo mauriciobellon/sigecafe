@@ -1,14 +1,18 @@
 [
   {
-    "id": 6,
+    "id": 2,
     "colaboradorId": 1
   },
   {
-    "id": 7,
+    "id": 3,
+    "colaboradorId": 2
+  },
+  {
+    "id": 4,
     "associadoId": 1
   },
   {
-    "id": 8,
-    "associadoId": 4
+    "id": 5,
+    "associadoId": 2
   }
 ]

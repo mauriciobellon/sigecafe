@@ -2,8 +2,14 @@ import { readdirSync, readFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
+
+// Simple hash function that matches the one in crypto.ts
+async function hash(password) {
+  return await bcrypt.hash(password, 10);
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,6 +32,11 @@ async function insertItem(model, item) {
     if (!item) {
       return;
     }
+
+    if (item.password) {
+      item.password = await hash(item.password);
+    }
+
     await prisma[model].create({ data: item });
   } catch (e) {
     console.error(`Error inserting item into ${model}:`, e);
