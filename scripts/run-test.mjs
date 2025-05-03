@@ -1,8 +1,9 @@
 import { spawn } from "child_process";
 import http from "http";
 
-const baseURL = process.env.BASE_URL
-const basePort = parseInt(baseURL?.split(':')[2] ?? '80')
+// Default to http://localhost if BASE_URL is not defined
+const baseURL = process.env.BASE_URL || 'http://localhost'
+const basePort = parseInt(baseURL?.split(':')[2] ?? '3000')
 
 function verificarServidorRodando() {
     return new Promise((resolve) => {
