@@ -20,7 +20,7 @@
 
           <AuthInput v-if="auth.step === 'celular'" :key="'celular-input'" v-model="auth.celular" model-name="celular"
             placeholder="(99) 9 9999-9999" type="tel" autocomplete="tel" maxlength="16" :disabled="auth.loading"
-            @input="auth.maskPhoneNumber" />
+            @input="$event => auth.maskPhoneNumber($event)" />
 
           <AuthInput v-if="auth.step === 'password'" :key="'password-input'" v-model="auth.password"
             model-name="password" placeholder="********" type="password" :disabled="auth.loading" />
