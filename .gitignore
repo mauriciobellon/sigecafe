@@ -30,3 +30,9 @@ logs
 
 # Syncthing
 .stfolder
+
+# Test results
+playwright-report
+playwright-test-results
+playwright-screenshots
+test-results

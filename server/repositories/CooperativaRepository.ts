@@ -7,6 +7,10 @@ export class CooperativaRepository {
         return prisma.cooperativa.findFirst({ where: { id: usuario.cooperativaId } });
     }
 
+    async getCooperativaById(id: number): Promise<Cooperativa | null> {
+        return prisma.cooperativa.findUnique({ where: { id } });
+    }
+
     async updateCooperativa(cooperativa: Cooperativa): Promise<Cooperativa | null> {
         return prisma.cooperativa.update({ where: { id: cooperativa.id }, data: cooperativa });
     }
