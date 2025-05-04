@@ -1,14 +1,17 @@
 import { setup } from "@nuxt/test-utils/e2e";
 
-const baseURL = process.env.BASE_URL
-const basePort = parseInt(baseURL?.split(':')[2] ?? '80')
-
-export default async () => {
+/**
+ * Setup function for e2e tests
+ *
+ * This ensures we have the correct URL for test navigation
+ */
+export default async function setupTests() {
   await setup({
-    host: `${baseURL}:${basePort}`,
+    // Use a stable localhost URL for testing
+    rootDir: process.cwd(),
     browser: true,
     browserOptions: {
       type: "chromium",
     },
   });
-};
+}

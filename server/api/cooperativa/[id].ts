@@ -1,15 +1,14 @@
-import { defineEventHandler } from 'h3';
+import { getServerSession } from '#auth';
+import { UsuarioType } from '@prisma/client';
+import { CooperativaRepository } from '@@/server/repositories/CooperativaRepository'
 
-import { CooperativaRepository } from '~~/server/repositories/CooperativaRepository';
 export default defineEventHandler(async (event) => {
-  const id = getRouterParam(event, 'id');
-
-  if (!id) {
-    throw createError({
-      statusCode: 400,
-      message: 'ID is required'
-    });
+  const session = await getServerSession(event);
+  if (!session?.user) {
+    return [];
   }
+
+  const id = getRouterParam(event, 'id');
 
   const cooperativaRepository = new CooperativaRepository();
 

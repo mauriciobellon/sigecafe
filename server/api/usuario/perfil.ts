@@ -154,9 +154,50 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
   // DELETE request to delete user profile
   if (event.method === 'DELETE') {
     try {
+      // Delete associated records first to avoid FK constraint violations
+      // 1. Delete UserPreference
+      await prisma.userPreference.deleteMany({
+        where: { usuarioId: userId }
+      });
+
+      // 2. Delete other related records
+      await prisma.notificacao.deleteMany({
+        where: { usuarioId: userId }
+      });
+
+      await prisma.passwordResetToken.deleteMany({
+        where: { usuarioId: userId }
+      });
+
+      await prisma.oferta.deleteMany({
+        where: { userId: userId }
+      });
+
+      // 3. Check for transactions and delete if exist
+      const transacoes = await prisma.transacao.findMany({
+        where: {
+          OR: [
+            { compradorId: userId },
+            { vendedorId: userId }
+          ]
+        }
+      });
+
+      if (transacoes.length > 0) {
+        await prisma.transacao.deleteMany({
+          where: {
+            OR: [
+              { compradorId: userId },
+              { vendedorId: userId }
+            ]
+          }
+        });
+      }
+
+      // 4. Finally delete the user
       await prisma.usuario.delete({
         where: { id: userId }
-      })
+      });
 
       return {
         success: true,
