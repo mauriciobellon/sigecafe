@@ -1,7 +1,7 @@
 import { defineEventHandler } from 'h3';
 import { getServerSession } from '#auth';
 import { CooperativaRepository } from '@@/server/repositories/CooperativaRepository'
-import type { Cooperativa, Escola } from '@prisma/client'
+import type { Cooperativa } from '@prisma/client'
 
 export default defineEventHandler(async (event) => {
   const session = await getServerSession(event);
