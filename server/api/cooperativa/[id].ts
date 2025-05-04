@@ -12,5 +12,11 @@ export default defineEventHandler(async (event) => {
 
   const cooperativaRepository = new CooperativaRepository();
 
+  if (!id) {
+    throw createError({
+      statusCode: 400,
+      message: 'ID is required'
+    });
+  }
   return await cooperativaRepository.getCooperativaById(parseInt(id));
-});
+})
