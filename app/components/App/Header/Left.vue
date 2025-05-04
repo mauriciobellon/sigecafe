@@ -2,7 +2,6 @@
   <div class="left-section">
     <NuxtLink to="/app" class="app-link">
       <AppHeaderLeftLogo />
-      <AppHeaderLeftTitle />
     </NuxtLink>
   </div>
 </template>

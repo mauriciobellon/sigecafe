@@ -18,6 +18,5 @@ export default defineEventHandler(async (event) => {
       message: 'ID is required'
     });
   }
-
   return await cooperativaRepository.getCooperativaById(parseInt(id));
 })

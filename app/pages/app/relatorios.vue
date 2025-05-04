@@ -25,38 +25,38 @@
 
               <div class="space-y-2">
                 <label class="text-sm font-medium">Data Inicial</label>
-                <input 
-                  type="date" 
-                  v-model="filters.startDate" 
+                <input
+                  type="date"
+                  v-model="filters.startDate"
                   class="h-10 w-full rounded-md border border-input bg-background px-3 py-2"
                 >
               </div>
 
               <div class="space-y-2">
                 <label class="text-sm font-medium">Data Final</label>
-                <input 
-                  type="date" 
-                  v-model="filters.endDate" 
+                <input
+                  type="date"
+                  v-model="filters.endDate"
                   class="h-10 w-full rounded-md border border-input bg-background px-3 py-2"
                 >
               </div>
 
               <div v-if="reportType === 'transactions'" class="space-y-2">
                 <label class="text-sm font-medium">Valor Mínimo</label>
-                <input 
-                  type="number" 
-                  v-model="filters.minValue" 
-                  placeholder="R$ 0,00" 
+                <input
+                  type="number"
+                  v-model="filters.minValue"
+                  placeholder="R$ 0,00"
                   class="h-10 w-full rounded-md border border-input bg-background px-3 py-2"
                 >
               </div>
 
               <div v-if="reportType === 'transactions'" class="space-y-2">
                 <label class="text-sm font-medium">Valor Máximo</label>
-                <input 
-                  type="number" 
-                  v-model="filters.maxValue" 
-                  placeholder="R$ 0,00" 
+                <input
+                  type="number"
+                  v-model="filters.maxValue"
+                  placeholder="R$ 0,00"
                   class="h-10 w-full rounded-md border border-input bg-background px-3 py-2"
                 >
               </div>
@@ -98,7 +98,7 @@
           <!-- Report results -->
           <div v-else-if="reportData.length > 0">
             <h3 class="text-lg font-medium mb-4">Resultados</h3>
-            
+
             <!-- Transaction report -->
             <Datatable
               v-if="reportType === 'transactions'"
@@ -131,7 +131,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch } from 'vue';
 import type { TransacaoDTO, AssociadoDTO } from '~/types/api';
-import UiSelect from '~/components/Ui/select.vue';
+import UiSelect from '~/components/Ui/Select/Select.vue';
 import Datatable from '~/components/Ui/Datatable.client.vue';
 
 // Report type

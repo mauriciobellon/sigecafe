@@ -20,7 +20,7 @@
           <AuthInput v-if="auth.step === 'name'" v-model="auth.name" placeholder="Nome Completo" type="text"
             autocomplete="name" :disabled="auth.loading" />
           <AuthInput v-if="auth.step === 'celular'" v-model="auth.celular" placeholder="(99) 9 9999-9999" type="tel"
-            autocomplete="tel" maxlength="16" :disabled="auth.loading" @input="auth.maskPhoneNumber" />
+            autocomplete="tel" maxlength="16" :disabled="auth.loading" @input="$event => auth.maskPhoneNumber($event)" />
           <AuthInput v-if="auth.step === 'password'" v-model="auth.password" placeholder="********" type="password"
             :disabled="auth.loading" />
           <UiButton type="submit" :disabled="auth.loading" class="h-12">

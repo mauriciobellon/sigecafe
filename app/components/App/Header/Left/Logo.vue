@@ -1,5 +1,7 @@
 <template>
-  <SharedLogo class="app-icon hidden md:flex" />
+  <div class="logo-container">
+    <SharedLogo class="app-icon hidden md:flex" />
+  </div>
 </template>
 
 <script lang="ts" setup></script>
