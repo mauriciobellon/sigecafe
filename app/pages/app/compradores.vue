@@ -154,7 +154,7 @@ import {
   AlertDialogTitle,
 } from "radix-vue";
 import type { Config, ConfigColumns } from "datatables.net";
-import UiSelect from '@/components/Ui/select.vue';
+import UiSelect from '@/components/Ui/Select/Select.vue';
 import UiInput from '@/components/Ui/Input.vue';
 
 // Tipagem do comprador

@@ -220,7 +220,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import UiSelect from '@/components/Ui/select.vue';
+import { AlertDialogRoot } from "radix-vue";
+import UiSelect from '@/components/Ui/Select/Select.vue';
 
 const filter = ref('');
 const statusFilter = ref('');

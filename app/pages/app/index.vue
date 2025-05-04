@@ -142,39 +142,41 @@
               return;
             }
           }
+        } catch (e) {
+          console.error('Error fetching associado data:', e);
         }
-      } catch (e) {
-        console.error('Error fetching associado data:', e);
       }
-    }
-    // Try cooperativa if no city from associado
-    if (cooperativaId) {
-      try {
-        console.log('Fetching cooperativa data...');
-        const res = await fetch(`/api/cooperativa/${cooperativaId}`, { credentials: 'include' });
-        if (res.ok) {
-          const json = await res.json();
-          console.log('Received cooperativa data:', json);
-          if (json.success && json.data && json.data.cidade) {
-            cidade.value = json.data.cidade;
-            console.log('Updated city to:', cidade.value, 'from cooperativa');
-            localStorage.setItem('userCidade', cidade.value);
-            return;
-          }
-        }
-      } catch (e) {
-        console.error('Error fetching cooperativa data:', e);
-      }
-    }
-  } catch (e) {
-    console.error('Error determining location:', e);
-  }
-}
 
-// Use computed for display with localStorage fallback
-const cidadeCooperativa = computed(() => {
-  if (cidade.value !== 'São Paulo') {
-    return cidade.value;
+      // Try cooperativa if no city from associado
+      if (cooperativaId) {
+        try {
+          console.log('Fetching cooperativa data...');
+          const res = await fetch(`/api/cooperativa/${cooperativaId}`, { credentials: 'include' });
+          if (res.ok) {
+            const json = await res.json();
+            console.log('Received cooperativa data:', json);
+            if (json.success && json.data && json.data.cidade) {
+              cidade.value = json.data.cidade;
+              console.log('Updated city to:', cidade.value, 'from cooperativa');
+              localStorage.setItem('userCidade', cidade.value);
+              return;
+            }
+          }
+        } catch (e) {
+          console.error('Error fetching cooperativa data:', e);
+        }
+      }
+    } catch (e) {
+      console.error('Error determining location:', e);
+    }
+  }
+
+  // Use computed for display with localStorage fallback
+  const cidadeCooperativa = computed(() => {
+    if (cidade.value !== 'São Paulo') {
+      return cidade.value;
+    }
+    return 'São Paulo';
   });
 
   // Coffee prices state
@@ -220,24 +222,13 @@ const cidadeCooperativa = computed(() => {
 
       // Use fallback prices
       coffeePricesData.value = {
-        arabica: Number(response.data.arabica) || 0,
-        robusta: Number(response.data.robusta) || 0,
-        date: new Date(response.data.date)
+        arabica: 31.20,
+        robusta: 28.50,
+        date: new Date()
       };
-    } else {
-      throw new Error(response?.message || 'Failed to fetch coffee prices');
+    } finally {
+      loadingPrices.value = false;
     }
-  } catch (error: unknown) {
-    console.error('Error fetching coffee prices:', error);
-    priceError.value = error instanceof Error ? error.message : 'Failed to fetch coffee prices';
-
-    coffeePricesData.value = {
-      arabica: 31.20,
-      robusta: 28.50,
-      date: new Date()
-    };
-  } finally {
-    loadingPrices.value = false;
   }
 
   // Mock data - replace with real data from your API
@@ -267,5 +258,9 @@ const cidadeCooperativa = computed(() => {
       data: 'Há 1h'
     }
   ]);
-});
+
+  onMounted(() => {
+    fetchCidadeInfo();
+    fetchCoffeePrices();
+  });
 </script>
