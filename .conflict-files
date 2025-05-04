@@ -1,0 +1,3 @@
+ancestorEntries = ["docker-compose.yaml"]
+ourEntries = ["docker-compose.yaml"]
+theirEntries = ["docker-compose.yaml"]
