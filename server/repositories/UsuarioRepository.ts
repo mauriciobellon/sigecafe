@@ -55,7 +55,7 @@ export class UsuarioRepository {
         return typedUsers;
     }
     async createUsuario(usuario: Partial<Usuario>): Promise<Usuario> {
-        const { email, name, password, celular, type, cooperativaId, produtorId, compradorId } = usuario;
+        const { email, name, password, celular, type, cooperativaId, associadoId, colaboradorId } = usuario;
         return prisma.usuario.create({
             data: {
                 email,
@@ -64,13 +64,13 @@ export class UsuarioRepository {
                 celular: celular!,
                 type,
                 cooperativaId,
-                produtorId,
-                compradorId
+                associadoId,
+                colaboradorId
             }
         });
     }
     async updateUsuario(usuario: Partial<Usuario> & { id: number }): Promise<Usuario> {
-        const { id, email, name, password, celular, type, cooperativaId, produtorId, compradorId } = usuario;
+        const { id, email, name, password, celular, type, cooperativaId, associadoId, colaboradorId } = usuario;
         return prisma.usuario.update({
             where: { id },
             data: {
@@ -80,15 +80,55 @@ export class UsuarioRepository {
                 celular,
                 type,
                 cooperativaId,
-                produtorId,
-                compradorId
+                associadoId,
+                colaboradorId
             }
         });
     }
     async deleteUsuarioById(id: number): Promise<void> {
+        // First delete associated UserPreference to avoid FK constraint errors
+        await prisma.userPreference.deleteMany({ where: { usuarioId: id } });
+
+        // Then delete other relations that might cause FK constraint errors
+        await prisma.notificacao.deleteMany({ where: { usuarioId: id } });
+        await prisma.passwordResetToken.deleteMany({ where: { usuarioId: id } });
+        await prisma.oferta.deleteMany({ where: { userId: id } });
+
+        // Check if user is involved in any transactions
+        const transacoes = await prisma.transacao.findMany({
+            where: {
+                OR: [
+                    { compradorId: id },
+                    { vendedorId: id }
+                ]
+            }
+        });
+
+        // If there are transactions, delete them
+        if (transacoes.length > 0) {
+            await prisma.transacao.deleteMany({
+                where: {
+                    OR: [
+                        { compradorId: id },
+                        { vendedorId: id }
+                    ]
+                }
+            });
+        }
+
+        // Finally delete the user
         await prisma.usuario.delete({ where: { id } });
     }
     async deleteUsuarioByCelular(celular: string): Promise<void> {
-        await prisma.usuario.delete({ where: { celular } });
+        const usuario = await this.getUsuarioByCelular(celular);
+        if (usuario) {
+            await this.deleteUsuarioById(usuario.id);
+        }
+    }
+    async deleteUsuarioByEmail(email: string): Promise<void> {
+        const usuario = await this.getUsuarioByEmail(email);
+        if (usuario) {
+            await this.deleteUsuarioById(usuario.id);
+        }
     }
 }

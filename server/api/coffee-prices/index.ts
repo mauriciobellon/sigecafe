@@ -32,12 +32,12 @@ export default defineEventHandler(async (event) => {
       // Determine if cache should be bypassed via ?force=true
       const query = getQuery(event)
       const forceFetch = query.force === 'true' || query.force === true
-      console.log(`[coffee-prices] GET request received; forceFetch=${forceFetch}`)
+      // console.log(`[coffee-prices] GET request received; forceFetch=${forceFetch}`)
 
       // Return recent cached price if not forcing a new fetch
       if (!forceFetch) {
         const lastDay = new Date()
-        console.log(`[coffee-prices] Checking cache for data since ${lastDay.toISOString()}`)
+        // console.log(`[coffee-prices] Checking cache for data since ${lastDay.toISOString()}`)
         lastDay.setDate(lastDay.getDate() - 1)
         const recentPrices = await prisma.$queryRaw<PrecoCafeHistorico[]>`
           SELECT * FROM "PrecoCafeHistorico"
@@ -45,10 +45,10 @@ export default defineEventHandler(async (event) => {
           ORDER BY "data" DESC
           LIMIT 1
         `
-        console.log('[coffee-prices] recentPrices from DB:', recentPrices)
+        // console.log('[coffee-prices] recentPrices from DB:', recentPrices)
         if (recentPrices && recentPrices.length > 0) {
           const price = recentPrices[0]
-          console.log('[coffee-prices] Returning cached prices:', price)
+          // console.log('[coffee-prices] Returning cached prices:', price)
           return {
             success: true,
             data: {
@@ -61,20 +61,20 @@ export default defineEventHandler(async (event) => {
       }
 
       // No cache hit or forcing new fetch: fetch latest prices from external source
-      console.log('[coffee-prices] No cached data or forceFetch; calling fetchLatestPrices()')
+      // console.log('[coffee-prices] No cached data or forceFetch; calling fetchLatestPrices()')
       const prices = await fetchLatestPrices()
-      console.log('[coffee-prices] fetchLatestPrices returned:', prices)
+      // console.log('[coffee-prices] fetchLatestPrices returned:', prices)
       const { arabica, robusta, date, isFallback } = prices
 
       // Persist to database only if fetch was successful (not fallback)
       if (!isFallback && arabica != null && robusta != null) {
-        console.log(`[coffee-prices] Persisting new prices to DB: arabica=${arabica}, robusta=${robusta}`)
+        // console.log(`[coffee-prices] Persisting new prices to DB: arabica=${arabica}, robusta=${robusta}`)
         await prisma.$executeRaw`
           INSERT INTO "PrecoCafeHistorico" ("data", "precoArabica", "precoRobusta", "fonte")
           VALUES (${date}, ${arabica}, ${robusta}, 'CEPEA/ESALQ')
         `
       } else {
-        console.log(`[coffee-prices] Skipping DB persist; isFallback=${isFallback}`)
+        // console.log(`[coffee-prices] Skipping DB persist; isFallback=${isFallback}`)
       }
 
       return {
@@ -98,10 +98,10 @@ export default defineEventHandler(async (event) => {
 
 // Function to fetch prices from external source with headless browser first, then HTTP fallback
 async function fetchLatestPrices() {
-  console.log('[fetchLatestPrices] Starting price fetch via Puppeteer')
+  // console.log('[fetchLatestPrices] Starting price fetch via Puppeteer')
   // Attempt headless browser scraper first
   try {
-    console.log('[fetchLatestPrices] Launching Puppeteer')
+    // console.log('[fetchLatestPrices] Launching Puppeteer')
     const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] })
     const page = await browser.newPage()
     // mimic typical browser environment
@@ -109,7 +109,7 @@ async function fetchLatestPrices() {
                             '(KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36')
     await page.setExtraHTTPHeaders({ 'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7' })
     await page.goto(CEPEA_URL, { waitUntil: 'networkidle0', timeout: 60000 })
-    console.log('[fetchLatestPrices] Puppeteer page loaded')
+    // console.log('[fetchLatestPrices] Puppeteer page loaded')
 
     // Extract table data in browser context
     const data = await page.evaluate(() => {
@@ -132,7 +132,7 @@ async function fetchLatestPrices() {
       return result
     })
     await browser.close()
-    console.log('[fetchLatestPrices] Puppeteer evaluation data:', data)
+    // console.log('[fetchLatestPrices] Puppeteer evaluation data:', data)
 
     // Parse values and detect fallback
     let arabicaPrice = 0, robustaPrice = 0, isFallback = false
@@ -149,16 +149,16 @@ async function fetchLatestPrices() {
       isFallback = true
     }
     const result = { arabica: arabicaPrice, robusta: robustaPrice, date: new Date(), isFallback }
-    console.log('[fetchLatestPrices] Puppeteer parsed result:', result)
+    // console.log('[fetchLatestPrices] Puppeteer parsed result:', result)
     return result
   } catch (err) {
     console.error('[fetchLatestPrices] Puppeteer scrape failed:', err)
-    console.log('[fetchLatestPrices] Falling back to HTTP+Cheerio fetch')
+    // console.log('[fetchLatestPrices] Falling back to HTTP+Cheerio fetch')
   }
 
   // HTTP+Cheerio fallback
   try {
-    console.log('[fetchLatestPrices] Sending HTTP request to CEPEA')
+    // console.log('[fetchLatestPrices] Sending HTTP request to CEPEA')
     const response = await ofetch(CEPEA_URL, {
       responseType: 'text',
       retry: 3,
@@ -171,40 +171,40 @@ async function fetchLatestPrices() {
         'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7'
       }
     })
-    console.log('[fetchLatestPrices] HTTP request successful; response length =', response.length)
+    // console.log('[fetchLatestPrices] HTTP request successful; response length =', response.length)
     const $ = cheerio.load(response)
-    console.log('[fetchLatestPrices] HTML loaded into Cheerio')
+    // console.log('[fetchLatestPrices] HTML loaded into Cheerio')
 
     let isFallback = false, arabicaPrice = 0, robustaPrice = 0
     const arabicaElement = $('#imagenet-indicador-cafe .imagenet-center td.text:contains("Arábica")').next()
-    console.log('[fetchLatestPrices] arabicaElement found:', arabicaElement.length)
+    // console.log('[fetchLatestPrices] arabicaElement found:', arabicaElement.length)
     if (arabicaElement.length) {
       const txt = arabicaElement.text().trim()
-      console.log('[fetchLatestPrices] Raw arabica text:', txt)
+      // console.log('[fetchLatestPrices] Raw arabica text:', txt)
       arabicaPrice = parseFloat(txt.replace('R$', '').replace('.', '').replace(',', '.').trim())
     } else {
       isFallback = true
     }
-    console.log('[fetchLatestPrices] Parsed arabicaPrice =', arabicaPrice)
+    // console.log('[fetchLatestPrices] Parsed arabicaPrice =', arabicaPrice)
 
     const robustaElement = $('#imagenet-indicador-cafe .imagenet-center td.text:contains("Robusta")').next()
-    console.log('[fetchLatestPrices] robustaElement found:', robustaElement.length)
+    // console.log('[fetchLatestPrices] robustaElement found:', robustaElement.length)
     if (robustaElement.length) {
       const txt = robustaElement.text().trim()
-      console.log('[fetchLatestPrices] Raw robusta text:', txt)
+      // console.log('[fetchLatestPrices] Raw robusta text:', txt)
       robustaPrice = parseFloat(txt.replace('R$', '').replace('.', '').replace(',', '.').trim())
     } else {
       isFallback = true
     }
-    console.log('[fetchLatestPrices] Parsed robustaPrice =', robustaPrice)
+    // console.log('[fetchLatestPrices] Parsed robustaPrice =', robustaPrice)
 
     const fallbackResult = { arabica: arabicaPrice, robusta: robustaPrice, date: new Date(), isFallback }
-    console.log('[fetchLatestPrices] Returning fallback Cheerio result:', fallbackResult)
+    // console.log('[fetchLatestPrices] Returning fallback Cheerio result:', fallbackResult)
     return fallbackResult
   } catch (error) {
     console.error('[fetchLatestPrices] HTTP+Cheerio fetch failed:', error)
     const fallback = { arabica: 1249.88, robusta: 779.25, date: new Date(), isFallback: true }
-    console.log('[fetchLatestPrices] Returning final fallback:', fallback)
+    // console.log('[fetchLatestPrices] Returning final fallback:', fallback)
     return fallback
   }
 }
