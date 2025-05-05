@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "UsuarioType" AS ENUM ('ADMINISTRADOR', 'COOPERATIVA', 'PRODUTOR', 'COMPRADOR', 'AUTENTICADO', 'COLABORADOR');
+CREATE TYPE "UsuarioType" AS ENUM ('ADMINISTRADOR', 'COOPERATIVA', 'PRODUTOR', 'COMPRADOR', 'AUTENTICADO', 'COLABORADOR', 'PUBLICO');
 
 -- CreateEnum
 CREATE TYPE "MenuType" AS ENUM ('ROOT', 'PERFIL', 'DROPDOWN');
@@ -9,6 +9,12 @@ CREATE TYPE "AssociadoTipo" AS ENUM ('PRODUTOR', 'COMPRADOR');
 
 -- CreateEnum
 CREATE TYPE "TransacaoStatus" AS ENUM ('PENDENTE', 'CONCLUIDA', 'CANCELADA');
+
+-- CreateEnum
+CREATE TYPE "OfferSide" AS ENUM ('BUY', 'SELL');
+
+-- CreateEnum
+CREATE TYPE "OfferStatus" AS ENUM ('OPEN', 'FILLED', 'CANCELLED');
 
 -- CreateTable
 CREATE TABLE "Usuario" (
@@ -152,6 +158,20 @@ CREATE TABLE "PasswordResetToken" (
     CONSTRAINT "PasswordResetToken_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Oferta" (
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "side" "OfferSide" NOT NULL,
+    "price" DOUBLE PRECISION NOT NULL,
+    "quantity" DOUBLE PRECISION NOT NULL,
+    "status" "OfferStatus" NOT NULL DEFAULT 'OPEN',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Oferta_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Usuario_celular_key" ON "Usuario"("celular");
 
@@ -168,13 +188,13 @@ CREATE UNIQUE INDEX "UserPreference_usuarioId_key" ON "UserPreference"("usuarioI
 CREATE UNIQUE INDEX "PasswordResetToken_token_key" ON "PasswordResetToken"("token");
 
 -- AddForeignKey
-ALTER TABLE "Usuario" ADD CONSTRAINT "Usuario_cooperativaId_fkey" FOREIGN KEY ("cooperativaId") REFERENCES "Cooperativa"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Usuario" ADD CONSTRAINT "Usuario_associadoId_fkey" FOREIGN KEY ("associadoId") REFERENCES "Associado"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Usuario" ADD CONSTRAINT "Usuario_colaboradorId_fkey" FOREIGN KEY ("colaboradorId") REFERENCES "Colaborador"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Usuario" ADD CONSTRAINT "Usuario_cooperativaId_fkey" FOREIGN KEY ("cooperativaId") REFERENCES "Cooperativa"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Associado" ADD CONSTRAINT "Associado_cooperativaId_fkey" FOREIGN KEY ("cooperativaId") REFERENCES "Cooperativa"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -196,3 +216,6 @@ ALTER TABLE "UserPreference" ADD CONSTRAINT "UserPreference_usuarioId_fkey" FORE
 
 -- AddForeignKey
 ALTER TABLE "PasswordResetToken" ADD CONSTRAINT "PasswordResetToken_usuarioId_fkey" FOREIGN KEY ("usuarioId") REFERENCES "Usuario"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Oferta" ADD CONSTRAINT "Oferta_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Usuario"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

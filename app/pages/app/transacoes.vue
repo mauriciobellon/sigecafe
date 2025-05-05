@@ -16,409 +16,507 @@
             </UiButton>
 
             <div class="flex items-center space-x-2">
-              <div>
+              <div class="relative w-72">
                 <label for="filter" class="sr-only">Filtrar</label>
-                <input
-                  id="filter"
-                  v-model="filter"
-                  placeholder="Filtrar transações..."
-                  class="h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                />
+                <input id="filter" v-model="filter" placeholder="Buscar transações..."
+                  class="h-12 w-full pl-10 pr-3 rounded-lg border border-input bg-background text-base shadow-md transition-colors file:border-0 file:bg-transparent file:text-base file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50" />
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                  <Icon name="lucide:search" class="h-5 w-5" />
+                </span>
               </div>
-              <UiSelect v-model="statusFilter">
-                <option value="">Todos os status</option>
-                <option value="PENDENTE">Pendente</option>
-                <option value="CONCLUIDA">Concluída</option>
-                <option value="CANCELADA">Cancelada</option>
+              <UiSelect v-model="statusFilter" class="w-72">
+                <UiSelectTrigger class="h-12 text-base rounded-lg shadow-md">
+                  <UiSelectValue placeholder="Todos os status" />
+                </UiSelectTrigger>
+                <UiSelectContent class="z-[200]">
+                  <UiSelectGroup>
+                    <UiSelectItem :value="null">Todos os status</UiSelectItem>
+                    <UiSelectItem value="PENDENTE">Pendente</UiSelectItem>
+                    <UiSelectItem value="CONCLUIDA">Concluída</UiSelectItem>
+                    <UiSelectItem value="CANCELADA">Cancelada</UiSelectItem>
+                  </UiSelectGroup>
+                </UiSelectContent>
               </UiSelect>
             </div>
           </div>
 
-          <div class="rounded-md border">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Data
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {{ usuario?.type === 'COMPRADOR' ? 'Vendedor' : 'Comprador' }}
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Quantidade
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Preço Unitário
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Ações
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-for="transacao in filteredTransacoes" :key="transacao.id">
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ formatDate(transacao.data) }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ usuario?.type === 'COMPRADOR' ? transacao.vendedor : transacao.comprador }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {{ transacao.quantidade }} sacas
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    R$ {{ transacao.precoUnitario.toFixed(2) }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    R$ {{ (transacao.quantidade * transacao.precoUnitario).toFixed(2) }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span
-                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                      :class="{
-                        'bg-green-100 text-green-800': transacao.status === 'CONCLUIDA',
-                        'bg-yellow-100 text-yellow-800': transacao.status === 'PENDENTE',
-                        'bg-red-100 text-red-800': transacao.status === 'CANCELADA'
+          <div class="rounded-md border dark:border-gray-700">
+            <div class="overflow-x-auto w-full">
+              <table
+                class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-black text-gray-900 dark:text-white">
+                <thead class="bg-gray-50 dark:bg-gray-900">
+                  <tr>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Data</th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      {{ usuario?.type === 'ADMINISTRADOR' ? 'Comprador' : (usuario?.type === 'COMPRADOR' ? 'Vendedor' :
+                      'Comprador') }}
+                    </th>
+                    <th v-if="usuario?.type === 'ADMINISTRADOR'"
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Vendedor
+                    </th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Quantidade</th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Preço Unitário</th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Total</th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Status</th>
+                    <th
+                      class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Ações</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-black divide-y divide-gray-200 dark:divide-gray-700">
+                  <tr v-for="transacao in filteredTransacoes" :key="transacao.id">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{
+                      formatDate(transacao.data) }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      {{ usuario?.type === 'ADMINISTRADOR' ? transacao.comprador : (usuario?.type === 'COMPRADOR' ?
+                        transacao.vendedor : transacao.comprador) }}
+                    </td>
+                    <td v-if="usuario?.type === 'ADMINISTRADOR'"
+                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      {{ transacao.vendedor }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{
+                      transacao.quantidade }} sacas</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      R$ {{ transacao.precoUnitario.toFixed(2) }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      R$ {{ (transacao.quantidade * transacao.precoUnitario).toFixed(2) }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" :class="{
+                        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': transacao.status === 'CONCLUIDA',
+                        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200': transacao.status === 'PENDENTE',
+                        'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200': transacao.status === 'CANCELADA'
                       }">
-                      {{ transacao.status }}
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button @click="editTransacao(transacao)" class="text-indigo-600 hover:text-indigo-900 mr-2">
-                      <Icon name="lucide:edit-2" class="h-4 w-4" />
-                    </button>
-                    <button @click="deleteTransacao(transacao)" class="text-red-600 hover:text-red-900">
-                      <Icon name="lucide:trash-2" class="h-4 w-4" />
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="filteredTransacoes.length === 0">
-                  <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
-                    Nenhuma transação encontrada
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                        {{ transacao.status }}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button @click="editTransacao(transacao)"
+                        class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200 mr-2">
+                        <Icon name="lucide:edit-2" class="h-4 w-4" />
+                      </button>
+                      <button @click="deleteTransacao(transacao)"
+                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200">
+                        <Icon name="lucide:trash-2" class="h-4 w-4" />
+                      </button>
+                    </td>
+                  </tr>
+                  <tr v-if="filteredTransacoes.length === 0">
+                    <td :colspan="usuario?.type === 'ADMINISTRADOR' ? 8 : 7"
+                      class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-300">
+                      Nenhuma transação encontrada
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </UiCardContent>
       </UiCard>
     </AppPage>
 
-    <!-- Modal para nova transação -->
-    <UiSheet v-model:open="isNewTransactionOpen" side="right">
-      <div class="flex flex-col h-full w-80 sm:w-96">
-        <div class="p-4 border-b">
-          <h2 class="text-lg font-medium">{{ editingTransacao ? 'Editar Transação' : 'Nova Transação' }}</h2>
-        </div>
-        <div class="p-4 flex-1 overflow-auto">
-          <form @submit.prevent="saveTransacao" class="space-y-4">
-            <div>
-              <label for="tipo" class="block text-sm font-medium text-gray-700">Tipo</label>
-              <select id="tipo" v-model="transacaoForm.tipo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                <option value="compra">Compra</option>
-                <option value="venda">Venda</option>
-              </select>
-            </div>
+    <!-- Modal para nova/edição de transação -->
+    <AlertDialogRoot v-model:open="isNewTransactionOpen">
+      <AlertDialogPortal>
+        <AlertDialogOverlay
+          class="data-[state=open]:animate-overlayShow fixed inset-0 z-30 bg-background/80 backdrop-blur-sm">
+          <div
+            class="absolute h-full w-full bg-[radial-gradient(theme(colors.border)_1px,transparent_1px)] [background-size:15px_15px] [mask-image:radial-gradient(ellipse_600px_600px_at_50%_50%,#000_10%,transparent_100%)] dark:bg-[radial-gradient(theme(colors.border)_1px,transparent_1px)]" />
+        </AlertDialogOverlay>
 
-            <div>
-              <label for="contraparte" class="block text-sm font-medium text-gray-700">
-                {{ transacaoForm.tipo === 'compra' ? 'Vendedor' : 'Comprador' }}
-              </label>
-              <input id="contraparte" v-model="transacaoForm.contraparte" type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-            </div>
+        <AlertDialogContent
+          class="data-[state=open]:animate-contentShow fixed left-[50%] top-[50%] z-[100] max-h-[85vh] w-[90vw] max-w-[700px] translate-x-[-50%] translate-y-[-50%] rounded-lg border border-input bg-primary-foreground p-[25px] text-[15px] shadow-[0_0px_50px_-30px_rgba(0,0,0,0.5)] focus:outline-none dark:bg-black dark:shadow-[0_0px_80px_-50px_rgba(0,0,0,0.5)] dark:shadow-gray-500 sm:w-[700px]">
+          <AlertDialogTitle class="mb-4 text-xl font-semibold">
+            {{ editingTransacao ? "Editar Transação" : "Nova Transação" }}
+          </AlertDialogTitle>
 
-            <div>
-              <label for="quantidade" class="block text-sm font-medium text-gray-700">Quantidade (sacas)</label>
-              <input id="quantidade" v-model.number="transacaoForm.quantidade" type="number" min="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-            </div>
+          <AlertDialogDescription class="mb-5 mt-4 text-[15px] leading-normal">
+            <form @submit.prevent="saveTransacao">
+              <div v-if="errorMessage" class="mb-4 p-2 rounded bg-red-100 text-red-800 border border-red-300">
+                {{ errorMessage }}
+              </div>
+              <div class="grid w-full items-center gap-4">
+                <div class="flex flex-col space-y-1.5">
+                  <template v-if="usuario?.type === 'ADMINISTRADOR'">
+                    <UiLabel for="comprador">Comprador</UiLabel>
+                    <UiSelect v-model="transacaoForm.compradorId" id="comprador"
+                      :disabled="usuario?.type === 'COMPRADOR'">
+                      <UiSelectTrigger class="w-full">
+                        <UiSelectValue
+                          :placeholder="usuario?.type === 'COMPRADOR' ? usuario.name : 'Selecione o comprador'" />
+                      </UiSelectTrigger>
+                      <UiSelectContent class="z-[200]">
+                        <UiSelectGroup>
+                          <UiSelectItem v-if="!usuario?.type === 'COMPRADOR'" :value="null">Selecione o comprador
+                          </UiSelectItem>
+                          <template v-if="usuario?.type === 'ADMINISTRADOR'">
+                            <UiSelectItem v-for="contraparte in contrapartes.filter(c => c.type === 'COMPRADOR')"
+                              :key="contraparte.id" :value="String(contraparte.id)">
+                              {{ contraparte.name }}
+                            </UiSelectItem>
+                          </template>
+                          <template v-else-if="usuario?.type === 'COMPRADOR'">
+                            <UiSelectItem :value="String(usuario.id)">{{ usuario.name }}</UiSelectItem>
+                          </template>
+                          <template v-else>
+                            <UiSelectItem v-for="contraparte in contrapartes" :key="contraparte.id"
+                              :value="String(contraparte.id)">
+                              {{ contraparte.name }}
+                            </UiSelectItem>
+                          </template>
+                        </UiSelectGroup>
+                      </UiSelectContent>
+                    </UiSelect>
 
-            <div>
-              <label for="precoUnitario" class="block text-sm font-medium text-gray-700">Preço Unitário (R$)</label>
-              <input id="precoUnitario" v-model.number="transacaoForm.precoUnitario" type="number" min="0.01" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-            </div>
+                    <UiLabel for="vendedor">Vendedor</UiLabel>
+                    <UiSelect v-model="transacaoForm.vendedorId" id="vendedor" :disabled="usuario?.type === 'PRODUTOR'">
+                      <UiSelectTrigger class="w-full">
+                        <UiSelectValue
+                          :placeholder="usuario?.type === 'PRODUTOR' ? usuario.name : 'Selecione o vendedor'" />
+                      </UiSelectTrigger>
+                      <UiSelectContent class="z-[200]">
+                        <UiSelectGroup>
+                          <UiSelectItem v-if="!usuario?.type === 'PRODUTOR'" :value="null">Selecione o vendedor
+                          </UiSelectItem>
+                          <template v-if="usuario?.type === 'ADMINISTRADOR'">
+                            <UiSelectItem v-for="contraparte in contrapartes.filter(c => c.type === 'PRODUTOR')"
+                              :key="contraparte.id" :value="String(contraparte.id)">
+                              {{ contraparte.name }}
+                            </UiSelectItem>
+                          </template>
+                          <template v-else-if="usuario?.type === 'PRODUTOR'">
+                            <UiSelectItem :value="String(usuario.id)">{{ usuario.name }}</UiSelectItem>
+                          </template>
+                          <template v-else>
+                            <UiSelectItem v-for="contraparte in contrapartes" :key="contraparte.id"
+                              :value="String(contraparte.id)">
+                              {{ contraparte.name }}
+                            </UiSelectItem>
+                          </template>
+                        </UiSelectGroup>
+                      </UiSelectContent>
+                    </UiSelect>
+                  </template>
+                  <template v-else-if="usuario?.type === 'COMPRADOR'">
+                    <UiLabel for="comprador">Comprador</UiLabel>
+                    <UiSelect v-model="transacaoForm.compradorId" id="comprador" disabled>
+                      <UiSelectTrigger class="w-full">
+                        <UiSelectValue :placeholder="usuario.name" />
+                      </UiSelectTrigger>
+                      <UiSelectContent class="z-[200]">
+                        <UiSelectGroup>
+                          <UiSelectItem :value="String(usuario.id)">{{ usuario.name }}</UiSelectItem>
+                        </UiSelectGroup>
+                      </UiSelectContent>
+                    </UiSelect>
 
-            <div>
-              <label for="data" class="block text-sm font-medium text-gray-700">Data</label>
-              <input id="data" v-model="transacaoForm.data" type="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-            </div>
+                    <UiLabel for="vendedor">Vendedor</UiLabel>
+                    <UiSelect v-model="transacaoForm.vendedorId" id="vendedor">
+                      <UiSelectTrigger class="w-full">
+                        <UiSelectValue placeholder="Selecione o vendedor" />
+                      </UiSelectTrigger>
+                      <UiSelectContent class="z-[200]">
+                        <UiSelectGroup>
+                          <UiSelectItem value="">Selecione o vendedor</UiSelectItem>
+                          <UiSelectItem v-for="contraparte in contrapartes" :key="contraparte.id"
+                            :value="String(contraparte.id)">
+                            {{ contraparte.name }}
+                          </UiSelectItem>
+                        </UiSelectGroup>
+                      </UiSelectContent>
+                    </UiSelect>
+                  </template>
+                  <template v-else-if="usuario?.type === 'PRODUTOR'">
+                    <UiLabel for="comprador">Comprador</UiLabel>
+                    <UiSelect v-model="transacaoForm.compradorId" id="comprador">
+                      <UiSelectTrigger class="w-full">
+                        <UiSelectValue placeholder="Selecione o comprador" />
+                      </UiSelectTrigger>
+                      <UiSelectContent class="z-[200]">
+                        <UiSelectGroup>
+                          <UiSelectItem value="">Selecione o comprador</UiSelectItem>
+                          <UiSelectItem v-for="contraparte in contrapartes" :key="contraparte.id"
+                            :value="String(contraparte.id)">
+                            {{ contraparte.name }}
+                          </UiSelectItem>
+                        </UiSelectGroup>
+                      </UiSelectContent>
+                    </UiSelect>
 
-            <div>
-              <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-              <select id="status" v-model="transacaoForm.status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                <option value="PENDENTE">Pendente</option>
-                <option value="CONCLUIDA">Concluída</option>
-                <option value="CANCELADA">Cancelada</option>
-              </select>
-            </div>
+                    <UiLabel for="vendedor">Vendedor</UiLabel>
+                    <UiSelect v-model="transacaoForm.vendedorId" id="vendedor" disabled>
+                      <UiSelectTrigger class="w-full">
+                        <UiSelectValue :placeholder="usuario.name" />
+                      </UiSelectTrigger>
+                      <UiSelectContent class="z-[200]">
+                        <UiSelectGroup>
+                          <UiSelectItem :value="String(usuario.id)">{{ usuario.name }}</UiSelectItem>
+                        </UiSelectGroup>
+                      </UiSelectContent>
+                    </UiSelect>
+                  </template>
 
-            <div>
-              <label for="observacoes" class="block text-sm font-medium text-gray-700">Observações</label>
-              <textarea id="observacoes" v-model="transacaoForm.observacoes" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
-            </div>
-          </form>
-        </div>
-        <div class="p-4 border-t flex justify-end space-x-2">
-          <UiButton variant="outline" @click="isNewTransactionOpen = false">Cancelar</UiButton>
-          <UiButton @click="saveTransacao">Salvar</UiButton>
-        </div>
-      </div>
-    </UiSheet>
+                  <UiLabel for="quantidade">Quantidade (sacas)</UiLabel>
+                  <UiInput id="quantidade" v-model.number="transacaoForm.quantidade" type="number" min="1" />
+
+                  <UiLabel for="precoUnitario">Preço Unitário (R$)</UiLabel>
+                  <UiInput id="precoUnitario" v-model.number="transacaoForm.precoUnitario" type="number" min="0.01"
+                    step="0.01" />
+
+                  <UiLabel for="data">Data</UiLabel>
+                  <UiInput id="data" v-model="transacaoForm.data" type="date" />
+
+                  <UiLabel for="status">Status</UiLabel>
+                  <UiSelect v-model="transacaoForm.status" id="status">
+                    <UiSelectTrigger class="w-full">
+                      <UiSelectValue placeholder="Selecione o status" />
+                    </UiSelectTrigger>
+                    <UiSelectContent class="z-[200]">
+                      <UiSelectGroup>
+                        <UiSelectItem value="PENDENTE">Pendente</UiSelectItem>
+                        <UiSelectItem value="CONCLUIDA">Concluída</UiSelectItem>
+                        <UiSelectItem value="CANCELADA">Cancelada</UiSelectItem>
+                      </UiSelectGroup>
+                    </UiSelectContent>
+                  </UiSelect>
+
+                  <UiLabel for="observacoes">Observações</UiLabel>
+                  <textarea id="observacoes" v-model="transacaoForm.observacoes" rows="3"
+                    class="form-input h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus:border-input focus:ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:[color-scheme:dark] sm:text-sm" />
+                </div>
+              </div>
+              <div class="flex justify-end gap-[25px] mt-6">
+                <AlertDialogCancel
+                  class="text-mauve11 bg-mauve4 hover:bg-mauve5 focus:shadow-mauve7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none outline-none focus:shadow-[0_0_0_2px]">
+                  Voltar
+                </AlertDialogCancel>
+                <button
+                  class="text-red11 bg-red4 hover:bg-red5 focus:shadow-red7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none outline-none focus:shadow-[0_0_0_2px]"
+                  type="submit">
+                  Salvar
+                </button>
+              </div>
+            </form>
+          </AlertDialogDescription>
+        </AlertDialogContent>
+      </AlertDialogPortal>
+    </AlertDialogRoot>
   </div>
 </template>
 
-<script setup lang="ts">
-  import { ref, computed, reactive, onMounted } from 'vue';
-  import { useUsuarioStore } from '~/stores/UserStore';
-  import type { TransacaoDTO } from '~/types/api';
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import { AlertDialogRoot } from "radix-vue";
+import UiSelect from '@/components/Ui/Select/Select.vue';
+import UiSelectContent from '@/components/Ui/Select/Content.vue';
+import UiSelectGroup from '@/components/Ui/Select/Group.vue';
+import UiSelectItem from '@/components/Ui/Select/Item.vue';
+import UiSelectTrigger from '@/components/Ui/Select/Trigger.vue';
+import UiSelectValue from '@/components/Ui/Select/Value.vue';
 
-  const usuarioStore = useUsuarioStore();
-  const usuario = computed(() => usuarioStore.usuarioPreferences);
+const filter = ref('');
+const statusFilter = ref(null);
+const isNewTransactionOpen = ref(false);
+const transacaoForm = ref({
+  quantidade: 1,
+  precoUnitario: 0,
+  valorTotal: 0,
+  data: '',
+  status: 'PENDENTE',
+  observacoes: '',
+  compradorId: null,
+  vendedorId: null,
+});
+const editingTransacao = ref(false);
+const transacoes = ref([]);
+const usuario = ref(null);
+const contrapartes = ref([]);
+const errorMessage = ref("");
 
-  // Estado local
-  const isNewTransactionOpen = ref(false);
-  const filter = ref('');
-  const statusFilter = ref('');
-  const editingTransacao = ref<TransacaoDTO | null>(null);
+const contraparteId = computed({
+  get: () => usuario.value?.type === 'COMPRADOR' ? transacaoForm.value.vendedorId : transacaoForm.value.compradorId,
+  set: (value) => {
+    if (usuario.value?.type === 'COMPRADOR') {
+      transacaoForm.value.vendedorId = value;
+    } else {
+      transacaoForm.value.compradorId = value;
+    }
+  }
+});
 
-  // Dados de transações
-  const transacoes = ref<TransacaoDTO[]>([]);
-  const loading = ref(false);
-  const error = ref<string | null>(null);
+// Buscar transações ao carregar a página
+onMounted(async () => {
+  await fetchUsuario();
+  await fetchTransacoes();
+});
 
-  // Formulário para nova transação
-  const transacaoForm = reactive({
-    id: null as string | null,
-    tipo: 'compra',
-    contraparte: '',
+// Buscar transações da API
+async function fetchTransacoes() {
+  try {
+    const response = await fetch('/api/transacoes', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error('Erro ao buscar transações');
+    }
+    const data = await response.json();
+    transacoes.value = data;
+  } catch (error) {
+    console.error('Erro ao buscar transações:', error);
+  }
+}
+
+// Buscar informações do usuário
+async function fetchUsuario() {
+  try {
+    const response = await fetch('/api/auth/session');
+    if (!response.ok) throw new Error('Erro ao buscar usuário');
+    const data = await response.json();
+    usuario.value = data.user;
+    // Após buscar o usuário, buscar as contrapartes
+    await fetchContrapartes();
+  } catch (error) {
+    console.error('Erro ao buscar usuário:', error);
+  }
+}
+
+// Buscar contrapartes (compradores ou vendedores)
+async function fetchContrapartes() {
+  try {
+    const response = await fetch('/api/transacoes/contrapartes');
+    if (!response.ok) throw new Error('Erro ao buscar contrapartes');
+    const data = await response.json();
+    contrapartes.value = data;
+  } catch (error) {
+    console.error('Erro ao buscar contrapartes:', error);
+  }
+}
+
+const filteredTransacoes = computed(() => {
+  return transacoes.value.filter(transacao => {
+    const statusMatch = statusFilter.value === null ? true : transacao.status === statusFilter.value;
+    let filterMatch = true;
+    if (filter.value.trim() !== '') {
+      const comprador = (transacao.comprador || '').toLowerCase();
+      const vendedor = (transacao.vendedor || '').toLowerCase();
+      const quantidade = String(transacao.quantidade || '').toLowerCase();
+      const precoUnitario = String(transacao.precoUnitario || '').toLowerCase();
+      const filtro = filter.value.toLowerCase();
+      filterMatch =
+        comprador.includes(filtro) ||
+        vendedor.includes(filtro) ||
+        quantidade.includes(filtro) ||
+        precoUnitario.includes(filtro);
+    }
+    return statusMatch && filterMatch;
+  });
+});
+
+const openNewTransactionModal = () => {
+  transacaoForm.value = {
     quantidade: 1,
-    precoUnitario: 900,
+    precoUnitario: 0,
+    valorTotal: 0,
     data: new Date().toISOString().split('T')[0],
-    status: 'PENDENTE' as 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA',
-    observacoes: ''
-  });
+    status: 'PENDENTE',
+    observacoes: '',
+    compradorId: usuario.value?.type === 'COMPRADOR' ? String(usuario.value.id) : null,
+    vendedorId: usuario.value?.type === 'PRODUTOR' ? String(usuario.value.id) : null,
+  };
+  editingTransacao.value = false;
+  isNewTransactionOpen.value = true;
+};
 
-  // Carregar transações ao montar o componente
-  onMounted(async () => {
-    await loadTransacoes();
-  });
+const saveTransacao = async () => {
+  errorMessage.value = "";
+  try {
+    // Calcular valor total
+    transacaoForm.value.valorTotal = transacaoForm.value.quantidade * transacaoForm.value.precoUnitario;
 
-  // Carregar transações da API
-  async function loadTransacoes() {
-    loading.value = true;
-    error.value = null;
+    // Converter IDs para número
+    transacaoForm.value.compradorId = Number(transacaoForm.value.compradorId);
+    transacaoForm.value.vendedorId = Number(transacaoForm.value.vendedorId);
 
-    try {
-      const response = await $fetch('/api/transacoes', {
-        credentials: 'include'
+    let response;
+    if (editingTransacao.value && transacaoForm.value.id) {
+      // Edição: PUT
+      response = await fetch(`/api/transacoes/${transacaoForm.value.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(transacaoForm.value),
       });
-
-      if (response && Array.isArray(response)) {
-        // Convert string dates to Date objects
-        transacoes.value = response.map(item => ({
-          ...item,
-          data: new Date(item.data),
-          createdAt: new Date(item.createdAt),
-          updatedAt: new Date(item.updatedAt)
-        })) as TransacaoDTO[];
-      } else {
-        throw new Error('Resposta inválida da API');
-      }
-    } catch (e) {
-      error.value = 'Erro ao carregar transações';
-      console.error(e);
-
-      // Fallback para mock data em caso de erro (desenvolvimento)
-      transacoes.value = [
-        {
-          id: "1",
-          data: new Date(),
-          comprador: 'Empresa A',
-          compradorId: 1,
-          vendedor: 'Produtor B',
-          vendedorId: 2,
-          quantidade: 10,
-          precoUnitario: 950.00,
-          valorTotal: 9500.00,
-          status: 'CONCLUIDA' as 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA',
-          observacoes: 'Café arábica de qualidade superior',
-          createdAt: new Date(),
-          updatedAt: new Date()
+    } else {
+      // Criação: POST
+      response = await fetch('/api/transacoes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        {
-          id: "2",
-          data: new Date(Date.now() - 86400000), // ontem
-          comprador: 'Empresa C',
-          compradorId: 3,
-          vendedor: 'Produtor A',
-          vendedorId: 4,
-          quantidade: 5,
-          precoUnitario: 920.50,
-          valorTotal: 4602.50,
-          status: 'PENDENTE' as 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA',
-          observacoes: '',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        },
-        {
-          id: "3",
-          data: new Date(Date.now() - 172800000), // 2 dias atrás
-          comprador: 'Empresa B',
-          compradorId: 5,
-          vendedor: 'Produtor C',
-          vendedorId: 6,
-          quantidade: 15,
-          precoUnitario: 900.00,
-          valorTotal: 13500.00,
-          status: 'CANCELADA' as 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA',
-          observacoes: 'Cancelado por atraso na entrega',
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      ];
-    } finally {
-      loading.value = false;
+        body: JSON.stringify(transacaoForm.value),
+      });
     }
-  }
 
-  // Filtragem de transações
-  const filteredTransacoes = computed(() => {
-    return transacoes.value.filter(t => {
-      const matchesFilter = filter.value === '' ||
-        t.comprador.toLowerCase().includes(filter.value.toLowerCase()) ||
-        t.vendedor.toLowerCase().includes(filter.value.toLowerCase()) ||
-        (t.observacoes && t.observacoes.toLowerCase().includes(filter.value.toLowerCase()));
-
-      const matchesStatus = statusFilter.value === '' || t.status === statusFilter.value.toUpperCase();
-
-      return matchesFilter && matchesStatus;
-    });
-  });
-
-  // Funções
-  function formatDate(date: Date): string {
-    return new Date(date).toLocaleDateString('pt-BR');
-  }
-
-  function openNewTransactionModal() {
-    // Reset form
-    Object.assign(transacaoForm, {
-      id: null,
-      tipo: 'compra',
-      contraparte: '',
-      quantidade: 1,
-      precoUnitario: 900,
-      data: new Date().toISOString().split('T')[0],
-      status: 'PENDENTE' as 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA',
-      observacoes: ''
-    });
-
-    editingTransacao.value = null;
-    isNewTransactionOpen.value = true;
-  }
-
-  function editTransacao(transacao: TransacaoDTO) {
-    // Preencher formulário com dados da transação
-    const tipo = usuario.value?.type === 'COMPRADOR' ? 'compra' : 'venda';
-    const contraparte = tipo === 'compra' ? transacao.vendedor : transacao.comprador;
-
-    Object.assign(transacaoForm, {
-      id: transacao.id,
-      tipo,
-      contraparte,
-      quantidade: transacao.quantidade,
-      precoUnitario: transacao.precoUnitario,
-      data: transacao.data instanceof Date
-        ? transacao.data.toISOString().split('T')[0]
-        : new Date(transacao.data).toISOString().split('T')[0],
-      status: transacao.status,
-      observacoes: transacao.observacoes || ''
-    });
-
-    editingTransacao.value = transacao;
-    isNewTransactionOpen.value = true;
-  }
-
-  function deleteTransacao(transacao: TransacaoDTO) {
-    // Confirmar antes de excluir
-    if (confirm(`Tem certeza que deseja excluir esta transação?`)) {
+    if (!response.ok) {
+      let msg = 'Erro ao salvar transação';
       try {
-        // Chamar a API para excluir no servidor
-        $fetch(`/api/transacoes/${transacao.id}`, {
-          method: 'DELETE',
-          credentials: 'include'
-        }).then(() => {
-          // Remover da lista local após sucesso
-          transacoes.value = transacoes.value.filter(t => t.id !== transacao.id);
-        }).catch(error => {
-          console.error('Erro ao excluir transação:', error);
-          alert('Não foi possível excluir a transação. Tente novamente.');
-        });
-      } catch (error) {
-        console.error('Erro ao excluir transação:', error);
-        alert('Não foi possível excluir a transação. Tente novamente.');
-      }
-    }
-  }
-
-  async function saveTransacao() {
-    // Validação básica do formulário
-    if (!transacaoForm.contraparte || transacaoForm.quantidade <= 0 || transacaoForm.precoUnitario <= 0) {
-      alert('Por favor, preencha todos os campos obrigatórios corretamente.');
+        const data = await response.json();
+        msg = data.statusMessage || data.message || msg;
+      } catch { }
+      errorMessage.value = msg;
       return;
     }
 
-    // Calcular valor total
-    const valorTotal = transacaoForm.quantidade * transacaoForm.precoUnitario;
-
-    try {
-      if (transacaoForm.id) {
-        // Atualizar transação existente
-        const response = await $fetch(`/api/transacoes/${transacaoForm.id}`, {
-          method: 'PUT',
-          body: {
-            quantidade: transacaoForm.quantidade,
-            precoUnitario: transacaoForm.precoUnitario,
-            valorTotal: valorTotal,
-            data: transacaoForm.data ? new Date(transacaoForm.data) : new Date(),
-            status: transacaoForm.status,
-            observacoes: transacaoForm.observacoes,
-            tipo: transacaoForm.tipo,
-            contraparte: transacaoForm.contraparte
-          },
-          credentials: 'include'
-        });
-      } else {
-        // Criar nova transação
-        const response = await $fetch('/api/transacoes', {
-          method: 'POST',
-          body: {
-            quantidade: transacaoForm.quantidade,
-            precoUnitario: transacaoForm.precoUnitario,
-            valorTotal: valorTotal,
-            data: transacaoForm.data ? new Date(transacaoForm.data) : new Date(),
-            status: transacaoForm.status,
-            observacoes: transacaoForm.observacoes,
-            tipo: transacaoForm.tipo,
-            contraparte: transacaoForm.contraparte
-          },
-          credentials: 'include'
-        });
-      }
-
-      // Recarregar transações após sucesso
-      await loadTransacoes();
-
-      // Fechar modal após sucesso
-      isNewTransactionOpen.value = false;
-    } catch (error) {
-      console.error('Erro ao salvar transação:', error);
-      alert('Não foi possível salvar a transação. Verifique os dados e tente novamente.');
-    }
+    await fetchTransacoes(); // Atualizar lista de transações
+    isNewTransactionOpen.value = false;
+  } catch (error) {
+    console.error('Erro ao salvar transação:', error);
+    errorMessage.value = error?.message || 'Erro desconhecido ao salvar transação';
   }
+};
+
+const editTransacao = (transacao) => {
+  transacaoForm.value = { ...transacao };
+  editingTransacao.value = true;
+  isNewTransactionOpen.value = true;
+};
+
+const deleteTransacao = async (transacao) => {
+  try {
+    const response = await fetch(`/api/transacoes/${transacao.id}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) throw new Error('Erro ao deletar transação');
+
+    await fetchTransacoes(); // Atualizar lista de transações
+  } catch (error) {
+    console.error('Erro ao deletar transação:', error);
+  }
+};
+
+const formatDate = (dateString) => {
+  const options = { year: 'numeric', month: 'short', day: 'numeric' };
+  const date = new Date(dateString);
+  return date.toLocaleDateString('pt-BR', options);
+};
 </script>

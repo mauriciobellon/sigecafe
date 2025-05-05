@@ -5,117 +5,196 @@
         <UiCardHeader>
           <UiCardTitle>Compradores</UiCardTitle>
           <UiCardDescription>
-            Gerencie os compradores de café associados à cooperativa.
+            Gerencie seus compradores cadastrados.
           </UiCardDescription>
         </UiCardHeader>
         <UiCardContent>
-          <ClientOnly>
-            <UiDatatable @ready="initializeTable" :options="options" :columns="columns" :data="compradores">
-              <template #actions="{ cellData }" class="m-0 flex items-center p-0">
-                <UiButton variant="outline" @click="viewDetails(cellData, $event)" class="m-0 mr-2 h-8 px-2">
-                  Detalhes
-                </UiButton>
-                <UiButton variant="outline" @click="editComprador(cellData, $event)" class="m-0 mr-2 h-8 px-2">
-                  Editar
-                </UiButton>
-              </template>
-            </UiDatatable>
-          </ClientOnly>
-        </UiCardContent>
-      </UiCard>
+          <div class="mb-4 flex justify-between">
+            <UiButton @click="openNewCompradorModal">
+              <Icon name="lucide:plus" class="mr-2 h-4 w-4" />
+              Novo Comprador
+            </UiButton>
 
-      <!-- Modal para adicionar/editar comprador -->
-      <UiDialog v-model:open="dialogOpen">
-        <UiDialogContent class="sm:max-w-[500px]">
-          <UiDialogHeader>
-            <UiDialogTitle>{{ isEditing ? 'Editar Comprador' : 'Novo Comprador' }}</UiDialogTitle>
-            <UiDialogDescription>
-              {{ isEditing ? 'Atualize os dados do comprador' : 'Adicione um novo comprador ao sistema' }}
-            </UiDialogDescription>
-          </UiDialogHeader>
-          <form @submit.prevent="saveComprador">
-            <div class="grid gap-4 py-4">
-              <div class="grid grid-cols-4 items-center gap-4">
-                <UiLabel for="nome" class="text-right">Nome</UiLabel>
-                <input id="nome" v-model="compradorForm.nome" class="col-span-3 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" required />
+            <div class="flex items-center space-x-2">
+              <div class="relative w-72">
+                <label for="filter" class="sr-only">Filtrar</label>
+                <input id="filter" v-model="filter" placeholder="Buscar compradores..."
+                  class="h-12 w-full pl-10 pr-3 rounded-lg border border-input bg-background text-base shadow-md transition-colors file:border-0 file:bg-transparent file:text-base file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus:border-primary disabled:cursor-not-allowed disabled:opacity-50" />
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                  <Icon name="lucide:search" class="h-5 w-5" />
+                </span>
               </div>
-              <div class="grid grid-cols-4 items-center gap-4">
-                <UiLabel for="celular" class="text-right">Celular</UiLabel>
-                <input id="celular" v-model="compradorForm.celular" class="col-span-3 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="(11) 98765-4321" />
-              </div>
-              <div class="grid grid-cols-4 items-center gap-4">
-                <UiLabel for="documento" class="text-right">Documento</UiLabel>
-                <input id="documento" v-model="compradorForm.documento" class="col-span-3 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" placeholder="CPF ou CNPJ" />
-              </div>
-              <div class="grid grid-cols-4 items-center gap-4">
-                <UiLabel for="endereco" class="text-right">Endereço</UiLabel>
-                <input id="endereco" v-model="compradorForm.endereco" class="col-span-3 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-              </div>
-              <div class="grid grid-cols-4 items-center gap-4">
-                <UiLabel for="cidade" class="text-right">Cidade</UiLabel>
-                <input id="cidade" v-model="compradorForm.cidade" class="col-span-3 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-              </div>
-              <div class="grid grid-cols-4 items-center gap-4">
-                <UiLabel for="estado" class="text-right">Estado</UiLabel>
-                <select id="estado" v-model="compradorForm.estado" class="col-span-3 h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                  <option value="">Selecione um estado</option>
-                  <option v-for="estado in estados" :key="estado" :value="estado">{{ estado }}</option>
-                </select>
-              </div>
-            </div>
-            <UiDialogFooter>
-              <UiButton type="button" variant="outline" @click="dialogOpen = false">Cancelar</UiButton>
-              <UiButton type="submit">{{ isEditing ? 'Atualizar' : 'Salvar' }}</UiButton>
-            </UiDialogFooter>
-          </form>
-        </UiDialogContent>
-      </UiDialog>
-
-      <!-- Modal de detalhes -->
-      <UiDialog v-model:open="detailsDialogOpen">
-        <UiDialogContent class="sm:max-w-[500px]">
-          <UiDialogHeader>
-            <UiDialogTitle>Detalhes do Comprador</UiDialogTitle>
-          </UiDialogHeader>
-          <div class="py-4" v-if="selectedComprador">
-            <div class="grid grid-cols-3 gap-4">
-              <div class="font-semibold">Nome:</div>
-              <div class="col-span-2">{{ selectedComprador.nome }}</div>
-              <div class="font-semibold">Celular:</div>
-              <div class="col-span-2">{{ selectedComprador.celular || 'Não informado' }}</div>
-              <div class="font-semibold">Documento:</div>
-              <div class="col-span-2">{{ selectedComprador.documento || 'Não informado' }}</div>
-              <div class="font-semibold">Endereço:</div>
-              <div class="col-span-2">{{ selectedComprador.endereco || 'Não informado' }}</div>
-              <div class="font-semibold">Cidade:</div>
-              <div class="col-span-2">{{ selectedComprador.cidade || 'Não informado' }}</div>
-              <div class="font-semibold">Estado:</div>
-              <div class="col-span-2">{{ selectedComprador.estado || 'Não informado' }}</div>
-              <div class="font-semibold">Cadastrado em:</div>
-              <div class="col-span-2">{{ formatDate(selectedComprador.createdAt) }}</div>
             </div>
           </div>
-          <UiDialogFooter>
-            <UiButton @click="detailsDialogOpen = false">Fechar</UiButton>
-          </UiDialogFooter>
-        </UiDialogContent>
-      </UiDialog>
+
+          <div class="rounded-md border dark:border-gray-700">
+            <div class="overflow-x-auto w-full">
+              <table
+                class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-black text-gray-900 dark:text-white">
+                <thead class="bg-gray-50 dark:bg-gray-900">
+                  <tr>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Nome</th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Celular</th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Documento</th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Endereço</th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Cidade</th>
+                    <th
+                      class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Estado</th>
+                    <th
+                      class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Ações</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-black divide-y divide-gray-200 dark:divide-gray-700">
+                  <tr v-for="comprador in filteredCompradores" :key="comprador.id">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ comprador.nome }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ comprador.celular
+                      }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ comprador.documento
+                      }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ comprador.endereco
+                      }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ comprador.cidade }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ comprador.estado }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button @click="editComprador(comprador)"
+                        class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200 mr-2">
+                        <Icon name="lucide:edit-2" class="h-4 w-4" />
+                      </button>
+                      <button @click="deleteComprador(comprador)"
+                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200">
+                        <Icon name="lucide:trash-2" class="h-4 w-4" />
+                      </button>
+                    </td>
+                  </tr>
+                  <tr v-if="filteredCompradores.length === 0">
+                    <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-300">
+                      Nenhum comprador encontrado
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </UiCardContent>
+      </UiCard>
     </AppPage>
+
+    <!-- Modal para novo/edição de comprador -->
+    <AlertDialogRoot v-model:open="isNewCompradorOpen">
+      <AlertDialogPortal>
+        <AlertDialogOverlay
+          class="data-[state=open]:animate-overlayShow fixed inset-0 z-30 bg-background/80 backdrop-blur-sm">
+          <div
+            class="absolute h-full w-full bg-[radial-gradient(theme(colors.border)_1px,transparent_1px)] [background-size:15px_15px] [mask-image:radial-gradient(ellipse_600px_600px_at_50%_50%,#000_10%,transparent_100%)] dark:bg-[radial-gradient(theme(colors.border)_1px,transparent_1px)]" />
+        </AlertDialogOverlay>
+
+        <AlertDialogContent
+          class="data-[state=open]:animate-contentShow fixed left-[50%] top-[50%] z-[100] max-h-[85vh] w-[90vw] max-w-[700px] translate-x-[-50%] translate-y-[-50%] rounded-lg border border-input bg-primary-foreground p-[25px] text-[15px] shadow-[0_0px_50px_-30px_rgba(0,0,0,0.5)] focus:outline-none dark:bg-black dark:shadow-[0_0px_80px_-50px_rgba(0,0,0,0.5)] dark:shadow-gray-500 sm:w-[700px]">
+          <AlertDialogTitle class="mb-4 text-xl font-semibold">
+            {{ editingComprador ? "Editar Comprador" : "Novo Comprador" }}
+          </AlertDialogTitle>
+
+          <AlertDialogDescription class="mb-5 mt-4 text-[15px] leading-normal">
+            <form @submit.prevent="saveComprador">
+              <div v-if="errorMessage" class="mb-4 p-2 rounded bg-red-100 text-red-800 border border-red-300">
+                {{ errorMessage }}
+              </div>
+              <div class="grid w-full items-center gap-4">
+                <div class="flex flex-col space-y-1.5">
+                  <UiLabel for="nome">Nome</UiLabel>
+                  <UiInput id="nome" v-model="compradorForm.nome" required />
+                  <UiLabel for="celular">Celular</UiLabel>
+                  <UiInput id="celular" v-model="compradorForm.celular" required />
+                  <UiLabel for="documento">Documento</UiLabel>
+                  <UiInput id="documento" v-model="compradorForm.documento" required />
+                  <UiLabel for="endereco">Endereço</UiLabel>
+                  <UiInput id="endereco" v-model="compradorForm.endereco" />
+                  <UiLabel for="cidade">Cidade</UiLabel>
+                  <UiInput id="cidade" v-model="compradorForm.cidade" />
+                  <UiLabel for="estado">Estado</UiLabel>
+                  <UiSelect v-model="compradorForm.estado" id="estado" required class="w-full">
+                    <UiSelectTrigger>
+                      <UiSelectValue placeholder="Selecione um estado" />
+                    </UiSelectTrigger>
+                    <UiSelectContent class="z-[200]">
+                      <UiSelectGroup>
+                        <UiSelectItem v-for="estado in estados" :key="estado" :value="estado">
+                          {{ estado }}
+                        </UiSelectItem>
+                      </UiSelectGroup>
+                    </UiSelectContent>
+                  </UiSelect>
+                </div>
+              </div>
+              <div class="flex justify-end gap-[25px] mt-6">
+                <AlertDialogCancel
+                  class="text-mauve11 bg-mauve4 hover:bg-mauve5 focus:shadow-mauve7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none outline-none focus:shadow-[0_0_0_2px]">
+                  Voltar
+                </AlertDialogCancel>
+                <button
+                  class="text-red11 bg-red4 hover:bg-red5 focus:shadow-red7 inline-flex h-[35px] items-center justify-center rounded-[4px] px-[15px] font-semibold leading-none outline-none focus:shadow-[0_0_0_2px]"
+                  type="submit">
+                  Salvar
+                </button>
+              </div>
+            </form>
+          </AlertDialogDescription>
+        </AlertDialogContent>
+      </AlertDialogPortal>
+    </AlertDialogRoot>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, computed, onMounted } from 'vue';
 import { useToast } from "~/composables/useToast";
 import { definePageMeta } from "#imports";
+import { useAuth } from "#imports";
+import type { UsuarioDTO } from "~/types/api";
 import languageBR from "datatables.net-plugins/i18n/pt-BR.mjs";
+import {
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogOverlay,
+  AlertDialogPortal,
+  AlertDialogRoot,
+  AlertDialogTitle,
+} from "radix-vue";
 import type { Config, ConfigColumns } from "datatables.net";
-import type { AssociadoDTO, AssociadoCreateDTO, AssociadoUpdateDTO, UsuarioDTO } from "~/types/api";
+import UiSelect from '../../components/Ui/Select/Select.vue';
+import UiSelectContent from '../../components/Ui/Select/Content.vue';
+import UiSelectGroup from '../../components/Ui/Select/Group.vue';
+import UiSelectItem from '../../components/Ui/Select/Item.vue';
+import UiSelectTrigger from '../../components/Ui/Select/Trigger.vue';
+import UiSelectValue from '../../components/Ui/Select/Value.vue';
+import UiInput from '../../components/Ui/Input.vue';
 
-// Extended AssociadoDTO to include createdAt/updatedAt that are in the database
-interface AssociadoCompleteDTO extends AssociadoDTO {
-  createdAt?: Date;
-  updatedAt?: Date;
+// Tipagem do comprador
+interface Comprador {
+  id?: number;
+  nome: string;
+  celular: string;
+  documento: string;
+  endereco: string;
+  cidade: string;
+  estado: string;
 }
 
 definePageMeta({
@@ -124,72 +203,25 @@ definePageMeta({
 
 const toast = useToast();
 const tableRef = ref<any>(null);
-const compradores = ref<AssociadoCompleteDTO[]>([]);
-const loading = ref(false);
-const dialogOpen = ref(false);
-const detailsDialogOpen = ref(false);
-const isEditing = ref(false);
-const selectedComprador = ref<AssociadoCompleteDTO | null>(null);
-
-const compradorForm = ref<AssociadoCreateDTO & { id?: number }>({
+const compradores = ref<Comprador[]>([]);
+const selectedRows = ref(0);
+const isNewCompradorOpen = ref(false);
+const editingComprador = ref(false);
+const compradorForm = ref<Comprador>({
+  id: undefined,
   nome: "",
   celular: "",
-  tipo: "COMPRADOR",
   documento: "",
   endereco: "",
   cidade: "",
-  estado: "",
-  cooperativaId: 0, // Isso será preenchido na função saveComprador
+  estado: ""
 });
+const errorMessage = ref("");
+const filter = ref('');
 
 const estados = [
   "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG",
   "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"
-];
-
-const options: Config = {
-  dom: "<'flex flex-col lg:flex-row w-full lg:items-start lg:justify-between gap-5 mb-5 lg:pr-1'Bf><'border rounded-lg't><'flex flex-col lg:flex-row gap-5 items-center lg:justify-between w-full pt-3 p-5 m-auto'lp>",
-  searching: true,
-  language: languageBR,
-  paging: true,
-  ordering: true,
-  responsive: true,
-  autoWidth: true,
-  select: {
-    style: "single",
-  },
-  buttons: [
-    {
-      text: "Novo Comprador",
-      action: function () {
-        newComprador();
-      },
-    },
-    {
-      text: "Atualizar",
-      action: async function () {
-        await fetchCompradores();
-      },
-    },
-  ],
-};
-
-const columns: ConfigColumns[] = [
-  { data: "id", title: "Id" },
-  { data: "nome", title: "Nome" },
-  { data: "celular", title: "Celular", defaultContent: "-" },
-  { data: "cidade", title: "Cidade", defaultContent: "-" },
-  { data: "estado", title: "Estado", defaultContent: "-" },
-  {
-    data: null,
-    title: "",
-    className: "no-export",
-    searchable: false,
-    orderable: false,
-    name: "actions",
-    render: "#actions",
-    responsivePriority: 3,
-  },
 ];
 
 onMounted(async () => {
@@ -197,166 +229,158 @@ onMounted(async () => {
 });
 
 async function fetchCompradores() {
-  loading.value = true;
   try {
-    // Obter usuário atual para saber a cooperativa
-    const usuarioResponse = await $fetch<UsuarioDTO>('/api/perfil');
-    if (!usuarioResponse.cooperativaId) {
-      toast.toast({
-        title: "Erro",
-        description: "Usuário não associado a uma cooperativa.",
-        variant: "destructive",
+    const response = await fetch('/api/associado?tipo=COMPRADOR', {
+      credentials: 'include'
+    });
+    if (!response.ok) throw new Error('Erro ao buscar compradores');
+    const data = await response.json();
+    compradores.value = Array.isArray(data.data) ? data.data : (Array.isArray(data) ? data : (Array.isArray(data.results) ? data.results : []));
+  } catch (error) {
+    toast.toast({ title: 'Erro', description: 'Não foi possível carregar os compradores.', variant: 'destructive' });
+  }
+}
+
+const filteredCompradores = computed(() => {
+  return compradores.value.filter(comprador => {
+    let filterMatch = true;
+    if (filter.value.trim() !== '') {
+      const nome = (comprador.nome || '').toLowerCase();
+      const celular = (comprador.celular || '').toLowerCase();
+      const documento = (comprador.documento || '').toLowerCase();
+      const cidade = (comprador.cidade || '').toLowerCase();
+      const estado = (comprador.estado || '').toLowerCase();
+      const filtro = filter.value.toLowerCase();
+      filterMatch =
+        nome.includes(filtro) ||
+        celular.includes(filtro) ||
+        documento.includes(filtro) ||
+        cidade.includes(filtro) ||
+        estado.includes(filtro);
+    }
+    return filterMatch;
+  });
+});
+
+const openNewCompradorModal = () => {
+  compradorForm.value = {
+    id: undefined,
+    nome: '',
+    celular: '',
+    documento: '',
+    endereco: '',
+    cidade: '',
+    estado: ''
+  };
+  editingComprador.value = false;
+  isNewCompradorOpen.value = true;
+};
+
+const saveComprador = async () => {
+  errorMessage.value = "";
+  try {
+    const auth = useAuth();
+    const session = await auth.getSession();
+    const user = session?.user as UsuarioDTO;
+
+    if (!user?.cooperativaId) {
+      throw new Error('Cooperativa não encontrada');
+    }
+
+    let response;
+    if (editingComprador.value && compradorForm.value.id) {
+      response = await fetch(`/api/associado/${compradorForm.value.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          ...compradorForm.value,
+          tipo: 'COMPRADOR',
+          cooperativaId: user.cooperativaId
+        }),
       });
+    } else {
+      response = await fetch('/api/associado', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          ...compradorForm.value,
+          tipo: 'COMPRADOR',
+          cooperativaId: user.cooperativaId
+        }),
+      });
+    }
+
+    if (!response.ok) {
+      let msg = 'Erro ao salvar comprador';
+      try {
+        const data = await response.json();
+        msg = data.statusMessage || data.message || msg;
+      } catch { }
+      errorMessage.value = msg;
       return;
     }
 
-    const cooperativaId = usuarioResponse.cooperativaId;
+    await fetchCompradores();
+    isNewCompradorOpen.value = false;
+    toast.toast({
+      title: "Sucesso",
+      description: editingComprador.value ? "Comprador atualizado com sucesso." : "Comprador criado com sucesso.",
+      variant: "default"
+    });
+  } catch (error) {
+    errorMessage.value = (error as any)?.message || 'Erro desconhecido ao salvar comprador';
+    toast.toast({ title: "Erro", description: "Não foi possível salvar o comprador.", variant: "destructive" });
+  }
+};
 
-    // Obter compradores daquela cooperativa
-    const response = await $fetch<AssociadoCompleteDTO[]>(`/api/associado/cooperativa/${cooperativaId}`, {
-      params: {
-        tipo: 'COMPRADOR'
-      }
+const editComprador = (comprador: any) => {
+  compradorForm.value = { ...comprador };
+  editingComprador.value = true;
+  isNewCompradorOpen.value = true;
+};
+
+const deleteComprador = async (comprador: any) => {
+  try {
+    const response = await fetch(`/api/associado/${comprador.id}`, {
+      method: 'DELETE',
+      credentials: 'include'
     });
 
-    compradores.value = response;
-
+    if (!response.ok) throw new Error('Erro ao deletar comprador');
+    toast.toast({ title: "Sucesso", description: "Comprador removido com sucesso." });
+    await fetchCompradores();
     if (tableRef.value) {
       tableRef.value.clear();
       // @ts-ignore
       tableRef.value.rows.add(compradores.value).draw();
     }
-
   } catch (error) {
-    console.error("Error fetching compradores:", error);
-    toast.toast({
-      title: "Erro",
-      description: "Falha ao carregar compradores.",
-      variant: "destructive",
-    });
-  } finally {
-    loading.value = false;
+    toast.toast({ title: "Erro", description: "Não foi possível remover o comprador.", variant: "destructive" });
   }
-}
-
-function initializeTable(instance: any) {
-  tableRef.value = instance;
-}
-
-function newComprador() {
-  isEditing.value = false;
-  compradorForm.value = {
-    nome: "",
-    celular: "",
-    tipo: "COMPRADOR",
-    documento: "",
-    endereco: "",
-    cidade: "",
-    estado: "",
-    cooperativaId: 0,
-  };
-  dialogOpen.value = true;
-}
-
-function editComprador(comprador: AssociadoCompleteDTO, event: Event) {
-  event.stopPropagation();
-  isEditing.value = true;
-  compradorForm.value = {
-    id: comprador.id,
-    nome: comprador.nome,
-    celular: comprador.celular || "",
-    tipo: "COMPRADOR",
-    documento: comprador.documento || "",
-    endereco: comprador.endereco || "",
-    cidade: comprador.cidade || "",
-    estado: comprador.estado || "",
-    cooperativaId: 0, // Será preenchido na função saveComprador
-  };
-  dialogOpen.value = true;
-}
-
-async function saveComprador() {
-  try {
-    // Obter usuário atual para saber a cooperativa
-    const usuarioResponse = await $fetch<UsuarioDTO>('/api/perfil');
-    if (!usuarioResponse.cooperativaId) {
-      toast.toast({
-        title: "Erro",
-        description: "Usuário não associado a uma cooperativa.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    compradorForm.value.cooperativaId = usuarioResponse.cooperativaId;
-
-    if (isEditing.value && compradorForm.value.id) {
-      // Editar comprador existente
-      const updateData: AssociadoUpdateDTO = {
-        id: compradorForm.value.id,
-        nome: compradorForm.value.nome,
-        celular: compradorForm.value.celular,
-        tipo: "COMPRADOR",
-        documento: compradorForm.value.documento,
-        endereco: compradorForm.value.endereco,
-        cidade: compradorForm.value.cidade,
-        estado: compradorForm.value.estado,
-      };
-
-      await $fetch(`/api/associado/${updateData.id}`, {
-        method: 'PUT',
-        body: updateData
-      });
-
-      toast.toast({
-        title: "Sucesso",
-        description: "Comprador atualizado com sucesso.",
-      });
-    } else {
-      // Criar novo comprador
-      const createData: AssociadoCreateDTO = {
-        nome: compradorForm.value.nome,
-        celular: compradorForm.value.celular,
-        tipo: "COMPRADOR",
-        documento: compradorForm.value.documento,
-        endereco: compradorForm.value.endereco,
-        cidade: compradorForm.value.cidade,
-        estado: compradorForm.value.estado,
-        cooperativaId: compradorForm.value.cooperativaId,
-      };
-
-      await $fetch('/api/associado', {
-        method: 'POST',
-        body: createData
-      });
-
-      toast.toast({
-        title: "Sucesso",
-        description: "Comprador criado com sucesso.",
-      });
-    }
-
-    // Fechar modal e atualizar tabela
-    dialogOpen.value = false;
-    await fetchCompradores();
-  } catch (error) {
-    console.error("Error saving comprador:", error);
-    toast.toast({
-      title: "Erro",
-      description: "Falha ao salvar comprador.",
-      variant: "destructive",
-    });
-  }
-}
-
-function viewDetails(comprador: AssociadoCompleteDTO, event: Event) {
-  event.stopPropagation();
-  selectedComprador.value = comprador;
-  detailsDialogOpen.value = true;
-}
-
-function formatDate(date: string | Date | undefined) {
-  if (!date) return 'N/A';
-  return new Date(date).toLocaleDateString('pt-BR');
-}
+};
 </script>
+
+<style scoped>
+.alert-input {
+  height: 2.5rem;
+  width: 100%;
+  border-radius: 0.375rem;
+  border: 1px solid var(--input-border);
+  background-color: var(--background);
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+}
+
+.alert-input:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+  box-shadow: 0 0 0 2px var(--ring), 0 0 0 4px var(--background);
+}
+
+.alert-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+</style>

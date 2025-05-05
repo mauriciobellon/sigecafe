@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "npm run kill && cross-env NODE_NO_WARNINGS=1 nuxt dev",
+    "dev": "npm run kill && npm run db && cross-env NODE_NO_WARNINGS=1 nuxt dev",
+    "host": "npm run kill && npm run db && cross-env NODE_NO_WARNINGS=1 nuxt dev --host 0.0.0.0",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
