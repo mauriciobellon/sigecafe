@@ -13,22 +13,23 @@ model Usuario {
   email         String?
   name          String
   password      String
-  celular       String               @unique
+  celular       String
   type          UsuarioType          @default(AUTENTICADO)
+  associado     Associado?           @relation(fields: [associadoId], references: [id])
+  colaborador   Colaborador?         @relation(fields: [colaboradorId], references: [id])
+  cooperativa   Cooperativa?         @relation(fields: [cooperativaId], references: [id])
   cooperativaId Int?
   associadoId   Int?
   colaboradorId Int?
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
+  deletedAt     DateTime?
   notificacoes  Notificacao[]
   ofertas       Oferta[]
   resetTokens   PasswordResetToken[]
   compras       Transacao[]          @relation("CompraTransacoes")
   vendas        Transacao[]          @relation("VendaTransacoes")
   preference    UserPreference?
-  associado     Associado?           @relation(fields: [associadoId], references: [id])
-  colaborador   Colaborador?         @relation(fields: [colaboradorId], references: [id])
-  cooperativa   Cooperativa?         @relation(fields: [cooperativaId], references: [id])
 }
 
 model Permission {
@@ -74,13 +75,12 @@ model Associado {
 
 model Colaborador {
   id            Int         @id @default(autoincrement())
-  nome          String
-  celular       String?
   cargo         String?
-  cooperativaId Int
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
   cooperativa   Cooperativa @relation(fields: [cooperativaId], references: [id])
+  cooperativaId Int
   usuarios      Usuario[]
 }
 

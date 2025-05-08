@@ -5,6 +5,11 @@ import prisma from '@@/lib/prisma';
 
 const repository = new UsuarioRepository();
 
+// Helper function to normalize phone number by removing non-digit characters
+function normalizePhoneNumber(phone: string): string {
+  return phone ? phone.replace(/\D/g, '') : '';
+}
+
 export default defineEventHandler(async (event) => {
   const session = await getServerSession(event);
   if (!session) {
@@ -14,7 +19,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  console.log("Session user:", session.user);
+  console.log("Session user:", session.user?.name);
 
   const method = event.method;
 
@@ -51,15 +56,20 @@ export default defineEventHandler(async (event) => {
 
       console.log("Fetching colaboradores for cooperativa:", cooperativaId);
 
-      // For admins and cooperativa managers, fetch all colaboradores from their cooperativa
-      const colaboradores = await repository.getUsuarioByCooperativaAndType(
-        cooperativaId,
-        "COLABORADOR" as UsuarioType
-      );
+      // Adjust the way we fetch colaboradores - now get actual colaboradores with their users
+      const colaboradores = await prisma.usuario.findMany({
+        where: {
+          type: "COLABORADOR" as UsuarioType,
+          cooperativaId: cooperativaId
+        },
+        include: {
+          colaborador: true
+        }
+      });
 
       console.log("Fetched colaboradores:", colaboradores.length);
 
-      return colaboradores;
+      return { data: colaboradores };
     } catch (error) {
       console.error("Error fetching colaboradores:", error);
       throw createError({
@@ -75,6 +85,11 @@ export default defineEventHandler(async (event) => {
       const body = await readBody(event);
       const currentUser = session.user as Usuario;
 
+      // Normalize phone if present
+      if (body.celular) {
+        body.celular = normalizePhoneNumber(body.celular);
+      }
+
       // Set the colaborador type and associate with the admin's cooperativa
       body.type = "COLABORADOR";
 
@@ -83,7 +98,11 @@ export default defineEventHandler(async (event) => {
         body.cooperativaId = currentUser.cooperativaId;
       }
 
-      return await repository.createUsuario(body);
+      // Create the usuario
+      const newUser = await repository.createUsuario(body);
+
+      // Force a reload after creation to get the complete object
+      return await fetchColaboradorById(newUser.id);
     } catch (error) {
       console.error("Error creating colaborador:", error);
       throw createError({
@@ -105,7 +124,41 @@ export default defineEventHandler(async (event) => {
         });
       }
 
-      return await repository.updateUsuario(body);
+      // Normalize phone if present
+      if (body.celular) {
+        body.celular = normalizePhoneNumber(body.celular);
+      }
+
+      // Handle the nested colaborador field
+      if (body.colaborador) {
+        // Get the colaborador ID for this user
+        const usuario = await prisma.usuario.findUnique({
+          where: { id: body.id },
+          include: { colaborador: true }
+        });
+
+        if (usuario?.colaborador) {
+          console.log("Updating colaborador cargo:", body.colaborador.cargo);
+          // Update the colaborador record
+          await prisma.colaborador.update({
+            where: { id: usuario.colaborador.id },
+            data: {
+              cargo: body.colaborador.cargo || usuario.colaborador.cargo
+            }
+          });
+        } else {
+          console.log("User does not have a colaborador record");
+        }
+
+        // Remove the colaborador data from the update payload
+        delete body.colaborador;
+      }
+
+      // Update the usuario
+      const updatedUser = await repository.updateUsuario(body);
+
+      // Force a reload of updated user with relationships
+      return await fetchColaboradorById(updatedUser.id);
     } catch (error) {
       console.error("Error updating colaborador:", error);
       throw createError({
@@ -136,6 +189,16 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Error deleting colaborador",
       });
     }
+  }
+
+  // Helper function to fetch a colaborador by ID
+  async function fetchColaboradorById(id: number) {
+    const usuario = await prisma.usuario.findUnique({
+      where: { id },
+      include: { colaborador: true }
+    });
+
+    return { data: [usuario] };
   }
 
   throw createError({
