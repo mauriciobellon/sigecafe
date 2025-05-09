@@ -24,6 +24,13 @@
     ]
   },
   {
+    "path": "/api/colaborador",
+    "usuarioType": [
+      "COOPERATIVA",
+      "ADMINISTRADOR"
+    ]
+  },
+  {
     "path": "/api/coffee-prices",
     "usuarioType": [
       "ADMINISTRADOR",

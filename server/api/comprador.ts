@@ -54,27 +54,27 @@ export default defineEventHandler(async (event) => {
         return [];
       }
 
-      console.log("Fetching colaboradores for cooperativa:", cooperativaId);
+      console.log("Fetching compradores for cooperativa:", cooperativaId);
 
-      // Adjust the way we fetch colaboradores - now get actual colaboradores with their users
-      const colaboradores = await prisma.usuario.findMany({
+      // Adjust the way we fetch compradores - now get actual compradores with their users
+      const compradores = await prisma.usuario.findMany({
         where: {
-          type: "COLABORADOR" as UsuarioType,
+          type: "COMPRADOR" as UsuarioType,
           cooperativaId: cooperativaId
         },
         include: {
-          colaborador: true
+          associado: true
         }
       });
 
-      console.log("Fetched colaboradores:", colaboradores.length);
+      console.log("Fetched compradores:", compradores.length);
 
-      return { data: colaboradores };
+      return { data: compradores };
     } catch (error) {
-      console.error("Error fetching colaboradores:", error);
+      console.error("Error fetching compradores:", error);
       throw createError({
         statusCode: 500,
-        statusMessage: "Error fetching colaboradores",
+        statusMessage: "Error fetching compradores",
       });
     }
   }
@@ -91,7 +91,7 @@ export default defineEventHandler(async (event) => {
       }
 
       // Set the colaborador type and associate with the admin's cooperativa
-      body.type = "COLABORADOR";
+      body.type = "COMPRADOR";
 
       // If the current user has a cooperativaId, assign the same to the new colaborador
       if (currentUser && currentUser.cooperativaId) {
@@ -102,12 +102,12 @@ export default defineEventHandler(async (event) => {
       const newUser = await repository.createUsuario(body);
 
       // Force a reload after creation to get the complete object
-      return await fetchColaboradorById(newUser.id);
+      return await fetchCompradorById(newUser.id);
     } catch (error) {
-      console.error("Error creating colaborador:", error);
+      console.error("Error creating comprador:", error);
       throw createError({
         statusCode: 500,
-        statusMessage: "Error creating colaborador",
+        statusMessage: "Error creating comprador",
       });
     }
   }
@@ -158,12 +158,12 @@ export default defineEventHandler(async (event) => {
       const updatedUser = await repository.updateUsuario(body);
 
       // Force a reload of updated user with relationships
-      return await fetchColaboradorById(updatedUser.id);
+      return await fetchCompradorById(updatedUser.id);
     } catch (error) {
-      console.error("Error updating colaborador:", error);
+      console.error("Error updating comprador:", error);
       throw createError({
         statusCode: 500,
-        statusMessage: "Error updating colaborador",
+        statusMessage: "Error updating comprador",
       });
     }
   }
@@ -177,25 +177,25 @@ export default defineEventHandler(async (event) => {
       if (!usuario || !usuario.id) {
         throw createError({
           statusCode: 400,
-          statusMessage: "Missing colaborador data for deletion",
+          statusMessage: "Missing comprador data for deletion",
         });
       }
 
       return await repository.deleteUsuarioById(usuario.id);
     } catch (error) {
-      console.error("Error deleting colaborador:", error);
+      console.error("Error deleting comprador:", error);
       throw createError({
         statusCode: 500,
-        statusMessage: "Error deleting colaborador",
+        statusMessage: "Error deleting comprador",
       });
     }
   }
 
   // Helper function to fetch a colaborador by ID
-  async function fetchColaboradorById(id: number) {
+  async function fetchCompradorById(id: number) {
     const usuario = await prisma.usuario.findUnique({
       where: { id },
-      include: { colaborador: true }
+      include: { associado: true }
     });
 
     return { data: [usuario] };

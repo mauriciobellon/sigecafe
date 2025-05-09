@@ -1,6 +1,5 @@
 [
   {
-    "id": "650e8400-e29b-41d4-a716-446655440000",
     "titulo": "Nova transação",
     "descricao": "Você tem uma nova transação de venda concluída",
     "icon": "lucide:check-circle",
@@ -9,7 +8,6 @@
     "usuarioId": 4
   },
   {
-    "id": "650e8400-e29b-41d4-a716-446655440001",
     "titulo": "Preço do café atualizado",
     "descricao": "O preço do café arábica foi atualizado para R$ 1.592,00",
     "icon": "lucide:trending-up",
@@ -18,7 +16,6 @@
     "usuarioId": 4
   },
   {
-    "id": "650e8400-e29b-41d4-a716-446655440002",
     "titulo": "Nova transação",
     "descricao": "Você tem uma nova transação de compra concluída",
     "icon": "lucide:check-circle",
@@ -27,7 +24,6 @@
     "usuarioId": 5
   },
   {
-    "id": "650e8400-e29b-41d4-a716-446655440003",
     "titulo": "Preço do café atualizado",
     "descricao": "O preço do café arábica foi atualizado para R$ 1.592,00",
     "icon": "lucide:trending-up",
@@ -36,7 +32,6 @@
     "usuarioId": 5
   },
   {
-    "id": "650e8400-e29b-41d4-a716-446655440004",
     "titulo": "Novas transações registradas",
     "descricao": "Foram registradas 5 novas transações na plataforma hoje",
     "icon": "lucide:clipboard-list",

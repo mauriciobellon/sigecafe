@@ -13,7 +13,9 @@ export class UsuarioRepository {
         const normalizedCelular = celular.replace(/\D/g, '');
 
         // Try with exact match first
-        let usuario = await prisma.usuario.findUnique({ where: { celular: normalizedCelular } });
+        let usuario = await prisma.usuario.findFirst({
+            where: { celular: normalizedCelular }
+        });
 
         // If not found, try with a contains query (for partially formatted numbers)
         if (!usuario) {
@@ -71,17 +73,36 @@ export class UsuarioRepository {
     }
     async updateUsuario(usuario: Partial<Usuario> & { id: number }): Promise<Usuario> {
         const { id, email, name, password, celular, type, cooperativaId, associadoId, colaboradorId } = usuario;
+
+        // Get current user data
+        const currentUser = await this.getUsuarioById(id);
+        if (!currentUser) {
+            throw new Error(`Usuario with id ${id} not found`);
+        }
+
+        // Check if we need to update the celular and if it's already used by another user
+        if (celular && celular !== currentUser.celular) {
+            const existingUserWithCelular = await this.getUsuarioByCelular(celular);
+
+            // If the phone is used by another user (not this one), throw an error
+            if (existingUserWithCelular && existingUserWithCelular.id !== id) {
+                throw new Error(`Celular ${celular} is already in use by another user`);
+            }
+        }
+
+        // Proceed with the update
         return prisma.usuario.update({
             where: { id },
             data: {
-                email,
-                name,
-                password,
-                celular,
-                type,
-                cooperativaId,
-                associadoId,
-                colaboradorId
+                // Only update fields that are provided
+                ...(email !== undefined ? { email } : {}),
+                ...(name !== undefined ? { name } : {}),
+                ...(password !== undefined ? { password } : {}),
+                ...(celular !== undefined ? { celular } : {}),
+                ...(type !== undefined ? { type } : {}),
+                ...(cooperativaId !== undefined ? { cooperativaId } : {}),
+                ...(associadoId !== undefined ? { associadoId } : {}),
+                ...(colaboradorId !== undefined ? { colaboradorId } : {})
             }
         });
     }

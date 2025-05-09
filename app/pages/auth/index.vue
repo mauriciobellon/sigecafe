@@ -20,7 +20,7 @@
 
           <AuthInput v-if="auth.step === 'celular'" :key="'celular-input'" v-model="auth.celular" model-name="celular"
             placeholder="(99) 9 9999-9999" type="tel" autocomplete="tel" maxlength="16" :disabled="auth.loading"
-            @input="$event => auth.maskPhoneNumber($event)" />
+            v-phone-mask @update:modelValue="sanitizePhone" />
 
           <AuthInput v-if="auth.step === 'password'" :key="'password-input'" v-model="auth.password"
             model-name="password" placeholder="********" type="password" :disabled="auth.loading" />
@@ -42,9 +42,20 @@
 
 <script setup lang="ts">
   import { useAuthStore } from "~/stores/AuthStore";
+  import { formatPhoneNumber, getPhoneDigits } from "~/utils/phoneUtils";
 
   const auth = useAuthStore();
   auth.setFormType("auth");
+
+  // Extra validation to ensure phone numbers are properly formatted
+  function sanitizePhone(value: string) {
+    if (value) {
+      const digits = getPhoneDigits(value);
+      const limitedDigits = digits.substring(0, 11);
+      // Make sure the store has a properly formatted value
+      auth.celular = formatPhoneNumber(limitedDigits);
+    }
+  }
 </script>
 
 <style scoped>

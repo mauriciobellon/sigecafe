@@ -29,6 +29,7 @@ CREATE TABLE "Usuario" (
     "colaboradorId" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "Usuario_pkey" PRIMARY KEY ("id")
 );
@@ -81,19 +82,18 @@ CREATE TABLE "Associado" (
 -- CreateTable
 CREATE TABLE "Colaborador" (
     "id" SERIAL NOT NULL,
-    "nome" TEXT NOT NULL,
-    "celular" TEXT,
     "cargo" TEXT,
-    "cooperativaId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
+    "cooperativaId" INTEGER NOT NULL,
 
     CONSTRAINT "Colaborador_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Transacao" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "data" TIMESTAMP(3) NOT NULL,
     "quantidade" DOUBLE PRECISION NOT NULL,
     "precoUnitario" DOUBLE PRECISION NOT NULL,
@@ -122,7 +122,7 @@ CREATE TABLE "PrecoCafeHistorico" (
 
 -- CreateTable
 CREATE TABLE "Notificacao" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "titulo" TEXT NOT NULL,
     "descricao" TEXT NOT NULL,
     "icon" TEXT NOT NULL DEFAULT 'lucide:bell',
@@ -149,7 +149,7 @@ CREATE TABLE "UserPreference" (
 
 -- CreateTable
 CREATE TABLE "PasswordResetToken" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "token" TEXT NOT NULL,
     "usuarioId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -171,9 +171,6 @@ CREATE TABLE "Oferta" (
 
     CONSTRAINT "Oferta_pkey" PRIMARY KEY ("id")
 );
-
--- CreateIndex
-CREATE UNIQUE INDEX "Usuario_celular_key" ON "Usuario"("celular");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Permission_path_key" ON "Permission"("path");
