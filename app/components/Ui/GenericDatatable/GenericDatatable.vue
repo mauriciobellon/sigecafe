@@ -63,20 +63,81 @@
                     type="tel" autocomplete="off" :disabled="col.readonly" v-phone-mask maxlength="16"
                     @input="(event) => sanitizePhoneValue(event, col.editField || col.field)" />
 
+                  <!-- Editable integer field -->
+                  <UiInput v-else-if="col.type === 'integer'" :id="col.field"
+                    :model-value="getFieldValue(store.currentItem, col.editField || col.field)"
+                    @update:model-value="setFieldValue(store.currentItem, col.editField || col.field, parseInt($event) || 0)"
+                    type="number" min="0" step="1" autocomplete="off" :disabled="col.readonly" />
+
+                  <!-- Editable money field -->
+                  <UiInput v-else-if="col.type === 'money'" :id="col.field"
+                    :model-value="getFieldValue(store.currentItem, col.editField || col.field)"
+                    @update:model-value="setFieldValue(store.currentItem, col.editField || col.field, parseFloat($event) || 0)"
+                    type="number" min="0" step="0.01" autocomplete="off" :disabled="col.readonly" />
+
                   <!-- Editable number field -->
                   <UiInput v-else-if="col.type === 'number'" :id="col.field"
                     :model-value="getFieldValue(store.currentItem, col.editField || col.field)"
                     @update:model-value="setFieldValue(store.currentItem, col.editField || col.field, $event)"
                     type="number" autocomplete="off" :disabled="col.readonly" />
 
+                  <!-- Date picker field -->
+                  <UiInput v-else-if="col.type === 'date'" :id="col.field"
+                    :model-value="formatDateForInput(getFieldValue(store.currentItem, col.editField || col.field))"
+                    @update:model-value="setFieldValue(store.currentItem, col.editField || col.field, $event)"
+                    type="date" autocomplete="off" :disabled="col.readonly" />
+
+                  <!-- Relation field (select from foreign table) -->
+                  <UiSelect v-else-if="col.type === 'relation'" :id="col.field"
+                    :model-value="getFieldValue(store.currentItem, col.editField || col.field)"
+                    @update:model-value="setFieldValue(store.currentItem, col.editField || col.field, $event)"
+                    :disabled="col.readonly">
+                    <UiSelectTrigger class="w-full">
+                      <UiSelectValue :placeholder="col.placeholder || `Selecione ${col.label}`" />
+                    </UiSelectTrigger>
+                    <UiSelectContent class="z-[200]">
+                      <UiSelectGroup>
+                        <UiSelectItem :value="null">{{ col.placeholder || `Selecione ${col.label}` }}</UiSelectItem>
+                        <UiSelectItem v-for="option in col.relationOptions" :key="option.value" :value="String(option.value)">
+                          {{ option.label }}
+                        </UiSelectItem>
+                      </UiSelectGroup>
+                    </UiSelectContent>
+                  </UiSelect>
+
+                  <!-- Status selector -->
+                  <UiSelect v-else-if="col.type === 'status'" :id="col.field"
+                    :model-value="getFieldValue(store.currentItem, col.editField || col.field)"
+                    @update:model-value="setFieldValue(store.currentItem, col.editField || col.field, $event)"
+                    :disabled="col.readonly">
+                    <UiSelectTrigger class="w-full">
+                      <UiSelectValue :placeholder="`Selecione ${col.label}`" />
+                    </UiSelectTrigger>
+                    <UiSelectContent class="z-[200]">
+                      <UiSelectGroup>
+                        <UiSelectItem v-for="status in col.statusOptions" :key="status.value" :value="status.value"
+                          :class="getStatusClass(status.value, col.statusClasses || {})">
+                          {{ status.label }}
+                        </UiSelectItem>
+                      </UiSelectGroup>
+                    </UiSelectContent>
+                  </UiSelect>
+
                   <!-- Editable select field -->
                   <UiSelect v-else-if="col.type === 'select' && col.options" :id="col.field"
                     :model-value="getFieldValue(store.currentItem, col.editField || col.field)"
                     @update:model-value="setFieldValue(store.currentItem, col.editField || col.field, $event)"
                     :disabled="col.readonly">
-                    <option v-for="option in col.options" :key="option.value" :value="option.value">
-                      {{ option.label }}
-                    </option>
+                    <UiSelectTrigger class="w-full">
+                      <UiSelectValue :placeholder="`Selecione ${col.label}`" />
+                    </UiSelectTrigger>
+                    <UiSelectContent class="z-[200]">
+                      <UiSelectGroup>
+                        <UiSelectItem v-for="option in col.options" :key="option.value" :value="option.value">
+                          {{ option.label }}
+                        </UiSelectItem>
+                      </UiSelectGroup>
+                    </UiSelectContent>
                   </UiSelect>
 
                   <!-- Default editable field -->
@@ -131,8 +192,12 @@ interface Column {
   label: string;
   field: string;
   editField?: string;
-  type: 'text' | 'number' | 'phone' | 'date' | 'select' | string;
+  type: 'text' | 'number' | 'phone' | 'date' | 'select' | 'relation' | 'money' | 'integer' | 'status' | string;
   options?: { label: string; value: any }[];
+  relationOptions?: { label: string; value: any }[];
+  statusOptions?: { label: string; value: any }[];
+  statusClasses?: Record<string, string>;
+  placeholder?: string;
   sortable?: boolean;
   hidden?: boolean;
   readonly?: boolean;
@@ -237,10 +302,36 @@ const datatableColumns = computed<ConfigColumns[]>(() => {
       title: col.label,
       defaultContent: "-",
       width: col.width,
-      // Custom render function for phone types
+      // Custom render functions for special types
       ...(col.type === 'phone' ? {
         render: function(data: any) {
           return data ? formatPhoneNumber(data) : '-';
+        }
+      } : {}),
+      ...(col.type === 'money' ? {
+        render: function(data: any) {
+          return data ? `R$ ${parseFloat(data).toFixed(2)}` : 'R$ 0,00';
+        }
+      } : {}),
+      ...(col.type === 'date' ? {
+        render: function(data: any) {
+          return data ? formatDateDisplay(data) : '-';
+        }
+      } : {}),
+      ...(col.type === 'status' && col.statusOptions ? {
+        render: function(data: any) {
+          const status = col.statusOptions?.find(s => s.value === data);
+          if (status) {
+            const statusClass = getStatusClass(data, col.statusClasses || {});
+            return `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${status.label}</span>`;
+          }
+          return data || '-';
+        }
+      } : {}),
+      ...(col.type === 'relation' && col.relationOptions ? {
+        render: function(data: any) {
+          const option = col.relationOptions?.find(o => String(o.value) === String(data));
+          return option ? option.label : data || '-';
         }
       } : {})
     }));
@@ -336,6 +427,52 @@ watch(
     }
   }
 );
+
+// Format date for display in table
+function formatDateDisplay(dateString: string): string {
+  if (!dateString) return '-';
+
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  } catch (e) {
+    return dateString;
+  }
+}
+
+// Format date for input field (YYYY-MM-DD)
+function formatDateForInput(dateString: string): string {
+  if (!dateString) return '';
+
+  try {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  } catch (e) {
+    return '';
+  }
+}
+
+// Get CSS class for status based on value
+function getStatusClass(value: string, statusClasses: Record<string, string>): string {
+  if (statusClasses && statusClasses[value]) {
+    return statusClasses[value];
+  }
+
+  // Default status classes if not specified
+  const defaultClasses: Record<string, string> = {
+    'CONCLUIDA': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    'PENDENTE': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+    'CANCELADA': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+    'ATIVO': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    'INATIVO': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+  };
+
+  return defaultClasses[value] || '';
+}
 
 // Initialize the table when ready
 function initializeTable(instance: any) {

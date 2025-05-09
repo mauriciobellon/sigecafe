@@ -1,0 +1,322 @@
+import { getServerSession } from "#auth";
+import { UsuarioRepository } from '@@/server/repositories/UsuarioRepository';
+import type { Usuario, Transacao } from "@prisma/client";
+import prisma from '@@/lib/prisma';
+
+// At the top of the file, add this interface
+interface UserBasicInfo {
+  id: number;
+  name: string;
+  type: string;
+}
+
+const usuarioRepository = new UsuarioRepository();
+
+export default defineEventHandler(async (event) => {
+  const session = await getServerSession(event);
+  if (!session) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+    });
+  }
+
+  console.log("Session user:", session.user?.name);
+
+  const method = event.method;
+  const currentUser = session.user as Usuario;
+
+  // If no user, return an error
+  if (!currentUser) {
+    console.log("No user found in session");
+    throw createError({
+      statusCode: 401,
+      statusMessage: "User not found in session",
+    });
+  }
+
+  // GET - Fetch all transactions
+  if (method === "GET") {
+    try {
+      console.log("Fetching transactions for user:", currentUser.id);
+
+      let transacoes: any[] = [];
+
+      // Different queries based on user type
+      if (currentUser.type === "ADMINISTRADOR") {
+        // Admins can see all transactions
+        transacoes = await prisma.transacao.findMany({
+          include: {
+            comprador: true,
+            vendedor: true
+          },
+          orderBy: {
+            data: 'desc'
+          }
+        });
+      } else if (currentUser.type === "COMPRADOR") {
+        // Compradores can only see their transactions
+        transacoes = await prisma.transacao.findMany({
+          where: {
+            compradorId: currentUser.id
+          },
+          include: {
+            comprador: true,
+            vendedor: true
+          },
+          orderBy: {
+            data: 'desc'
+          }
+        });
+      } else if (currentUser.type === "PRODUTOR") {
+        // Produtores can only see their transactions
+        transacoes = await prisma.transacao.findMany({
+          where: {
+            vendedorId: currentUser.id
+          },
+          include: {
+            comprador: true,
+            vendedor: true
+          },
+          orderBy: {
+            data: 'desc'
+          }
+        });
+      }
+
+      console.log(`Fetched ${transacoes.length} transactions`);
+      return transacoes;
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Error fetching transactions",
+      });
+    }
+  }
+
+  // POST - Create new transaction
+  if (method === "POST") {
+    try {
+      const body = await readBody(event);
+
+      // Validate required fields
+      if (!body.compradorId || !body.vendedorId || !body.quantidade || !body.precoUnitario) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: "Missing required fields",
+        });
+      }
+
+      // Make sure the IDs are numbers
+      body.compradorId = Number(body.compradorId);
+      body.vendedorId = Number(body.vendedorId);
+      body.quantidade = Number(body.quantidade);
+      body.precoUnitario = Number(body.precoUnitario);
+
+      // Calculate total value if not provided
+      if (!body.valorTotal) {
+        body.valorTotal = body.quantidade * body.precoUnitario;
+      }
+
+      // Set date if not provided
+      if (!body.data) {
+        body.data = new Date();
+      }
+
+      // Set default status if not provided
+      if (!body.status) {
+        body.status = "PENDENTE";
+      }
+
+      // Create the transaction
+      const newTransacao = await prisma.transacao.create({
+        data: {
+          compradorId: body.compradorId,
+          vendedorId: body.vendedorId,
+          quantidade: body.quantidade,
+          precoUnitario: body.precoUnitario,
+          valorTotal: body.valorTotal,
+          data: new Date(body.data),
+          status: body.status,
+          observacoes: body.observacoes || ""
+        },
+        include: {
+          comprador: true,
+          vendedor: true
+        }
+      });
+
+      return newTransacao;
+    } catch (error) {
+      console.error("Error creating transaction:", error);
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Error creating transaction",
+      });
+    }
+  }
+
+  // PUT - Update existing transaction
+  if (method === "PUT") {
+    try {
+      const body = await readBody(event);
+
+      if (!body.id) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: "Missing ID for update",
+        });
+      }
+
+      // Convert numeric fields
+      const id = Number(body.id);
+      if (body.compradorId) body.compradorId = Number(body.compradorId);
+      if (body.vendedorId) body.vendedorId = Number(body.vendedorId);
+      if (body.quantidade) body.quantidade = Number(body.quantidade);
+      if (body.precoUnitario) body.precoUnitario = Number(body.precoUnitario);
+
+      // Calculate total value if quantity or price changed
+      if (body.quantidade && body.precoUnitario) {
+        body.valorTotal = body.quantidade * body.precoUnitario;
+      }
+
+      // Update the transaction - using the ID as is (after schema change to Int)
+      const updatedTransacao = await prisma.$executeRaw`
+        UPDATE "Transacao"
+        SET "compradorId" = ${body.compradorId},
+            "vendedorId" = ${body.vendedorId},
+            "quantidade" = ${body.quantidade},
+            "precoUnitario" = ${body.precoUnitario},
+            "valorTotal" = ${body.valorTotal},
+            "data" = ${body.data ? new Date(body.data) : undefined},
+            "status" = ${body.status},
+            "observacoes" = ${body.observacoes}
+        WHERE "id" = ${id}
+      `;
+
+      // Fetch the updated transaction
+      const transaction = await prisma.transacao.findUnique({
+        where: { id },
+        include: {
+          comprador: true,
+          vendedor: true
+        }
+      });
+
+      return transaction;
+    } catch (error) {
+      console.error("Error updating transaction:", error);
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Error updating transaction",
+      });
+    }
+  }
+
+  // DELETE - Remove transaction
+  if (method === "DELETE") {
+    try {
+      // Get ID from URL params
+      const idParam = event.context.params?.id;
+
+      // If no ID in params, try from body
+      if (!idParam) {
+        const body = await readBody(event);
+        if (!body.id) {
+          throw createError({
+            statusCode: 400,
+            statusMessage: "Missing transaction ID for deletion",
+          });
+        }
+
+        await prisma.$executeRaw`DELETE FROM "Transacao" WHERE "id" = ${Number(body.id)}`;
+      } else {
+        await prisma.$executeRaw`DELETE FROM "Transacao" WHERE "id" = ${Number(idParam)}`;
+      }
+
+      return { success: true, message: "Transaction deleted successfully" };
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Error deleting transaction",
+      });
+    }
+  }
+
+  throw createError({
+    statusCode: 405,
+    statusMessage: "Method not allowed",
+  });
+});
+
+// Endpoint to get contrapartes (potential buyers/sellers)
+export const getContrapartes = defineEventHandler(async (event) => {
+  const session = await getServerSession(event);
+  if (!session) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+    });
+  }
+
+  const currentUser = session.user as Usuario;
+  if (!currentUser) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "User not found in session",
+    });
+  }
+
+  try {
+    // Get potential transaction partners based on user type
+    let usuarios: UserBasicInfo[] = [];
+
+    if (currentUser.type === "ADMINISTRADOR") {
+      // Admin can see all users
+      usuarios = await prisma.usuario.findMany({
+        where: {
+          type: { in: ["COMPRADOR", "PRODUTOR"] }
+        },
+        select: {
+          id: true,
+          name: true,
+          type: true
+        }
+      });
+    } else if (currentUser.type === "COMPRADOR") {
+      // Buyers need vendedores/produtores
+      usuarios = await prisma.usuario.findMany({
+        where: {
+          type: "PRODUTOR"
+        },
+        select: {
+          id: true,
+          name: true,
+          type: true
+        }
+      });
+    } else if (currentUser.type === "PRODUTOR") {
+      // Sellers need compradores
+      usuarios = await prisma.usuario.findMany({
+        where: {
+          type: "COMPRADOR"
+        },
+        select: {
+          id: true,
+          name: true,
+          type: true
+        }
+      });
+    }
+
+    return usuarios;
+  } catch (error) {
+    console.error("Error fetching contrapartes:", error);
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Error fetching contrapartes",
+    });
+  }
+});

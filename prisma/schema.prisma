@@ -85,7 +85,7 @@ model Colaborador {
 }
 
 model Transacao {
-  id            String          @id @default(uuid())
+  id            Int            @id @default(autoincrement())
   data          DateTime
   quantidade    Float
   precoUnitario Float
@@ -110,7 +110,7 @@ model PrecoCafeHistorico {
 }
 
 model Notificacao {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   titulo    String
   descricao String
   icon      String   @default("lucide:bell")
@@ -133,7 +133,7 @@ model UserPreference {
 }
 
 model PasswordResetToken {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   token     String   @unique
   usuarioId Int
   createdAt DateTime @default(now())

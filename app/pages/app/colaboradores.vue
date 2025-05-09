@@ -3,11 +3,7 @@
     <AppPage>
       <UiCard class="mt-10">
         <UiCardContent>
-            <UiGenericDatatable
-              model="Colaborador"
-              :columns="columns"
-              selectable
-            />
+          <UiGenericDatatable model="Colaborador" :columns="columns" />
         </UiCardContent>
       </UiCard>
     </AppPage>
