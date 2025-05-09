@@ -103,7 +103,7 @@ async function fetchLatestPrices() {
     const browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-      executablePath: process.env.PUPPETEER_SKIP_CHROMIUM_DOWNLOAD === 'true' ? 'google-chrome-stable' : undefined
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined
     })
     const page = await browser.newPage()
     // mimic typical browser environment
