@@ -204,6 +204,7 @@ interface Column {
   readonly?: boolean;
   unique?: boolean;
   width?: string;
+  collapsible?: boolean;
 }
 
 const props = defineProps<{
@@ -246,6 +247,11 @@ const processedColumns = computed<Column[]>(() => {
     // If a field is marked as unique, make it readonly when editing
     if (column.unique && column.readonly === undefined) {
       column.readonly = true;
+    }
+
+    // If a field is marked as collapsible, make it hidden when editing
+    if (column.collapsible && column.hidden === undefined) {
+      column.hidden = true;
     }
 
     return column;

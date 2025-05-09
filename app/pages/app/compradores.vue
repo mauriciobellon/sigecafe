@@ -33,44 +33,52 @@ const columns = [
   },
   {
     label: "Documento",
-    field: "comprador.documento",
+    field: "associado.documento",
     type: "text"
   },
   {
     label: "Endereço",
-    field: "comprador.endereco",
-    type: "text"
+    field: "associado.endereco",
+    type: "text",
+    collapsible: true
   },
   {
     label: "Cidade",
-    field: "comprador.cidade",
+    field: "associado.cidade",
     type: "text"
   },
   {
     label: "Estado",
-    field: "comprador.estado",
+    field: "associado.estado",
     type: "select",
     options: [
-      { label: "SP", value: "SP" },
-      { label: "RJ", value: "RJ" },
-      { label: "MG", value: "MG" },
-      { label: "ES", value: "ES" },
-      { label: "PR", value: "PR" },
-      { label: "SC", value: "SC" },
-      { label: "RS", value: "RS" },
-      { label: "BA", value: "BA" },
-      { label: "SE", value: "SE" },
-      { label: "PE", value: "PE" },
-      { label: "AL", value: "AL" },
-      { label: "PB", value: "PB" },
-      { label: "RN", value: "RN" },
-      { label: "CE", value: "CE" },
-      { label: "PI", value: "PI" },
-      { label: "MA", value: "MA" },
-      { label: "PA", value: "PA" },
-      { label: "AP", value: "AP" },
-      { label: "AM", value: "AM" },
-      { label: "RO", value: "RO" }
+      { label: "Acre", value: "AC" },
+      { label: "Alagoas", value: "AL" },
+      { label: "Amapá", value: "AP" },
+      { label: "Amazonas", value: "AM" },
+      { label: "Bahia", value: "BA" },
+      { label: "Ceará", value: "CE" },
+      { label: "Espírito Santo", value: "ES" },
+      { label: "Goiás", value: "GO" },
+      { label: "Maranhão", value: "MA" },
+      { label: "Mato Grosso", value: "MT" },
+      { label: "Mato Grosso do Sul", value: "MS" },
+      { label: "Minas Gerais", value: "MG" },
+      { label: "Pará", value: "PA" },
+      { label: "Paraíba", value: "PB" },
+      { label: "Paraná", value: "PR" },
+      { label: "Pernambuco", value: "PE" },
+      { label: "Piauí", value: "PI" },
+      { label: "Rio de Janeiro", value: "RJ" },
+      { label: "Rio Grande do Norte", value: "RN" },
+      { label: "Rio Grande do Sul", value: "RS" },
+      { label: "Rondônia", value: "RO" },
+      { label: "Roraima", value: "RR" },
+      { label: "Santa Catarina", value: "SC" },
+      { label: "São Paulo", value: "SP" },
+      { label: "Sergipe", value: "SE" },
+      { label: "Tocantins", value: "TO" },
+      { label: "Distrito Federal", value: "DF" }
     ]
   }
 ];

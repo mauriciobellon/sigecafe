@@ -14,22 +14,22 @@ model Usuario {
   name          String
   password      String
   celular       String
-  type          UsuarioType          @default(AUTENTICADO)
-  associado     Associado?           @relation(fields: [associadoId], references: [id])
-  colaborador   Colaborador?         @relation(fields: [colaboradorId], references: [id])
-  cooperativa   Cooperativa?         @relation(fields: [cooperativaId], references: [id])
-  cooperativaId Int?
-  associadoId   Int?
-  colaboradorId Int?
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
   deletedAt     DateTime?
+  preference    UserPreference?
+  resetTokens   PasswordResetToken[]
+  type          UsuarioType          @default(AUTENTICADO)
+  associado     Associado?           @relation(fields: [associadoId], references: [id])
+  associadoId   Int?
+  colaborador   Colaborador?         @relation(fields: [colaboradorId], references: [id])
+  colaboradorId Int?
+  cooperativa   Cooperativa?         @relation(fields: [cooperativaId], references: [id])
+  cooperativaId Int?
   notificacoes  Notificacao[]
   ofertas       Oferta[]
-  resetTokens   PasswordResetToken[]
   compras       Transacao[]          @relation("CompraTransacoes")
   vendas        Transacao[]          @relation("VendaTransacoes")
-  preference    UserPreference?
 }
 
 model Permission {

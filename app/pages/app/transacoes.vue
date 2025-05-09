@@ -41,17 +41,17 @@ const columns = [
     type: "text"
   },
   {
-    label: "Quantidade",
+    label: "Qtd",
     field: "quantidade",
     type: "number"
   },
   {
-    label: "Preço Unitário",
+    label: "Unitário",
     field: "precoUnitario",
     type: "money"
   },
   {
-    label: "Valor Total",
+    label: "Total",
     field: "valorTotal",
     type: "money"
   },
@@ -59,6 +59,7 @@ const columns = [
     label: "Status",
     field: "status",
     type: "status",
+    width: "80px",
     statusOptions: [
       { label: "Pendente", value: "PENDENTE" },
       { label: "Concluída", value: "CONCLUIDA" },
