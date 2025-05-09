@@ -29,7 +29,7 @@ RUN echo '#!/bin/sh\n\
 echo "Waiting for database to be ready..."\n\
 sleep 5\n\
 echo "Running database migrations..."\n\
-prisma migrate deploy\n\
+npm run db:migrate\n\
 echo "Running database seeds..."\n\
 node scripts/db-seed.mjs\n\
 echo "Starting application..."\n\
