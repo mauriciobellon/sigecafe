@@ -37,10 +37,27 @@ async function insertItem(model, item) {
       item.password = await hash(item.password);
     }
 
+    // First check if the item exists
+    if (model === 'cooperativa' && item.cnpj) {
+      const existing = await prisma[model].findFirst({
+        where: { cnpj: item.cnpj }
+      });
+
+      if (existing) {
+        console.log(`${model} with cnpj ${item.cnpj} already exists, skipping.`);
+        return;
+      }
+    }
+
     await prisma[model].create({ data: item });
   } catch (e) {
     console.error(`Error inserting item into ${model}:`, e);
-    process.exit(1);
+    // Don't exit the process on non-critical errors
+    if (e.code === 'P2002') {
+      console.log(`Unique constraint error. Skipping this record.`);
+    } else {
+      process.exit(1);
+    }
   }
 }
 

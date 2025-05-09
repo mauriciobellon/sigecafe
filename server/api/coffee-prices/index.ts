@@ -100,7 +100,11 @@ async function fetchLatestPrices() {
   // Attempt headless browser scraper first
   try {
     // console.log('[fetchLatestPrices] Launching Puppeteer')
-    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] })
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+      executablePath: process.env.PUPPETEER_SKIP_CHROMIUM_DOWNLOAD === 'true' ? 'google-chrome-stable' : undefined
+    })
     const page = await browser.newPage()
     // mimic typical browser environment
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
