@@ -15,6 +15,13 @@
 </template>
 
 <script lang="ts" setup>
+
+  const themeToggleStore = useThemeToggleStore();
+  themeToggleStore.initTheme();
+
+  const fontSizeStore = useFontSizeStore();
+  fontSizeStore.initFontSize();
+
   const userStore = useUsuarioStore();
   userStore.fetchUsuarioPreferences();
 
