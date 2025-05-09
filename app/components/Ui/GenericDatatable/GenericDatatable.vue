@@ -6,13 +6,13 @@
       </template>
 
       <template #actions="{ cellData }" v-if="!$slots.actions">
-        <UiButton variant="muted" @click="handleEdit(cellData)" class="h-8">
+        <UiButton variant="ghost" @click="handleEdit(cellData)" class="h-8">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
             <path fill="none" stroke="green" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
           </svg>
         </UiButton>
-        <UiButton variant="muted" @click="handleDelete(cellData)" class="h-8">
+        <UiButton variant="ghost" @click="handleDelete(cellData)" class="h-8">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
             <path fill="none" stroke="red" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6" />
@@ -61,7 +61,7 @@
                     :model-value="getFieldValue(store.currentItem, col.editField || col.field)"
                     @update:model-value="setFieldValue(store.currentItem, col.editField || col.field, $event)"
                     type="tel" autocomplete="off" :disabled="col.readonly" v-phone-mask maxlength="16"
-                    @input="(event) => sanitizePhoneValue(event, col.editField || col.field)" />
+                    @input="(event: Event) => sanitizePhoneValue(event, col.editField || col.field)" />
 
                   <!-- Editable integer field -->
                   <UiInput v-else-if="col.type === 'integer'" :id="col.field"
@@ -97,8 +97,9 @@
                     </UiSelectTrigger>
                     <UiSelectContent class="z-[200]">
                       <UiSelectGroup>
-                        <UiSelectItem :value="null">{{ col.placeholder || `Selecione ${col.label}` }}</UiSelectItem>
-                        <UiSelectItem v-for="option in col.relationOptions" :key="option.value" :value="String(option.value)">
+                        <UiSelectItem :value="''">{{ col.placeholder || `Selecione ${col.label}` }}</UiSelectItem>
+                        <UiSelectItem v-for="option in col.relationOptions" :key="option.value"
+                          :value="String(option.value)">
                           {{ option.label }}
                         </UiSelectItem>
                       </UiSelectGroup>
@@ -377,7 +378,7 @@ const tableOptions = computed<Config>(() => {
     ],
     select: props.selectable ? {
       style: "multi",
-    } : false,
+    } : undefined,
     // Additional initialization complete callback
     initComplete: function(settings: any, json: any) {
       // Force column width calculation
@@ -450,7 +451,7 @@ function formatDateForInput(dateString: string): string {
 
   try {
     const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
+    return date.toISOString().split('T')[0] || '';
   } catch (e) {
     return '';
   }
