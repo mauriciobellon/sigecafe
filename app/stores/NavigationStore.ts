@@ -20,7 +20,7 @@ export const useNavigationStore = defineStore("navigation", {
         const index = result.findIndex((p) => p.path === path);
         if (index !== -1) {
           const [page] = result.splice(index, 1);
-          result.unshift(page);
+          result.unshift(page as PermissionDTO);
         }
       }
 
