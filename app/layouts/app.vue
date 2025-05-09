@@ -31,7 +31,6 @@
 </script>
 
 <style scoped>
-  /* stylelint-disable */
   .main {
     @apply grid;
     @apply grid-cols-1;
