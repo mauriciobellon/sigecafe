@@ -73,8 +73,6 @@ export default defineEventHandler(async (event) => {
           INSERT INTO "PrecoCafeHistorico" ("data", "precoArabica", "precoRobusta", "fonte")
           VALUES (${date}, ${arabica}, ${robusta}, 'CEPEA/ESALQ')
         `
-      } else {
-        // console.log(`[coffee-prices] Skipping DB persist; isFallback=${isFallback}`)
       }
 
       return {
@@ -115,6 +113,7 @@ async function fetchLatestPrices() {
     const data = await page.evaluate(() => {
       const result: Record<string, string> = {}
       // Arábica table
+      // @ts-ignore - Running in browser context via Puppeteer
       const arabicaTable = document.querySelector('#imagenet-indicador1')
       if (arabicaTable) {
         const row = arabicaTable.querySelector('tbody tr')
@@ -122,6 +121,7 @@ async function fetchLatestPrices() {
         result.arabicaText = cells[1]?.textContent?.trim() ?? ''
       }
       // Robusta table (second .imagenet-table)
+      // @ts-ignore - Running in browser context via Puppeteer
       const tables = document.querySelectorAll('table.imagenet-table')
       if (tables.length >= 2) {
         const robustaTable = tables[1]
@@ -203,7 +203,7 @@ async function fetchLatestPrices() {
     return fallbackResult
   } catch (error) {
     console.error('[fetchLatestPrices] HTTP+Cheerio fetch failed:', error)
-    const fallback = { arabica: 1249.88, robusta: 779.25, date: new Date(), isFallback: true }
+    const fallback = { arabica: 2560.75, robusta: 1678.9, date: new Date(), isFallback: true }
     // console.log('[fetchLatestPrices] Returning final fallback:', fallback)
     return fallback
   }
