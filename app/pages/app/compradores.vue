@@ -33,22 +33,22 @@ const columns = [
   },
   {
     label: "Documento",
-    field: "associado.documento",
+    field: "comprador.documento",
     type: "text"
   },
   {
     label: "Endereço",
-    field: "associado.endereco",
+    field: "comprador.endereco",
     type: "text"
   },
   {
     label: "Cidade",
-    field: "associado.cidade",
+    field: "comprador.cidade",
     type: "text"
   },
   {
     label: "Estado",
-    field: "associado.estado",
+    field: "comprador.estado",
     type: "select",
     options: [
       { label: "SP", value: "SP" },

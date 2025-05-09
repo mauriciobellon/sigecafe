@@ -20,18 +20,28 @@ COPY --from=build-stage /nuxtapp/package.json ./package.json
 COPY --from=build-stage /nuxtapp/package-lock.json ./package-lock.json
 COPY --from=build-stage /nuxtapp/scripts/ ./scripts/
 
-# Install Chrome for Puppeteer
-RUN apt-get update \
-    && apt-get install -y wget gnupg ca-certificates \
-    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
-      --no-install-recommends \
+# Install dependencies for headless browser alternatives
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    fonts-liberation \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libdbus-1-3 \
+    libgbm1 \
+    libnspr4 \
+    libnss3 \
+    libu2f-udev \
+    xdg-utils \
+    wget \
+    chromium \
+    --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Set environment variable to skip Puppeteer's Chrome download
+# Set Puppeteer environment variables to skip Chrome download and use a different browser
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Install only production dependencies and Prisma
 RUN npm install --only=production && \
