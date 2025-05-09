@@ -46,7 +46,7 @@ model Cooperativa {
   id            Int           @id @default(autoincrement())
   nome          String
   celular       String?
-  cnpj          String?       @unique
+  cnpj          String?
   endereco      String?
   cidade        String?
   estado        String?
