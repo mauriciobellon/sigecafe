@@ -35,6 +35,35 @@ export const createGenericDatabaseStore = (modelName: string) => {
       processItemForApi(item: any, columns?: any[]) {
         const processed = { ...item };
 
+        // Handle nested fields (fields with dots like "associado.documento")
+        const nestedFields: Record<string, any> = {};
+
+        // First pass: identify all nested fields and their values
+        for (const key in processed) {
+          if (key.includes('.')) {
+            const parts = key.split('.');
+            const parent = parts[0];
+            const child = parts[1];
+
+            if (parent && child) {
+              if (!nestedFields[parent]) {
+                nestedFields[parent] = {};
+              }
+              nestedFields[parent][child] = processed[key];
+              // Remove the flattened field
+              delete processed[key];
+            }
+          }
+        }
+
+        // Second pass: merge nested fields into the processed object
+        for (const parent in nestedFields) {
+          processed[parent] = {
+            ...(processed[parent] || {}),
+            ...nestedFields[parent]
+          };
+        }
+
         // If we have columns, check for special types that need normalization
         if (columns) {
           columns.forEach(col => {

@@ -103,6 +103,12 @@ export default defineEventHandler(async (event) => {
         });
       }
 
+      // Ensure password is provided
+      if (!body.password) {
+        body.password = 'password'; // Set a default password if none provided
+        console.log("Setting default password for new colaborador");
+      }
+
       // Extract colaborador-specific data (like cargo)
       const colaboradorData = body.colaborador || {};
       delete body.colaborador;

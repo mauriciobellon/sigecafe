@@ -48,6 +48,15 @@
       "COMPRADOR"
     ]
   },
+    {
+      "path": "/api/transacao",
+      "usuarioType": [
+        "ADMINISTRADOR",
+        "COOPERATIVA",
+        "PRODUTOR",
+        "COMPRADOR"
+      ]
+    },
   {
     "path": "/api/notificacao",
     "usuarioType": [

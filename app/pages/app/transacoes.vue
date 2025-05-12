@@ -2,10 +2,6 @@
   <div>
     <AppPage>
       <UiCard class="mt-10">
-        <UiCardHeader>
-          <UiCardTitle>Transações</UiCardTitle>
-          <UiCardDescription>Gerencie suas transações de compra e venda de café.</UiCardDescription>
-        </UiCardHeader>
         <UiCardContent>
           <UiGenericDatatable model="transacao" :columns="columns" />
         </UiCardContent>
@@ -33,12 +29,12 @@ const columns = [
   {
     label: "Comprador",
     field: "comprador.name",
-    type: "text"
+    type: "relation"
   },
   {
     label: "Vendedor",
     field: "vendedor.name",
-    type: "text"
+    type: "relation"
   },
   {
     label: "Qtd",

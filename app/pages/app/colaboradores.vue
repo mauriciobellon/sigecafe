@@ -27,6 +27,11 @@ const columns = [
     type: "text"
   },
   {
+    label: "Email",
+    field: "email",
+    type: "text"
+  },
+  {
     label: "Celular",
     field: "celular",
     type: "phone"
@@ -34,7 +39,8 @@ const columns = [
   {
     label: "Cargo",
     field: "colaborador.cargo",
-    type: "text"
+    type: "text",
+    editField: "colaborador.cargo"
   }
 ];
 </script>
