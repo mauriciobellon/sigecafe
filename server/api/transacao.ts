@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
       const transacoes = await prisma.transacao.findMany({
         include: {
           comprador: true,
-          vendedor: true
+          produtor: true
         },
         orderBy: {
           data: 'desc'
@@ -74,7 +74,7 @@ export default defineEventHandler(async (event) => {
       const body = await readBody(event);
 
       // Validate required fields
-      if (!body.compradorId || !body.vendedorId || !body.quantidade || !body.precoUnitario) {
+      if (!body.compradorId || !body.produtorId || !body.quantidade || !body.precoUnitario) {
         throw createError({
           statusCode: 400,
           statusMessage: "Missing required fields",
@@ -83,14 +83,10 @@ export default defineEventHandler(async (event) => {
 
       // Make sure the IDs are numbers
       body.compradorId = Number(body.compradorId);
-      body.vendedorId = Number(body.vendedorId);
+      body.produtorId = Number(body.produtorId);
       body.quantidade = Number(body.quantidade);
       body.precoUnitario = Number(body.precoUnitario);
 
-      // Calculate total value if not provided
-      if (!body.valorTotal) {
-        body.valorTotal = body.quantidade * body.precoUnitario;
-      }
 
       // Set date if not provided
       if (!body.data) {
@@ -106,17 +102,16 @@ export default defineEventHandler(async (event) => {
       const newTransacao = await prisma.transacao.create({
         data: {
           compradorId: body.compradorId,
-          vendedorId: body.vendedorId,
+          produtorId: body.produtorId,
           quantidade: body.quantidade,
           precoUnitario: body.precoUnitario,
-          valorTotal: body.valorTotal,
           data: new Date(body.data),
           status: body.status,
           observacoes: body.observacoes || ""
         },
         include: {
           comprador: true,
-          vendedor: true
+          produtor: true
         }
       });
 
@@ -145,7 +140,7 @@ export default defineEventHandler(async (event) => {
       // Convert numeric fields
       const id = Number(body.id);
       if (body.compradorId) body.compradorId = Number(body.compradorId);
-      if (body.vendedorId) body.vendedorId = Number(body.vendedorId);
+      if (body.produtorId) body.produtorId = Number(body.produtorId);
       if (body.quantidade) body.quantidade = Number(body.quantidade);
       if (body.precoUnitario) body.precoUnitario = Number(body.precoUnitario);
 
@@ -158,10 +153,9 @@ export default defineEventHandler(async (event) => {
       const updatedTransacao = await prisma.$executeRaw`
         UPDATE "Transacao"
         SET "compradorId" = ${body.compradorId},
-            "vendedorId" = ${body.vendedorId},
+            "produtorId" = ${body.produtorId},
             "quantidade" = ${body.quantidade},
             "precoUnitario" = ${body.precoUnitario},
-            "valorTotal" = ${body.valorTotal},
             "data" = ${body.data ? new Date(body.data) : undefined},
             "status" = ${body.status},
             "observacoes" = ${body.observacoes}
@@ -173,7 +167,7 @@ export default defineEventHandler(async (event) => {
         where: { id },
         include: {
           comprador: true,
-          vendedor: true
+          produtor: true
         }
       });
 

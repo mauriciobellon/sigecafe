@@ -29,12 +29,18 @@ const columns = [
   {
     label: "Comprador",
     field: "comprador.name",
-    type: "relation"
+    type: "relation",
+    relationEndpoint: "/api/comprador",
+    relationLabel: "name",
+    relationValue: "id"
   },
   {
-    label: "Vendedor",
-    field: "vendedor.name",
-    type: "relation"
+    label: "Produtor",
+    field: "produtor.name",
+    type: "relation",
+    relationEndpoint: "/api/produtor",
+    relationLabel: "name",
+    relationValue: "id"
   },
   {
     label: "Qtd",
@@ -44,11 +50,6 @@ const columns = [
   {
     label: "Unitário",
     field: "precoUnitario",
-    type: "money"
-  },
-  {
-    label: "Total",
-    field: "valorTotal",
     type: "money"
   },
   {

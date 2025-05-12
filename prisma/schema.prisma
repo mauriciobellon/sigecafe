@@ -89,15 +89,14 @@ model Transacao {
   data          DateTime
   quantidade    Float
   precoUnitario Float
-  valorTotal    Float
   status        TransacaoStatus
   observacoes   String?
+  comprador     Usuario         @relation("CompraTransacoes", fields: [compradorId], references: [id])
   compradorId   Int
-  vendedorId    Int
+  produtor      Usuario         @relation("VendaTransacoes", fields: [produtorId], references: [id])
+  produtorId    Int
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-  comprador     Usuario         @relation("CompraTransacoes", fields: [compradorId], references: [id])
-  vendedor      Usuario         @relation("VendaTransacoes", fields: [vendedorId], references: [id])
 }
 
 model PrecoCafeHistorico {

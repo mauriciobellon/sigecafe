@@ -91,15 +91,13 @@
                   <UiSelect v-else-if="col.type === 'relation'" :id="col.field"
                     :model-value="getFieldValue(store.currentItem, col.editField || col.field)"
                     @update:model-value="setFieldValue(store.currentItem, col.editField || col.field, $event)"
-                    :disabled="col.readonly">
+                    :disabled="col.readonly || ((col.relationOptions ?? []).length === 1 && (col.relationOptions?.[0]?.value === '__empty__'))">
                     <UiSelectTrigger class="w-full">
                       <UiSelectValue :placeholder="col.placeholder || `Selecione ${col.label}`" />
                     </UiSelectTrigger>
                     <UiSelectContent class="z-[200]">
                       <UiSelectGroup>
-                        <UiSelectItem :value="''">{{ col.placeholder || `Selecione ${col.label}` }}</UiSelectItem>
-                        <UiSelectItem v-for="option in col.relationOptions" :key="option.value"
-                          :value="String(option.value)">
+                        <UiSelectItem v-for="option in (col.relationOptions ?? [])" :key="option.value" :value="String(option.value)" :disabled="option.value === '__empty__'">
                           {{ option.label }}
                         </UiSelectItem>
                       </UiSelectGroup>
@@ -196,6 +194,9 @@ interface Column {
   type: 'text' | 'number' | 'phone' | 'date' | 'select' | 'relation' | 'money' | 'integer' | 'status' | string;
   options?: { label: string; value: any }[];
   relationOptions?: { label: string; value: any }[];
+  relationEndpoint?: string;
+  relationLabel?: string;
+  relationValue?: string;
   statusOptions?: { label: string; value: any }[];
   statusClasses?: Record<string, string>;
   placeholder?: string;
@@ -408,6 +409,12 @@ const tableOptions = computed<Config>(() => {
 
 // Fetch data on mount
 onMounted(async () => {
+  // Fetch relation options for all relation columns with endpoint
+  await Promise.all(
+    processedColumns.value
+      .filter(col => col.type === 'relation' && col.relationEndpoint && col.relationLabel && col.relationValue)
+      .map(col => fetchRelationOptions(col))
+  );
   await fetchData();
 });
 
@@ -676,6 +683,32 @@ function sanitizePhoneValue(event: Event, fieldPath: string) {
 
     // Update the store with formatted value
     setFieldValue(store.currentItem, fieldPath, formatPhoneNumber(limitedDigits));
+  }
+}
+
+// Fetch relation options for columns of type 'relation' with an endpoint
+async function fetchRelationOptions(col: Column) {
+  if (!col.relationEndpoint || !col.relationLabel || !col.relationValue) return;
+  try {
+    const apiResponse = await $fetch(col.relationEndpoint, { credentials: "include" }) as any;
+    console.log(`[GenericDatatable] Response from relationEndpoint (${col.relationEndpoint}):`, apiResponse);
+    const apiData: any[] = Array.isArray(apiResponse) ? apiResponse : (apiResponse?.data ?? []);
+    col.relationOptions = apiData.map((item: any) => ({
+      label: item[col.relationLabel!],
+      value: item[col.relationValue!]
+    }));
+    // If no options, add a disabled option prompting to create a related model
+    if (!col.relationOptions || col.relationOptions.length === 0) {
+      col.relationOptions = [{
+        label: `Favor criar um ${humanizedModelName.value} primeiro`,
+        value: "__empty__"
+      }];
+    }
+  } catch (e) {
+    col.relationOptions = [{
+      label: `Favor criar um ${humanizedModelName.value} primeiro`,
+      value: "__empty__"
+    }];
   }
 }
 
