@@ -18,5 +18,25 @@
     "cidade": "Ibatiba",
     "estado": "ES",
     "cooperativaId": 1
+  },
+  {
+    "nome": "Lucas Produtor",
+    "celular": "88888888888",
+    "tipo": "PRODUTOR",
+    "documento": "888.999.000-11",
+    "endereco": "Fazenda Boa Vista, km 12",
+    "cidade": "Patrocínio",
+    "estado": "MG",
+    "cooperativaId": 2
+  },
+  {
+    "nome": "Fernanda Compradora",
+    "celular": "99999999999",
+    "tipo": "COMPRADOR",
+    "documento": "999.000.111-22",
+    "endereco": "Rua das Flores, 321",
+    "cidade": "Patrocínio",
+    "estado": "MG",
+    "cooperativaId": 2
   }
 ]

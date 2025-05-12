@@ -33,5 +33,40 @@
     "password": "password",
     "type": "COMPRADOR",
     "celular": "44444444444"
+  },
+  {
+    "name": "Cerrado Admin",
+    "email": "admin@cerradocafe.com",
+    "password": "password",
+    "type": "ADMINISTRADOR",
+    "celular": "55555555555"
+  },
+  {
+    "name": "Maria do Café",
+    "email": "maria@cerradocafe.com",
+    "password": "password",
+    "type": "COOPERATIVA",
+    "celular": "66666666666"
+  },
+  {
+    "name": "Pedro Barista",
+    "email": "pedro@cerradocafe.com",
+    "password": "password",
+    "type": "COLABORADOR",
+    "celular": "77777777777"
+  },
+  {
+    "name": "Lucas Produtor",
+    "email": "lucas@cerradocafe.com",
+    "password": "password",
+    "type": "PRODUTOR",
+    "celular": "88888888888"
+  },
+  {
+    "name": "Fernanda Compradora",
+    "email": "fernanda@cerradocafe.com",
+    "password": "password",
+    "type": "COMPRADOR",
+    "celular": "99999999999"
   }
 ]

@@ -51,93 +51,96 @@ export default defineEventHandler(async (event) => {
 })
 
 async function getUsuariosWithRoles(page: number, limit: number, search: string, typeFilter?: UsuarioType) {
-  const skip = (page - 1) * limit
+  try {
+    const skip = (page - 1) * limit
 
-  // Construir condição where
-  const where: any = {}
+    // Construir condição where
+    const where: any = {}
 
-  // Adicionar filtro por tipo se fornecido
-  if (typeFilter) {
-    where.type = typeFilter
-  }
-
-  // Adicionar filtro de busca se fornecido
-  if (search) {
-    where.OR = [
-      { name: { contains: search, mode: 'insensitive' } },
-      { email: { contains: search, mode: 'insensitive' } },
-      { celular: { contains: search, mode: 'insensitive' } }
-    ]
-  }
-
-  // Buscar usuários com paginação
-  const [usuarios, total] = await Promise.all([
-    prisma.usuario.findMany({
-      where,
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        celular: true,
-        type: true,
-        cooperativaId: true,
-        cooperativa: {
-          select: {
-            nome: true
-          }
-        },
-        associadoId: true,
-        associado: {
-          select: {
-            nome: true,
-            tipo: true
-          }
-        },
-        colaboradorId: true,
-        colaborador: {
-          select: {
-            nome: true,
-            cargo: true
-          }
-        },
-        createdAt: true,
-        updatedAt: true
-      },
-      skip,
-      take: limit,
-      orderBy: { name: 'asc' }
-    }),
-    prisma.usuario.count({ where })
-  ])
-
-  // Formatar os resultados
-  const formattedUsers = usuarios.map(user => ({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    celular: user.celular,
-    role: user.type,
-    roleLabel: formatRoleLabel(user.type),
-    cooperativa: user.cooperativa?.nome,
-    cooperativaId: user.cooperativaId,
-    associado: user.associado?.nome,
-    associadoId: user.associadoId,
-    associadoTipo: user.associado?.tipo,
-    colaborador: user.colaborador?.nome,
-    colaboradorId: user.colaboradorId,
-    colaboradorCargo: user.colaborador?.cargo,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt
-  }))
-
-  return {
-    data: formattedUsers,
-    meta: {
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit)
+    // Adicionar filtro por tipo se fornecido
+    if (typeFilter) {
+      where.type = typeFilter
     }
+
+    // Adicionar filtro de busca se fornecido
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+        { celular: { contains: search, mode: 'insensitive' } }
+      ]
+    }
+
+    // Buscar usuários com paginação
+    const [usuarios, total] = await Promise.all([
+      prisma.usuario.findMany({
+        where,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          celular: true,
+          type: true,
+          cooperativaId: true,
+          cooperativa: {
+            select: {
+              nome: true
+            }
+          },
+          associadoId: true,
+          associado: {
+            select: {
+              nome: true,
+              tipo: true
+            }
+          },
+          colaboradorId: true,
+          colaborador: {
+            select: {
+              cargo: true
+            }
+          },
+          createdAt: true,
+          updatedAt: true
+        },
+        skip,
+        take: limit,
+        orderBy: { name: 'asc' }
+      }),
+      prisma.usuario.count({ where })
+    ])
+
+    // Formatar os resultados
+    const formattedUsers = usuarios.map(user => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      celular: user.celular,
+      role: user.type,
+      roleLabel: formatRoleLabel(user.type),
+      cooperativa: user.cooperativa?.nome,
+      cooperativaId: user.cooperativaId,
+      associado: user.associado?.nome,
+      associadoId: user.associadoId,
+      associadoTipo: user.associado?.tipo,
+      colaborador: user.colaborador?.cargo || (user.colaboradorId ? 'Colaborador' : undefined),
+      colaboradorId: user.colaboradorId,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    }))
+
+    return {
+      data: formattedUsers,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching users:', error)
+    throw error
   }
 }
 

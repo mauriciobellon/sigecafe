@@ -48,5 +48,25 @@
     "observacoes": "Cancelada pelo vendedor",
     "compradorId": 5,
     "vendedorId": 4
+  },
+  {
+    "data": "2024-06-02T14:00:00Z",
+    "quantidade": 18,
+    "precoUnitario": 948.00,
+    "valorTotal": 17064.00,
+    "status": "CONCLUIDA",
+    "observacoes": "Café do Cerrado, safra 2024",
+    "compradorId": 10,
+    "vendedorId": 9
+  },
+  {
+    "data": "2024-06-03T11:30:00Z",
+    "quantidade": 10,
+    "precoUnitario": 950.00,
+    "valorTotal": 9500.00,
+    "status": "PENDENTE",
+    "observacoes": "Aguardando confirmação de entrega",
+    "compradorId": 10,
+    "vendedorId": 9
   }
 ]

@@ -6,5 +6,13 @@
     "endereco": "Rua Principal, 500",
     "cidade": "Ibatiba",
     "estado": "ES"
+  },
+  {
+    "nome": "Cooperativa dos Cafeicultores do Cerrado",
+    "celular": "31988887777",
+    "cnpj": "98.765.432/0002-10",
+    "endereco": "Avenida do Café, 1000",
+    "cidade": "Patrocínio",
+    "estado": "MG"
   }
 ]

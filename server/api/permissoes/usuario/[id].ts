@@ -85,7 +85,6 @@ async function getUserDetails(userId: number) {
       colaborador: {
         select: {
           id: true,
-          nome: true,
           cargo: true
         }
       }
@@ -111,7 +110,7 @@ async function getUserDetails(userId: number) {
     associado: user.associado?.nome,
     associadoId: user.associadoId,
     associadoTipo: user.associado?.tipo,
-    colaborador: user.colaborador?.nome,
+    colaborador: user.colaborador?.cargo || (user.colaboradorId ? 'Colaborador' : undefined),
     colaboradorId: user.colaboradorId,
     colaboradorCargo: user.colaborador?.cargo
   }
@@ -193,7 +192,6 @@ async function updateUserRole(userId: number, data: UpdateRoleDTO) {
       colaboradorId: true,
       colaborador: {
         select: {
-          nome: true,
           cargo: true
         }
       }
@@ -215,7 +213,7 @@ async function updateUserRole(userId: number, data: UpdateRoleDTO) {
       associado: updatedUser.associado?.nome,
       associadoId: updatedUser.associadoId,
       associadoTipo: updatedUser.associado?.tipo,
-      colaborador: updatedUser.colaborador?.nome,
+      colaborador: updatedUser.colaborador?.cargo || (updatedUser.colaboradorId ? 'Colaborador' : undefined),
       colaboradorId: updatedUser.colaboradorId,
       colaboradorCargo: updatedUser.colaborador?.cargo
     }

@@ -96,9 +96,27 @@ export default defineEventHandler(async (event) => {
       // If the current user has a cooperativaId, assign the same to the new colaborador
       if (currentUser && currentUser.cooperativaId) {
         body.cooperativaId = currentUser.cooperativaId;
+      } else {
+        throw createError({
+          statusCode: 400,
+          statusMessage: "Current user doesn't have a cooperativa assigned",
+        });
       }
 
-      // Create the usuario
+      // Extract colaborador-specific data (like cargo)
+      const colaboradorData = body.colaborador || {};
+      delete body.colaborador;
+
+      // First create the Colaborador record
+      const newColaborador = await prisma.colaborador.create({
+        data: {
+          cargo: colaboradorData.cargo || "Colaborador",
+          cooperativaId: body.cooperativaId
+        }
+      });
+
+      // Now create the Usuario with reference to the Colaborador
+      body.colaboradorId = newColaborador.id;
       const newUser = await repository.createUsuario(body);
 
       // Force a reload after creation to get the complete object

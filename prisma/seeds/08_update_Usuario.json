@@ -14,5 +14,21 @@
   {
     "id": 5,
     "associadoId": 2
+  },
+  {
+    "id": 7,
+    "colaboradorId": 3
+  },
+  {
+    "id": 8,
+    "colaboradorId": 4
+  },
+  {
+    "id": 9,
+    "associadoId": 3
+  },
+  {
+    "id": 10,
+    "associadoId": 4
   }
 ]

@@ -48,5 +48,27 @@
         "id": 2
       }
     }
+  },
+  {
+    "id": 6,
+    "cooperativa": { "connect": { "id": 2 } }
+  },
+  {
+    "id": 7,
+    "cooperativa": { "connect": { "id": 2 } }
+  },
+  {
+    "id": 8,
+    "cooperativa": { "connect": { "id": 2 } }
+  },
+  {
+    "id": 9,
+    "cooperativa": { "connect": { "id": 2 } },
+    "associado": { "connect": { "id": 3 } }
+  },
+  {
+    "id": 10,
+    "cooperativa": { "connect": { "id": 2 } },
+    "associado": { "connect": { "id": 4 } }
   }
 ]

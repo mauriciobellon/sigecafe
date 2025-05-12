@@ -38,5 +38,21 @@
     "lida": false,
     "enviada": true,
     "usuarioId": 4
+  },
+  {
+    "titulo": "Bem-vindo ao Cerrado!",
+    "descricao": "Sua conta foi criada com sucesso na Cooperativa dos Cafeicultores do Cerrado.",
+    "icon": "lucide:coffee",
+    "lida": false,
+    "enviada": true,
+    "usuarioId": 9
+  },
+  {
+    "titulo": "Nova oferta disponível",
+    "descricao": "Uma nova oferta de café está disponível para compra.",
+    "icon": "lucide:star",
+    "lida": false,
+    "enviada": true,
+    "usuarioId": 10
   }
 ]
