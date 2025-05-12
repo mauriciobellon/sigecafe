@@ -5,7 +5,7 @@
     "cnpj": "12.345.678/0001-90",
     "endereco": "Rua Principal, 500",
     "cidade": "Ibatiba",
-    "estado": "ES"
+    "estadoId": 7
   },
   {
     "nome": "Cooperativa dos Cafeicultores do Cerrado",
@@ -13,6 +13,6 @@
     "cnpj": "98.765.432/0002-10",
     "endereco": "Avenida do Café, 1000",
     "cidade": "Patrocínio",
-    "estado": "MG"
+    "estadoId": 12
   }
 ]

@@ -9,27 +9,34 @@ datasource db {
 }
 
 model Usuario {
-  id            Int                  @id @default(autoincrement())
-  email         String?
-  name          String
-  password      String
-  celular       String
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-  deletedAt     DateTime?
-  preference    UserPreference?
-  resetTokens   PasswordResetToken[]
-  type          UsuarioType          @default(AUTENTICADO)
-  associado     Associado?           @relation(fields: [associadoId], references: [id])
-  associadoId   Int?
-  colaborador   Colaborador?         @relation(fields: [colaboradorId], references: [id])
-  colaboradorId Int?
-  cooperativa   Cooperativa?         @relation(fields: [cooperativaId], references: [id])
+  id        Int     @id @default(autoincrement())
+  celular   String  @unique
+  name      String
+  password  String
+  email     String?
+  theme     String  @default("system")
+  fontSize  String  @default("medium")
+  documento String?
+  endereco  String?
+  cidade    String?
+  cargo     String?
+
+  type UsuarioType @default(AUTENTICADO)
+
+  estado   Estado? @relation("UsuarioEstado", fields: [estadoId], references: [id])
+  estadoId Int?
+
+  cooperativa   Cooperativa? @relation("CooperativaUsuario", fields: [cooperativaId], references: [id])
   cooperativaId Int?
-  notificacoes  Notificacao[]
-  ofertas       Oferta[]
-  compras       Transacao[]          @relation("CompraTransacoes")
-  vendas        Transacao[]          @relation("VendaTransacoes")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  notificacoes Notificacao[] @relation("NotificacoesUsuario")
+  ofertas      Oferta[]      @relation("OfertasUsuario")
+  compras      Transacao[]   @relation("CompraTransacoes")
+  vendas       Transacao[]   @relation("VendaTransacoes")
 }
 
 model Permission {
@@ -43,49 +50,21 @@ model Permission {
 }
 
 model Cooperativa {
-  id            Int           @id @default(autoincrement())
-  nome          String
-  celular       String?
-  cnpj          String?
-  endereco      String?
-  cidade        String?
-  estado        String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  associados    Associado[]
-  colaboradores Colaborador[]
-  usuarios      Usuario[]
-}
-
-model Associado {
-  id            Int           @id @default(autoincrement())
-  nome          String
-  celular       String?
-  tipo          AssociadoTipo
-  documento     String?
-  endereco      String?
-  cidade        String?
-  estado        String?
-  cooperativaId Int
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  cooperativa   Cooperativa   @relation(fields: [cooperativaId], references: [id])
-  usuarios      Usuario[]
-}
-
-model Colaborador {
-  id            Int         @id @default(autoincrement())
-  cargo         String?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  deletedAt     DateTime?
-  cooperativa   Cooperativa @relation(fields: [cooperativaId], references: [id])
-  cooperativaId Int
-  usuarios      Usuario[]
+  id        Int       @id @default(autoincrement())
+  nome      String
+  celular   String?
+  cnpj      String?
+  endereco  String?
+  cidade    String?
+  estado    Estado? @relation("CooperativaEstado", fields: [estadoId], references: [id])
+  estadoId  Int?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  usuarios  Usuario[] @relation("CooperativaUsuario")
 }
 
 model Transacao {
-  id            Int            @id @default(autoincrement())
+  id            Int             @id @default(autoincrement())
   data          DateTime
   quantidade    Float
   precoUnitario Float
@@ -115,41 +94,22 @@ model Notificacao {
   icon      String   @default("lucide:bell")
   lida      Boolean  @default(false)
   enviada   Boolean  @default(false)
-  usuarioId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
-}
-
-model UserPreference {
-  id        Int      @id @default(autoincrement())
-  theme     String   @default("system")
-  fontSize  String   @default("medium")
-  usuarioId Int      @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
-}
-
-model PasswordResetToken {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique
+  usuario   Usuario  @relation("NotificacoesUsuario", fields: [usuarioId], references: [id])
   usuarioId Int
-  createdAt DateTime @default(now())
-  expiresAt DateTime
-  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 }
 
 model Oferta {
   id        Int         @id @default(autoincrement())
-  userId    Int
   side      OfferSide
   price     Float
   quantity  Float
   status    OfferStatus @default(OPEN)
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
-  usuario   Usuario     @relation(fields: [userId], references: [id])
+  usuario   Usuario     @relation("OfertasUsuario", fields: [usuarioId], references: [id])
+  usuarioId Int
 }
 
 enum UsuarioType {
@@ -168,11 +128,6 @@ enum MenuType {
   DROPDOWN
 }
 
-enum AssociadoTipo {
-  PRODUTOR
-  COMPRADOR
-}
-
 enum TransacaoStatus {
   PENDENTE
   CONCLUIDA
@@ -188,4 +143,12 @@ enum OfferStatus {
   OPEN
   FILLED
   CANCELLED
+}
+
+model Estado {
+  id       Int       @id @default(autoincrement())
+  nome     String
+  sigla    String
+  usuarios Usuario[] @relation("UsuarioEstado")
+  cooperativas Cooperativa[] @relation("CooperativaEstado")
 }

@@ -1,6 +1,6 @@
 import { getServerSession } from "#auth";
 import { UsuarioRepository } from '@@/server/repositories/UsuarioRepository';
-import type { Usuario, UsuarioType, AssociadoTipo } from "@prisma/client";
+import type { Usuario, UsuarioType } from "@prisma/client";
 import prisma from '@@/lib/prisma';
 
 const repository = new UsuarioRepository();
@@ -61,9 +61,6 @@ export default defineEventHandler(async (event) => {
         where: {
           type: "COMPRADOR" as UsuarioType,
           cooperativaId: cooperativaId
-        },
-        include: {
-          associado: true
         }
       });
 
@@ -104,40 +101,11 @@ export default defineEventHandler(async (event) => {
         console.log("Setting default password for new comprador");
       }
 
-      // Extract associado data from the request body
-      const associadoData = body.associado || {};
-      delete body.associado; // Remove associado data from main user body
-
       // Create the usuario first
       const newUser = await repository.createUsuario(body);
 
-      // Create the associado record if data exists
-      if (Object.keys(associadoData).length > 0 && currentUser?.cooperativaId) {
-        console.log("Creating associado for comprador:", newUser.id);
-
-        // Create the associado with proper fields
-        const associado = await prisma.associado.create({
-          data: {
-            ...associadoData,
-            nome: body.name || associadoData.nome || "Comprador",
-            tipo: "COMPRADOR" as AssociadoTipo,
-            cooperativaId: currentUser.cooperativaId,
-            createdAt: new Date(),
-            updatedAt: new Date()
-          }
-        });
-
-        // Now connect the user to the associado
-        await prisma.usuario.update({
-          where: { id: newUser.id },
-          data: {
-            associadoId: associado.id
-          }
-        });
-      }
-
-      // Force a reload after creation to get the complete object
-      return await fetchCompradorById(newUser.id);
+      // No associado model: user creation complete
+      return { data: [newUser] };
     } catch (error) {
       console.error("Error creating comprador:", error);
       throw createError({
@@ -164,56 +132,11 @@ export default defineEventHandler(async (event) => {
         body.celular = normalizePhoneNumber(body.celular);
       }
 
-      // Extract associado data from the request body
-      const associadoData = body.associado || {};
-      delete body.associado; // Remove associado data from main user body
-
       // Update the usuario
       const updatedUser = await repository.updateUsuario(body);
 
-      // Check if we have associado data to update
-      if (Object.keys(associadoData).length > 0) {
-        if (updatedUser.associadoId) {
-          // Update existing associado
-          console.log("Updating associado for comprador:", updatedUser.id);
-          await prisma.associado.update({
-            where: { id: updatedUser.associadoId },
-            data: {
-              ...associadoData,
-              updatedAt: new Date()
-            }
-          });
-        } else {
-          // Get the cooperativaId
-          const cooperativaId = updatedUser.cooperativaId;
-
-          if (cooperativaId) {
-            // Create new associado
-            console.log("Creating associado for comprador:", updatedUser.id);
-            const associado = await prisma.associado.create({
-              data: {
-                ...associadoData,
-                nome: updatedUser.name || associadoData.nome || "Comprador",
-                tipo: "COMPRADOR" as AssociadoTipo,
-                cooperativaId: cooperativaId,
-                createdAt: new Date(),
-                updatedAt: new Date()
-              }
-            });
-
-            // Now connect the user to the associado
-            await prisma.usuario.update({
-              where: { id: updatedUser.id },
-              data: {
-                associadoId: associado.id
-              }
-            });
-          }
-        }
-      }
-
-      // Force a reload of updated user with relationships
-      return await fetchCompradorById(updatedUser.id);
+      // No associado model: handle only user update
+      return { data: [updatedUser] };
     } catch (error) {
       console.error("Error updating comprador:", error);
       throw createError({
@@ -244,16 +167,6 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Error deleting comprador",
       });
     }
-  }
-
-  // Helper function to fetch a colaborador by ID
-  async function fetchCompradorById(id: number) {
-    const usuario = await prisma.usuario.findUnique({
-      where: { id },
-      include: { associado: true }
-    });
-
-    return { data: [usuario] };
   }
 
   throw createError({
