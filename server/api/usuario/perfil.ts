@@ -38,10 +38,10 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
 
   const userId = dbUser.id;
 
-  // GET request to fetch user profile
+  // GET request to fetch user profile and preferences
   if (event.method === 'GET') {
     try {
-      // Fetch user profile including optional associations
+      // Fetch user profile including preferences
       const usuario = await prisma.usuario.findUnique({
         where: { id: userId },
         select: {
@@ -49,8 +49,9 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
           email: true,
           celular: true,
           type: true,
-          cooperativaId: true,
-          associadoId: true
+          theme: true,
+          fontSize: true,
+          cooperativaId: true
         }
       })
 
@@ -66,8 +67,9 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
         email: usuario.email || '',
         celular: usuario.celular,
         type: usuario.type,
-        cooperativaId: usuario.cooperativaId,
-        associadoId: usuario.associadoId
+        theme: usuario.theme,
+        fontSize: usuario.fontSize,
+        cooperativaId: usuario.cooperativaId
       }
 
       return {
@@ -83,17 +85,23 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
     }
   }
 
-  // PUT request to update user profile
+  // PUT request to update user profile and preferences
   if (event.method === 'PUT') {
     try {
       const body = await readBody(event) as UsuarioPreferencesDTO
-      const { name, email, celular } = body
+      const { name, email, celular, theme, fontSize } = body
 
-      if (!name || !celular) {
-        return {
-          success: false,
-          message: 'Nome e número de celular são obrigatórios'
-        }
+      // Build update data
+      const updateData: any = {}
+      if (name) updateData.name = name
+      if (email !== undefined) updateData.email = email
+      if (celular) updateData.celular = celular
+      // Validate and include preferences
+      if (theme && ['light', 'dark', 'system'].includes(theme)) {
+        updateData.theme = theme
+      }
+      if (fontSize && ['small', 'medium', 'large', 'xlarge'].includes(fontSize)) {
+        updateData.fontSize = fontSize
       }
 
       // Check if celular already exists for another user
@@ -117,16 +125,14 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
 
       const updatedUser = await prisma.usuario.update({
         where: { id: userId },
-        data: {
-          name,
-          email,
-          celular
-        },
+        data: updateData,
         select: {
           name: true,
           email: true,
           celular: true,
-          type: true
+          type: true,
+          theme: true,
+          fontSize: true
         }
       })
 
@@ -134,7 +140,9 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
         name: updatedUser.name,
         email: updatedUser.email || '',
         celular: updatedUser.celular,
-        type: updatedUser.type
+        type: updatedUser.type,
+        theme: updatedUser.theme,
+        fontSize: updatedUser.fontSize
       }
 
       return {
@@ -155,22 +163,15 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
   if (event.method === 'DELETE') {
     try {
       // Delete associated records first to avoid FK constraint violations
-      // 1. Delete UserPreference
-      await prisma.userPreference.deleteMany({
-        where: { usuarioId: userId }
-      });
-
       // 2. Delete other related records
       await prisma.notificacao.deleteMany({
         where: { usuarioId: userId }
       });
 
-      await prisma.passwordResetToken.deleteMany({
-        where: { usuarioId: userId }
-      });
+      // No password reset tokens to delete (model removed)
 
       await prisma.oferta.deleteMany({
-        where: { userId: userId }
+        where: { usuarioId: userId }
       });
 
       // 3. Check for transactions and delete if exist
@@ -178,7 +179,7 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
         where: {
           OR: [
             { compradorId: userId },
-            { vendedorId: userId }
+            { produtorId: userId }
           ]
         }
       });
@@ -188,7 +189,7 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
           where: {
             OR: [
               { compradorId: userId },
-              { vendedorId: userId }
+              { produtorId: userId }
             ]
           }
         });

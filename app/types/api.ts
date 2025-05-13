@@ -118,9 +118,14 @@ export interface UsuarioDTO {
   email?: string | null;
   celular: string;
   type: UsuarioType;
+  theme: string;
+  fontSize: string;
+  documento?: string | null;
+  endereco?: string | null;
+  cidade?: string | null;
+  cargo?: string | null;
   cooperativaId?: number | null;
-  associadoId?: number | null;
-  colaboradorId?: number | null;
+  estadoId?: number | null;
 }
 
 export interface UsuarioPreferencesDTO {
@@ -128,6 +133,9 @@ export interface UsuarioPreferencesDTO {
   email: string;
   celular?: string;
   type: string;
+  // Preference fields stored in Usuario model
+  theme?: string;
+  fontSize?: string;
   // Optional associations for fetching location
   cooperativaId?: number | null;
   associadoId?: number | null;

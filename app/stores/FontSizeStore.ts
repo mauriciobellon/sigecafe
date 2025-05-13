@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useUsuarioStore } from "~/stores/UserStore";
 
 export type FontSizePreference = "small" | "medium" | "large" | "xlarge";
 
@@ -26,10 +27,8 @@ export const useFontSizeStore = defineStore("FontSize", {
       // If user is authenticated and initialized, save to API
       if (this.initialized) {
         try {
-          await $fetch<UserPreferences>('/api/preferences', {
-            method: 'PUT',
-            body: { fontSize: size }
-          });
+          const userStore = useUsuarioStore();
+          await userStore.updatePreferences({ fontSize: size });
         } catch (error) {
           console.error('Error saving font size preference:', error);
         }
@@ -70,25 +69,23 @@ export const useFontSizeStore = defineStore("FontSize", {
     },
 
     async initFontSize() {
+      const userStore = useUsuarioStore();
       try {
-        // Try to fetch from API first
-        const preferences = await $fetch<UserPreferences>('/api/preferences');
-
-        if (preferences && preferences.fontSize) {
-          this.preference = preferences.fontSize;
+        // Fetch stored preferences from user profile
+        const prefs = await userStore.fetchUsuarioPreferences();
+        if (prefs && prefs.fontSize) {
+          this.preference = prefs.fontSize as FontSizePreference;
         } else if (process.client) {
-          // Otherwise try localStorage
+          // Fallback to localStorage
           const savedPreference = localStorage.getItem("font-size-preference") as FontSizePreference | null;
-
           if (savedPreference && ["small", "medium", "large", "xlarge"].includes(savedPreference)) {
             this.preference = savedPreference;
           }
         }
       } catch (error) {
-        // If API fails, try localStorage
+        // If loading preferences fails, fallback to localStorage
         if (process.client) {
           const savedPreference = localStorage.getItem("font-size-preference") as FontSizePreference | null;
-
           if (savedPreference && ["small", "medium", "large", "xlarge"].includes(savedPreference)) {
             this.preference = savedPreference;
           }
