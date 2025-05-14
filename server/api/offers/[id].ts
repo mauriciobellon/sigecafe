@@ -33,28 +33,27 @@ export default defineEventHandler(async (event) => {
 
     try {
       // Check if offer exists and belongs to user
-      const offerQuery = await prisma.$queryRaw`
-        SELECT * FROM "Oferta"
-        WHERE id = ${offerId} AND status = 'OPEN'
-      `
+      const offer = await prisma.oferta.findFirst({
+        where: {
+          id: offerId,
+          status: 'OPEN'
+        }
+      })
 
-      const offers = offerQuery as any[]
-      console.log('Found offers:', offers)
+      console.log('Found offer:', offer)
 
-      if (offers.length === 0) {
+      if (!offer) {
         throw createError({
           statusCode: 404,
           statusMessage: 'Offer not found or already cancelled/completed'
         })
       }
 
-      const offer = offers[0]
-
       // Check if user is admin/staff or offer belongs to user
       const isAdminOrStaff = userType === 'ADMINISTRADOR' || userType === 'COOPERATIVA' || userType === 'COLABORADOR'
 
-      if (!isAdminOrStaff && offer.userId !== userId) {
-        console.log(`Unauthorized: Offer belongs to user ${offer.userId}, not ${userId}`)
+      if (!isAdminOrStaff && offer.usuarioId !== userId) {
+        console.log(`Unauthorized: Offer belongs to user ${offer.usuarioId}, not ${userId}`)
         throw createError({
           statusCode: 403,
           statusMessage: 'You can only cancel your own offers'
@@ -63,11 +62,13 @@ export default defineEventHandler(async (event) => {
 
       // Cancel the offer
       console.log(`Cancelling offer ${offerId}`)
-      const updateResult = await prisma.$executeRaw`
-        UPDATE "Oferta"
-        SET status = 'CANCELLED', "updatedAt" = NOW()
-        WHERE id = ${offerId}
-      `
+      const updateResult = await prisma.oferta.update({
+        where: { id: offerId },
+        data: {
+          status: 'CANCELLED',
+          updatedAt: new Date()
+        }
+      })
 
       console.log('Update result:', updateResult)
 

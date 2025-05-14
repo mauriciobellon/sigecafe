@@ -1,5 +1,6 @@
 import { getServerSession } from '#auth'
-import { Usuario, UsuarioType } from '@prisma/client'
+import type { Usuario } from '@prisma/client'
+import { UsuarioType } from '@prisma/client'
 import { PermissionRepository } from '@@/server/repositories/PermissionRepository'
 
 export default defineEventHandler(async (event) => {

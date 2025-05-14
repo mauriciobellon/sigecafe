@@ -57,7 +57,23 @@ export class UsuarioRepository {
         return typedUsers;
     }
     async createUsuario(usuario: Partial<Usuario>): Promise<Usuario> {
-        const { email, name, password, celular, type, cooperativaId, associadoId, colaboradorId } = usuario;
+        const {
+            email,
+            name,
+            password,
+            celular,
+            type,
+            cooperativaId,
+            cargo,
+            // Add the missing fields
+            documento,
+            endereco,
+            cidade,
+            estadoId,
+            theme,
+            fontSize
+        } = usuario;
+
         return prisma.usuario.create({
             data: {
                 email,
@@ -66,13 +82,36 @@ export class UsuarioRepository {
                 celular: celular!,
                 type,
                 cooperativaId,
-                associadoId,
-                colaboradorId
+                cargo,
+                // Include the missing fields
+                documento,
+                endereco,
+                cidade,
+                estadoId,
+                // Include optional theme/fontsize if provided
+                ...(theme ? { theme } : {}),
+                ...(fontSize ? { fontSize } : {})
             }
         });
     }
     async updateUsuario(usuario: Partial<Usuario> & { id: number }): Promise<Usuario> {
-        const { id, email, name, password, celular, type, cooperativaId, associadoId, colaboradorId } = usuario;
+        const {
+            id,
+            email,
+            name,
+            password,
+            celular,
+            type,
+            cooperativaId,
+            cargo,
+            // Add missing fields
+            documento,
+            endereco,
+            cidade,
+            estadoId,
+            theme,
+            fontSize
+        } = usuario;
 
         // Get current user data
         const currentUser = await this.getUsuarioById(id);
@@ -94,33 +133,36 @@ export class UsuarioRepository {
         return prisma.usuario.update({
             where: { id },
             data: {
-                // Only update fields that are provided
                 ...(email !== undefined ? { email } : {}),
                 ...(name !== undefined ? { name } : {}),
                 ...(password !== undefined ? { password } : {}),
                 ...(celular !== undefined ? { celular } : {}),
                 ...(type !== undefined ? { type } : {}),
                 ...(cooperativaId !== undefined ? { cooperativaId } : {}),
-                ...(associadoId !== undefined ? { associadoId } : {}),
-                ...(colaboradorId !== undefined ? { colaboradorId } : {})
+                ...(cargo !== undefined ? { cargo } : {}),
+                // Add missing fields
+                ...(documento !== undefined ? { documento } : {}),
+                ...(endereco !== undefined ? { endereco } : {}),
+                ...(cidade !== undefined ? { cidade } : {}),
+                ...(estadoId !== undefined ? { estadoId } : {}),
+                ...(theme !== undefined ? { theme } : {}),
+                ...(fontSize !== undefined ? { fontSize } : {})
             }
         });
     }
     async deleteUsuarioById(id: number): Promise<void> {
-        // First delete associated UserPreference to avoid FK constraint errors
-        await prisma.userPreference.deleteMany({ where: { usuarioId: id } });
+        // Delete related notifications and offers before deleting user
 
         // Then delete other relations that might cause FK constraint errors
         await prisma.notificacao.deleteMany({ where: { usuarioId: id } });
-        await prisma.passwordResetToken.deleteMany({ where: { usuarioId: id } });
-        await prisma.oferta.deleteMany({ where: { userId: id } });
+        await prisma.oferta.deleteMany({ where: { usuarioId: id } });
 
         // Check if user is involved in any transactions
         const transacoes = await prisma.transacao.findMany({
             where: {
                 OR: [
                     { compradorId: id },
-                    { vendedorId: id }
+                    { produtorId: id }
                 ]
             }
         });
@@ -131,7 +173,7 @@ export class UsuarioRepository {
                 where: {
                     OR: [
                         { compradorId: id },
-                        { vendedorId: id }
+                        { produtorId: id }
                     ]
                 }
             });

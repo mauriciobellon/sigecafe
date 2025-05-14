@@ -39,7 +39,8 @@ export default defineEventHandler(async (event): Promise<PermissionDTO[]> => {
 
   const dashboardIndex = filteredLinks.findIndex(p => p.path === "/app");
   if (dashboardIndex !== -1) {
-    const [dashboardPage] = filteredLinks.splice(dashboardIndex, 1);
+    const removed = filteredLinks.splice(dashboardIndex, 1);
+    const dashboardPage = removed[0]!;
     filteredLinks.unshift(dashboardPage);
   }
 

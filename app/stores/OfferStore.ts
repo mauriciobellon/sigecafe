@@ -20,9 +20,11 @@ export const useOfferStore = defineStore('offer', {
       this.loading = true
       this.error = null
       try {
+        // Fetch all offers in a single request
         const res = await $fetch<{ success: boolean; data: OfferBookDTO }>('/api/offers', {
           credentials: 'include'
         })
+
         if (!res.success) throw new Error('Failed to load offers')
         this.bids = res.data.bids
         this.asks = res.data.asks
@@ -32,6 +34,47 @@ export const useOfferStore = defineStore('offer', {
         this.loading = false
       }
     },
+
+    async fetchBids() {
+      this.loading = true
+      this.error = null
+      try {
+        const res = await $fetch<{ success: boolean; data: OfferDTO[] }>('/api/offers', {
+          query: { type: 'bids' },
+          credentials: 'include'
+        })
+
+        if (!res.success) throw new Error('Failed to load buy offers')
+        this.bids = res.data
+        return res.data
+      } catch (err: any) {
+        this.error = err.message || 'Error fetching buy offers'
+        throw err
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async fetchAsks() {
+      this.loading = true
+      this.error = null
+      try {
+        const res = await $fetch<{ success: boolean; data: OfferDTO[] }>('/api/offers', {
+          query: { type: 'asks' },
+          credentials: 'include'
+        })
+
+        if (!res.success) throw new Error('Failed to load sell offers')
+        this.asks = res.data
+        return res.data
+      } catch (err: any) {
+        this.error = err.message || 'Error fetching sell offers'
+        throw err
+      } finally {
+        this.loading = false
+      }
+    },
+
     async createOffer(payload: CreateOfferDTO) {
       this.loading = true
       this.error = null
@@ -46,8 +89,9 @@ export const useOfferStore = defineStore('offer', {
           throw new Error(res.message || 'Falha ao criar oferta')
         }
 
-        // Refresh book
+        // Refresh offers list
         await this.fetchOffers()
+        return res.data
       } catch (err: any) {
         console.error('Erro criando oferta:', err)
         // Handle different types of errors
@@ -63,6 +107,7 @@ export const useOfferStore = defineStore('offer', {
         this.loading = false
       }
     },
+
     async cancelOffer(offerId: number) {
       this.loading = true
       this.error = null
@@ -72,7 +117,8 @@ export const useOfferStore = defineStore('offer', {
           credentials: 'include'
         })
         if (!res.success) throw new Error('Failed to cancel offer')
-        // Refresh book
+
+        // Refresh offers list
         await this.fetchOffers()
       } catch (err: any) {
         this.error = err.message || 'Error canceling offer'

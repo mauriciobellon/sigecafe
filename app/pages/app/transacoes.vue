@@ -2,10 +2,6 @@
   <div>
     <AppPage>
       <UiCard class="mt-10">
-        <UiCardHeader>
-          <UiCardTitle>Transações</UiCardTitle>
-          <UiCardDescription>Gerencie suas transações de compra e venda de café.</UiCardDescription>
-        </UiCardHeader>
         <UiCardContent>
           <UiGenericDatatable model="transacao" :columns="columns" />
         </UiCardContent>
@@ -33,32 +29,34 @@ const columns = [
   {
     label: "Comprador",
     field: "comprador.name",
-    type: "text"
+    type: "relation",
+    relationEndpoint: "/api/comprador",
+    relationLabel: "name",
+    relationValue: "id"
   },
   {
-    label: "Vendedor",
-    field: "vendedor.name",
-    type: "text"
+    label: "Produtor",
+    field: "produtor.name",
+    type: "relation",
+    relationEndpoint: "/api/produtor",
+    relationLabel: "name",
+    relationValue: "id"
   },
   {
-    label: "Quantidade",
+    label: "Qtd",
     field: "quantidade",
     type: "number"
   },
   {
-    label: "Preço Unitário",
+    label: "Unitário",
     field: "precoUnitario",
-    type: "money"
-  },
-  {
-    label: "Valor Total",
-    field: "valorTotal",
     type: "money"
   },
   {
     label: "Status",
     field: "status",
     type: "status",
+    width: "80px",
     statusOptions: [
       { label: "Pendente", value: "PENDENTE" },
       { label: "Concluída", value: "CONCLUIDA" },

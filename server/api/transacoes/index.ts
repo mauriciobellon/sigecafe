@@ -1,43 +1,34 @@
+import { defineEventHandler, readBody, createError } from 'h3'
 import { getServerSession } from '#auth'
-import { PrismaClient, UsuarioType, TransacaoStatus } from '@prisma/client'
-import type { TransacaoDTO, CreateTransacaoDTO } from '~/types/api'
+import { TransacaoRepository } from '@@/server/repositories/TransacaoRepository'
+import type { CreateTransacaoDTO, TransacaoFilterDTO } from '~/types/api'
+import { getQuery } from 'h3'
 
-const prisma = new PrismaClient()
+const repo = new TransacaoRepository()
 
 export default defineEventHandler(async (event) => {
-  // Verificar autenticação
   const session = await getServerSession(event)
-  if (!session || !session.user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Você precisa estar autenticado para acessar esta funcionalidade',
-    })
+  if (!session?.user) {
+    throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
   }
-
-  // Buscar o usuário pelo email (considerando que o email é usado como login)
-  const usuario = await prisma.usuario.findFirst({
-    where: { email: session.user.email }
-  })
-
-  if (!usuario) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Usuário não encontrado',
-    })
+  if (event.method === 'GET') {
+    const q = getQuery(event)
+    const filters: TransacaoFilterDTO = {
+      page: q.page ? Number(q.page) : undefined,
+      limit: q.limit ? Number(q.limit) : undefined,
+      compradorId: q.compradorId ? Number(q.compradorId) : undefined,
+      produtorId: q.produtorId ? Number(q.produtorId) : undefined,
+      status: q.status as any,
+      dataInicio: q.dataInicio ? new Date(q.dataInicio as string) : undefined,
+      dataFim: q.dataFim ? new Date(q.dataFim as string) : undefined,
+    }
+    return await repo.findAll(filters)
   }
-
-  // Processar as requisições de acordo com o método
-  switch (event.method) {
-    case 'GET':
-      return handleGetTransacoes(usuario.id)
-    case 'POST':
-      return handleCreateTransacao(event, usuario.id)
-    default:
-      throw createError({
-        statusCode: 405,
-        statusMessage: 'Método não permitido',
-      })
+  if (event.method === 'POST') {
+    const body = await readBody<CreateTransacaoDTO>(event)
+    return await repo.create(body)
   }
+  throw createError({ statusCode: 405, statusMessage: 'Method Not Allowed' })
 })
 
 // Interface para tipagem das transações com informações de usuários
@@ -46,17 +37,12 @@ interface TransacaoWithUsers {
   data: Date;
   quantidade: number;
   precoUnitario: number;
-  valorTotal: number;
   status: TransacaoStatus;
   observacoes: string | null;
   compradorId: number;
-  vendedorId: number;
-  comprador: {
-    name: string;
-  };
-  vendedor: {
-    name: string;
-  };
+  produtorId: number;
+  comprador: { name: string };
+  produtor: { name: string };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -80,20 +66,10 @@ async function handleGetTransacoes(usuarioId: number): Promise<TransacaoDTO[]> {
     // Se não, buscar apenas as transações onde o usuário é comprador ou vendedor
     const transacoes = await prisma.transacao.findMany({
       where: usuario.type === UsuarioType.ADMINISTRADOR
-        ? {}  // Sem filtros para administrador
-        : {
-            OR: [
-              { compradorId: usuarioId },
-              { vendedorId: usuarioId },
-            ],
-          },
-      include: {
-        comprador: true,
-        vendedor: true,
-      },
-      orderBy: {
-        data: 'desc',
-      },
+        ? {}
+        : { OR: [ { compradorId: usuarioId }, { produtorId: usuarioId } ] },
+      include: { comprador: true, produtor: true },
+      orderBy: { data: 'desc' },
     }) as TransacaoWithUsers[]
 
     // Formatar as transações para o frontend
@@ -102,11 +78,10 @@ async function handleGetTransacoes(usuarioId: number): Promise<TransacaoDTO[]> {
       data: t.data,
       comprador: t.comprador.name,
       compradorId: t.compradorId,
-      vendedor: t.vendedor.name,
-      vendedorId: t.vendedorId,
+      produtor: t.produtor.name,
+      produtorId: t.produtorId,
       quantidade: t.quantidade,
       precoUnitario: t.precoUnitario,
-      valorTotal: t.valorTotal,
       status: t.status,
       observacoes: t.observacoes || '',
       createdAt: t.createdAt,
@@ -134,12 +109,9 @@ async function handleCreateTransacao(event: any, usuarioId: number): Promise<Tra
       })
     }
 
-    // Verificar se os IDs do comprador e vendedor foram fornecidos
-    if (!body.compradorId || !body.vendedorId) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'IDs do comprador e vendedor são obrigatórios',
-      })
+    // Verificar se os IDs do comprador e produtor foram fornecidos
+    if (!body.compradorId || !body.produtorId) {
+      throw createError({ statusCode: 400, statusMessage: 'IDs do comprador e produtor são obrigatórios' })
     }
 
     // Criar a transação
@@ -147,25 +119,13 @@ async function handleCreateTransacao(event: any, usuarioId: number): Promise<Tra
       data: {
         quantidade: body.quantidade,
         precoUnitario: body.precoUnitario,
-        valorTotal: body.valorTotal,
         data: new Date(body.data),
         status: body.status as TransacaoStatus,
         observacoes: body.observacoes,
-        comprador: {
-          connect: {
-            id: body.compradorId,
-          },
-        },
-        vendedor: {
-          connect: {
-            id: body.vendedorId,
-          },
-        },
+        comprador: { connect: { id: body.compradorId } },
+        produtor: { connect: { id: body.produtorId } },
       },
-      include: {
-        comprador: true,
-        vendedor: true,
-      },
+      include: { comprador: true, produtor: true },
     }) as TransacaoWithUsers
 
     // Retornar a transação formatada
@@ -174,11 +134,10 @@ async function handleCreateTransacao(event: any, usuarioId: number): Promise<Tra
       data: transacao.data,
       comprador: transacao.comprador.name,
       compradorId: transacao.compradorId,
-      vendedor: transacao.vendedor.name,
-      vendedorId: transacao.vendedorId,
+      produtor: transacao.produtor.name,
+      produtorId: transacao.produtorId,
       quantidade: transacao.quantidade,
       precoUnitario: transacao.precoUnitario,
-      valorTotal: transacao.valorTotal,
       status: transacao.status,
       observacoes: transacao.observacoes || '',
       createdAt: transacao.createdAt,

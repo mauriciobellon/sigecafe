@@ -1,5 +1,6 @@
 import { getServerSession } from '#auth'
-import { PrismaClient, Usuario, UsuarioType } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
+import type { Usuario, UsuarioType } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -67,28 +68,8 @@ async function getUserDetails(userId: number) {
       celular: true,
       type: true,
       cooperativaId: true,
-      cooperativa: {
-        select: {
-          id: true,
-          nome: true
-        }
-      },
-      associadoId: true,
-      associado: {
-        select: {
-          id: true,
-          nome: true,
-          tipo: true
-        }
-      },
-      colaboradorId: true,
-      colaborador: {
-        select: {
-          id: true,
-          nome: true,
-          cargo: true
-        }
-      }
+      cooperativa: { select: { id: true, nome: true } }
+      // associado and colaborador removed
     }
   })
 
@@ -107,21 +88,15 @@ async function getUserDetails(userId: number) {
     type: user.type,
     roleLabel: formatRoleLabel(user.type),
     cooperativa: user.cooperativa?.nome,
-    cooperativaId: user.cooperativaId,
-    associado: user.associado?.nome,
-    associadoId: user.associadoId,
-    associadoTipo: user.associado?.tipo,
-    colaborador: user.colaborador?.nome,
-    colaboradorId: user.colaboradorId,
-    colaboradorCargo: user.colaborador?.cargo
+    cooperativaId: user.cooperativaId
+    // associado and colaborador fields removed
   }
 }
 
 interface UpdateRoleDTO {
   type: UsuarioType;
   cooperativaId?: number | null;
-  associadoId?: number | null;
-  colaboradorId?: number | null;
+  // associadoId and colaboradorId removed
 }
 
 async function updateUserRole(userId: number, data: UpdateRoleDTO) {
@@ -148,28 +123,15 @@ async function updateUserRole(userId: number, data: UpdateRoleDTO) {
     })
   }
 
-  if (newType === UsuarioType.PRODUTOR && !data.associadoId) {
-    throw createError({
-      statusCode: 400,
-      message: 'É necessário fornecer um associado produtor para usuários do tipo PRODUTOR'
-    })
-  }
-
-  if (newType === UsuarioType.COMPRADOR && !data.associadoId) {
-    throw createError({
-      statusCode: 400,
-      message: 'É necessário fornecer um associado comprador para usuários do tipo COMPRADOR'
-    })
-  }
+  // Removal of associado/comprador role validation
 
   // Atualizar o usuário com o novo papel/função
   const updatedUser = await prisma.usuario.update({
     where: { id: userId },
     data: {
       type: data.type,
-      cooperativaId: data.cooperativaId,
-      associadoId: data.associadoId,
-      colaboradorId: data.colaboradorId
+      cooperativaId: data.cooperativaId
+      // associadoId and colaboradorId removed
     },
     select: {
       id: true,
@@ -183,20 +145,7 @@ async function updateUserRole(userId: number, data: UpdateRoleDTO) {
           nome: true
         }
       },
-      associadoId: true,
-      associado: {
-        select: {
-          nome: true,
-          tipo: true
-        }
-      },
-      colaboradorId: true,
-      colaborador: {
-        select: {
-          nome: true,
-          cargo: true
-        }
-      }
+      // associado and colaborador selects removed
     }
   })
 
@@ -211,13 +160,8 @@ async function updateUserRole(userId: number, data: UpdateRoleDTO) {
       type: updatedUser.type,
       roleLabel: formatRoleLabel(updatedUser.type),
       cooperativa: updatedUser.cooperativa?.nome,
-      cooperativaId: updatedUser.cooperativaId,
-      associado: updatedUser.associado?.nome,
-      associadoId: updatedUser.associadoId,
-      associadoTipo: updatedUser.associado?.tipo,
-      colaborador: updatedUser.colaborador?.nome,
-      colaboradorId: updatedUser.colaboradorId,
-      colaboradorCargo: updatedUser.colaborador?.cargo
+      cooperativaId: updatedUser.cooperativaId
+      // associado and colaborador removed from response
     }
   }
 }

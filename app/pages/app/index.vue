@@ -146,27 +146,15 @@
   async function fetchCidadeInfo() {
     console.log('Fetching location data...');
     try {
-      const { associadoId, cooperativaId } = usuario.value || {};
-      console.log('User data:', { associadoId, cooperativaId });
+      const { cooperativaId, cidade: userCidade, estadoId } = usuario.value || {};
+      console.log('User data:', { cooperativaId, cidade: userCidade, estadoId });
 
-      // Try to get associado location first
-      if (associadoId) {
-        try {
-          console.log('Fetching associado data...');
-          const res = await fetch(`/api/associado/${associadoId}`, { credentials: 'include' });
-          if (res.ok) {
-            const json = await res.json();
-            console.log('Received associado data:', json);
-            if (json.success && json.data && json.data.cidade) {
-              cidade.value = json.data.cidade;
-              console.log('Updated city to:', cidade.value, 'from associado');
-              localStorage.setItem('userCidade', cidade.value);
-              return;
-            }
-          }
-        } catch (e) {
-          console.error('Error fetching associado data:', e);
-        }
+      // Check if user already has cidade information
+      if (userCidade) {
+        cidade.value = userCidade;
+        console.log('Updated city to:', cidade.value, 'from user data');
+        localStorage.setItem('userCidade', cidade.value);
+        return;
       }
       // Try cooperativa if no city from associado
       if (cooperativaId) {

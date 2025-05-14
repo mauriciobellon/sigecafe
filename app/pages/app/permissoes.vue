@@ -269,9 +269,9 @@ async function updateUserRole(): Promise<void> {
 
   try {
     const userId = selectedUser.value.id;
-    await $fetch(`/api/permissoes/usuario/${userId}/role`, {
+    await $fetch(`/api/permissoes/usuario/${userId}`, {
       method: 'PUT',
-      body: { role: selectedRole.value },
+      body: { type: selectedRole.value },
       credentials: 'include'
     });
 

@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import type { WeatherDataDTO } from '~/types/api';
-import { useUsuarioStore } from './UserStore';
 import { useCooperativaStore } from './CooperativaStore';
 
 interface WeatherState {
@@ -32,50 +31,18 @@ export const useWeatherStore = defineStore('weather', {
       this.error = null;
 
       try {
-        // Determine user location: check associado -> cooperativa -> fallback to São Paulo
-        const usuarioStore = useUsuarioStore();
-        await usuarioStore.fetchUsuarioPreferences();
-        const { associadoId, cooperativaId } = usuarioStore.usuarioPreferences || {};
+        // Determine user location from cooperativa; fallback to São Paulo
+        const coopStore = useCooperativaStore();
+        await coopStore.fetchCooperativa();
 
         let latitude = -23.55;
         let longitude = -46.64;
-        let city: string | undefined;
-        let state: string | undefined;
-
-        // Try to get associado location
-        if (associadoId) {
-          try {
-            const res = await fetch(`/api/associado/${associadoId}`, { credentials: 'include' });
-            if (res.ok) {
-              const json = await res.json();
-              if (json.success && json.data) {
-                city = json.data.cidade || undefined;
-                state = json.data.estado || undefined;
-                console.log(`[weather] Found associado location city=${city}, state=${state}`);
-              }
-            }
-          } catch (e) {
-            console.error('[weather] Error fetching associado for location:', e);
-          }
-        }
-
-        // Try cooperativa if no city from associado
-        if (!city && cooperativaId) {
-          const coopStore = useCooperativaStore();
-          try {
-            await coopStore.fetchCooperativa();
-            if (coopStore.cooperativa) {
-              city = coopStore.cooperativa.cidade || undefined;
-              state = coopStore.cooperativa.estado || undefined;
-              console.log(`[weather] Found cooperativa location city=${city}, state=${state}`);
-            }
-          } catch (e) {
-            console.error('[weather] Error fetching cooperativa for location:', e);
-          }
-        }
+        const city: string | undefined = coopStore.cooperativa?.cidade || undefined;
+        const state: string | undefined = coopStore.cooperativa?.estado || undefined;
+        console.log(`[weather] Using cooperativa location city=${city}, state=${state}`);
 
         // Geocode city if available
-        if (city) {
+        if (city && state) {
           try {
             const query = encodeURIComponent(city) + (state ? `,%20${encodeURIComponent(state)}` : '');
             const geoRes = await fetch(

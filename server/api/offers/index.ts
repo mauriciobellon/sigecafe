@@ -1,7 +1,8 @@
-import { defineEventHandler, readBody, createError } from 'h3'
+import { defineEventHandler, readBody, createError, getQuery } from 'h3'
 import { getServerSession } from '#auth'
-import prisma from '@@/lib/prisma'
+import { OfertaRepository } from '~~/server/repositories/OfertaRepository'
 import type { OfferDTO, CreateOfferDTO, OfferBookDTO, UsuarioDTO } from '~/types/api'
+import prisma from '@@/lib/prisma';
 
 export default defineEventHandler(async (event) => {
   // Authenticate user
@@ -21,81 +22,89 @@ export default defineEventHandler(async (event) => {
 
   const userId = user.id
 
-  // Fetch associado type to enforce side
-  let associadoType: string | null = null
-  if (user.associadoId) {
-    const assoc = await prisma.associado.findUnique({
-      where: { id: user.associadoId }
-    })
-    associadoType = assoc?.tipo ?? null
-  }
+  // Initialize repository
+  const ofertaRepository = new OfertaRepository()
 
   if (event.method === 'GET') {
-    // Get open buy offers (bids) and sell offers (asks)
     try {
-      const bidsRaw = await prisma.$queryRaw`
-        SELECT o.*, u.name
-        FROM "Oferta" o
-        JOIN "Usuario" u ON o."userId" = u.id
-        WHERE o.status = 'OPEN' AND o.side = 'BUY'
-        ORDER BY o.price DESC
-      `
+      const query = getQuery(event)
+      const type = query.type as string
 
-      const asksRaw = await prisma.$queryRaw`
-        SELECT o.*, u.name
-        FROM "Oferta" o
-        JOIN "Usuario" u ON o."userId" = u.id
-        WHERE o.status = 'OPEN' AND o.side = 'SELL'
-        ORDER BY o.price DESC
-      `
+      // If specific type is requested (bids or asks), return just that type
+      if (type === 'bids') {
+        const bids = await ofertaRepository.getBids()
+        return { success: true, data: bids }
+      } else if (type === 'asks') {
+        const asks = await ofertaRepository.getAsks()
+        return { success: true, data: asks }
+      }
 
-      const bids: OfferDTO[] = (bidsRaw as any[]).map((o) => ({
-        id: o.id,
-        userId: o.userId,
-        user: o.name,
-        side: o.side,
-        price: o.price,
-        quantity: o.quantity,
-        status: o.status,
-        createdAt: o.createdAt
-      }))
-
-      const asks: OfferDTO[] = (asksRaw as any[]).map((o) => ({
-        id: o.id,
-        userId: o.userId,
-        user: o.name,
-        side: o.side,
-        price: o.price,
-        quantity: o.quantity,
-        status: o.status,
-        createdAt: o.createdAt
-      }))
+      // Default: return both in the book format
+      const [bids, asks] = await Promise.all([
+        ofertaRepository.getBids(),
+        ofertaRepository.getAsks()
+      ])
 
       const book: OfferBookDTO = { bids, asks }
       return { success: true, data: book }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching offers:', error)
-      throw createError({ statusCode: 500, statusMessage: 'Failed to fetch offers' })
+      throw createError({
+        statusCode: 500,
+        statusMessage: `Failed to fetch offers: ${error.message || 'Unknown error'}`
+      })
     }
   }
 
   if (event.method === 'POST') {
     try {
-      const body = await readBody<CreateOfferDTO>(event)
+      const body = await readBody(event)
 
-      console.log('Received offer creation request:', {
-        userId,
-        ...body,
-        associadoType
-      })
+      console.log('Received offer creation request:', { userId, ...body })
 
-      const { side, price, quantity } = body
+      // Extract data from body, handling potential missing fields
+      let { side, price, quantity, usuarioId } = body
 
-      if (!side || price == null || quantity == null) {
-        throw createError({ statusCode: 400, statusMessage: 'Missing offer parameters' })
+      // If usuarioId is provided AND user is admin/staff, we need to handle it differently
+      // This is likely a case where an admin is creating an offer on behalf of another user
+      let targetUserId = userId;
+      let targetUserType = user.type;
+
+      const isAdminOrStaff = user.type === 'ADMINISTRADOR' || user.type === 'COOPERATIVA' || user.type === 'COLABORADOR';
+
+      if (isAdminOrStaff && usuarioId && usuarioId !== userId) {
+        // Admin is creating an offer for another user, look up that user's type
+        const targetUser = await prisma.usuario.findUnique({
+          where: { id: usuarioId }
+        });
+
+        if (!targetUser) {
+          throw createError({ statusCode: 400, statusMessage: 'Target user not found' });
+        }
+
+        targetUserId = targetUser.id;
+        targetUserType = targetUser.type;
+
+        // For admin creating offers for others, if side is not specified, determine it based on target user type
+        if (!side) {
+          if (targetUser.type === 'PRODUTOR') {
+            side = 'SELL';
+          } else if (targetUser.type === 'COMPRADOR') {
+            side = 'BUY';
+          } else {
+            throw createError({
+              statusCode: 400,
+              statusMessage: 'Cannot determine appropriate side for this user type'
+            });
+          }
+        }
       }
 
       // Validate price and quantity
+      if (price == null || quantity == null) {
+        throw createError({ statusCode: 400, statusMessage: 'Missing price or quantity parameters' })
+      }
+
       if (price <= 0) {
         throw createError({ statusCode: 400, statusMessage: 'Price must be greater than 0' })
       }
@@ -104,59 +113,44 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, statusMessage: 'Quantity must be greater than 0' })
       }
 
+      // If side is not provided (and not already determined above for admin+usuarioId case)
+      if (!side) {
+        if (targetUserType === 'PRODUTOR') {
+          side = 'SELL';
+        } else if (targetUserType === 'COMPRADOR') {
+          side = 'BUY';
+        } else if (isAdminOrStaff) {
+          // For admin and staff users creating offers for themselves, we require the side parameter
+          throw createError({
+            statusCode: 400,
+            statusMessage: 'Admin and staff users must specify the side (BUY or SELL) parameter when creating offers for themselves'
+          });
+        } else {
+          // For any other user type
+          throw createError({
+            statusCode: 400,
+            statusMessage: 'Unknown user type or missing side parameter'
+          });
+        }
+      }
+
       // Enforce role-based side: PRODUTOR only SELL, COMPRADOR only BUY
-      if (associadoType === 'PRODUTOR' && side !== 'SELL') {
-        throw createError({ statusCode: 403, statusMessage: 'Produtor users can only place sell offers' })
-      }
-      if (associadoType === 'COMPRADOR' && side !== 'BUY') {
-        throw createError({ statusCode: 403, statusMessage: 'Comprador users can only place buy offers' })
-      }
-
-      // Try a simpler insertion
-      const now = new Date()
-
-      // Direct insert using raw SQL
-      try {
-        const insertSQL = `
-          INSERT INTO "Oferta" ("userId", "side", "price", "quantity", "status", "createdAt", "updatedAt")
-          VALUES ($1, $2::text::"OfferSide", $3, $4, 'OPEN', $5, $6)
-        `;
-
-        await prisma.$executeRawUnsafe(
-          insertSQL,
-          userId,
-          side,
-          price,
-          Math.floor(quantity),
-          now,
-          now
-        );
-
-        console.log('Insert successful');
-      } catch (sqlError: any) {
-        console.error('SQL Error:', sqlError);
-        throw new Error(`SQL Error: ${sqlError.message || 'Unknown database error'}`);
+      // Skip this check for admin/staff users when they're creating offers for other users
+      if (!isAdminOrStaff || targetUserId === userId) {
+        if (targetUserType === 'PRODUTOR' && side !== 'SELL') {
+          throw createError({ statusCode: 403, statusMessage: 'Produtor users can only place sell offers' })
+        }
+        if (targetUserType === 'COMPRADOR' && side !== 'BUY') {
+          throw createError({ statusCode: 403, statusMessage: 'Comprador users can only place buy offers' })
+        }
       }
 
-      // Get the user name for the response
-      const userName = user.name;
-
-      // Create a response object - use a new object since we may not be able to get the created record back
-      const offerResponse: OfferDTO = {
-        id: 0, // We don't know the actual ID, but the client will refresh
-        userId: userId,
-        user: userName,
-        side: side,
-        price: price,
-        quantity: quantity,
-        status: 'OPEN',
-        createdAt: now
-      }
+      // Create the offer
+      const newOffer = await ofertaRepository.createOffer(targetUserId, { side, price, quantity })
 
       return {
         success: true,
-        message: 'Offer created successfully',
-        data: offerResponse
+        data: newOffer
       }
     } catch (error: any) {
       console.error('Error creating offer:', error)
@@ -173,8 +167,8 @@ export default defineEventHandler(async (event) => {
       console.error('Error details:', errorDetails)
 
       throw createError({
-        statusCode: 500,
-        statusMessage: `Failed to create offer: ${errorMessage}`
+        statusCode: error.statusCode || 500,
+        statusMessage: error.statusMessage || `Failed to create offer: ${errorMessage}`
       })
     }
   }

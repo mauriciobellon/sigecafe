@@ -54,6 +54,30 @@ export const useUsuarioStore = defineStore("usuario", {
       }
     },
 
+    async updatePreferences(preferences: { theme?: string; fontSize?: string }) {
+      try {
+        this.loading = true;
+        const response = await $fetch<AuthResponseDTO>("/api/usuario/perfil", {
+          method: "PUT",
+          credentials: "include",
+          body: preferences
+        });
+        if (!response.success) {
+          throw new Error(response.message || 'Erro ao atualizar preferências');
+        }
+        this.usuarioPreferences = {
+          ...this.usuarioPreferences,
+          ...response.data
+        } as UsuarioPreferencesDTO;
+        return response.data;
+      } catch (err: any) {
+        this.error = err.message || 'Erro ao atualizar preferências';
+        throw err;
+      } finally {
+        this.loading = false;
+      }
+    },
+
     clearStore() {
       this.usuarioPreferences = null;
       this.error = null;

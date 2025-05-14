@@ -27,13 +27,18 @@ const columns = [
     type: "text"
   },
   {
+    label: "Email",
+    field: "email",
+    type: "text"
+  },
+  {
     label: "Celular",
     field: "celular",
     type: "phone"
   },
   {
     label: "Cargo",
-    field: "colaborador.cargo",
+    field: "cargo",
     type: "text"
   }
 ];

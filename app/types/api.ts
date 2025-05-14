@@ -11,15 +11,14 @@ export interface PermissionDTO {
 }
 
 export interface TransacaoDTO {
-  id: string;
+  id: number;
   data: Date;
   comprador: string;
   compradorId: number;
-  vendedor: string;
-  vendedorId: number;
+  produtor: string;
+  produtorId: number;
   quantidade: number;
   precoUnitario: number;
-  valorTotal: number;
   status: 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA';
   observacoes: string | null;
   createdAt: Date;
@@ -29,19 +28,17 @@ export interface TransacaoDTO {
 export interface CreateTransacaoDTO {
   quantidade: number;
   precoUnitario: number;
-  valorTotal: number;
   data: Date;
   status: 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA';
   observacoes?: string | null;
   compradorId: number;
-  vendedorId: number;
+  produtorId: number;
 }
 
 export interface UpdateTransacaoDTO {
-  id: string;
+  id: number;
   quantidade?: number;
   precoUnitario?: number;
-  valorTotal?: number;
   data?: Date;
   status?: 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA';
   observacoes?: string | null;
@@ -49,7 +46,7 @@ export interface UpdateTransacaoDTO {
 
 export interface TransacaoFilterDTO {
   compradorId?: number;
-  vendedorId?: number;
+  produtorId?: number;
   status?: 'PENDENTE' | 'CONCLUIDA' | 'CANCELADA';
   dataInicio?: Date;
   dataFim?: Date;
@@ -118,9 +115,14 @@ export interface UsuarioDTO {
   email?: string | null;
   celular: string;
   type: UsuarioType;
+  theme: string;
+  fontSize: string;
+  documento?: string | null;
+  endereco?: string | null;
+  cidade?: string | null;
+  cargo?: string | null;
   cooperativaId?: number | null;
-  associadoId?: number | null;
-  colaboradorId?: number | null;
+  estadoId?: number | null;
 }
 
 export interface UsuarioPreferencesDTO {
@@ -128,9 +130,14 @@ export interface UsuarioPreferencesDTO {
   email: string;
   celular?: string;
   type: string;
-  // Optional associations for fetching location
+  // Preference fields stored in Usuario model
+  theme?: string;
+  fontSize?: string;
+  // Associations and location data
   cooperativaId?: number | null;
-  associadoId?: number | null;
+  estadoId?: number | null;
+  cidade?: string | null;
+  endereco?: string | null;
 }
 
 export interface LoginDTO {
@@ -165,13 +172,18 @@ export interface WeatherDataDTO {
 // Order book offer types
 export interface OfferDTO {
   id: number;
-  userId: number;
+  userId: number; // actually usuarioId in the database
   user: string; // user name
   side: 'BUY' | 'SELL';
   price: number;
   quantity: number;
   status: 'OPEN' | 'FILLED' | 'CANCELLED';
   createdAt: Date;
+  usuario?: {
+    id: number;
+    name: string;
+    type: string;
+  };
 }
 
 export interface CreateOfferDTO {
@@ -185,22 +197,7 @@ export interface OfferBookDTO {
   asks: OfferDTO[];
 }
 
-// Password recovery related DTOs
-export interface PasswordRecoveryRequestDTO {
-  celular: string;
-}
-
-export interface PasswordResetRequestDTO {
-  token: string;
-  password: string;
-}
-
-export interface PasswordTokenDTO {
-  token: string;
-  userId: number;
-  createdAt: Date;
-  expiresAt: Date;
-}
+// Password recovery endpoints removed (schema no longer supports PasswordResetToken)
 
 // Associado-related DTOs
 export interface AssociadoCreateDTO {

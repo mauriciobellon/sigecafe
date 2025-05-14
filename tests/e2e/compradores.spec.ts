@@ -31,15 +31,13 @@ async function setupTestUser(): Promise<number | null> {
       console.log(`Deleting existing test user: ${existingUser.id}`);
 
       // Delete related records
-      await prisma.userPreference.deleteMany({ where: { usuarioId: existingUser.id } });
       await prisma.notificacao.deleteMany({ where: { usuarioId: existingUser.id } });
-      await prisma.passwordResetToken.deleteMany({ where: { usuarioId: existingUser.id } });
-      await prisma.oferta.deleteMany({ where: { userId: existingUser.id } });
+      await prisma.oferta.deleteMany({ where: { usuarioId: existingUser.id } });
       await prisma.transacao.deleteMany({
         where: {
           OR: [
             { compradorId: existingUser.id },
-            { vendedorId: existingUser.id }
+            { produtorId: existingUser.id }
           ]
         }
       });
@@ -78,15 +76,13 @@ async function cleanupTestUser(userId: number | null): Promise<void> {
     console.log(`Cleaning up test user ID: ${userId}`);
 
     // Delete related records
-    await prisma.userPreference.deleteMany({ where: { usuarioId: userId } });
     await prisma.notificacao.deleteMany({ where: { usuarioId: userId } });
-    await prisma.passwordResetToken.deleteMany({ where: { usuarioId: userId } });
-    await prisma.oferta.deleteMany({ where: { userId: userId } });
+    await prisma.oferta.deleteMany({ where: { usuarioId: userId } });
     await prisma.transacao.deleteMany({
       where: {
         OR: [
           { compradorId: userId },
-          { vendedorId: userId }
+          { produtorId: userId }
         ]
       }
     });

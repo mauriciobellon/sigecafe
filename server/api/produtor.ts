@@ -12,18 +12,21 @@ function normalizePhoneNumber(phone: string): string {
 
 export default defineEventHandler(async (event) => {
   const session = await getServerSession(event);
-  const user = session?.user as Usuario | undefined;
-  if (!user) {
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
+  if (!session) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+    });
   }
-  console.log("Session user:", user.name);
+
+  console.log("Session user:", session.user?.name);
 
   const method = event.method;
 
   // GET - Fetch all colaboradores
   if (method === "GET") {
     try {
-      const currentUser = user;
+      const currentUser = session.user as Usuario;
 
       // If no user, return an empty list
       if (!currentUser) {
@@ -51,21 +54,36 @@ export default defineEventHandler(async (event) => {
         return [];
       }
 
-      console.log("Fetching colaboradores for cooperativa:", cooperativaId);
+      console.log("Fetching produtores for cooperativa:", cooperativaId);
 
-      // Adjust the way we fetch colaboradores - now get actual colaboradores with their users
-      const colaboradores = await prisma.usuario.findMany({
-        where: { type: "COLABORADOR" as UsuarioType, cooperativaId }
+      // Adjust the way we fetch produtores - now get actual produtores with their users
+      const produtores = await prisma.usuario.findMany({
+        where: {
+          type: "PRODUTOR" as UsuarioType,
+          cooperativaId: cooperativaId
+        },
+        include: {
+          estado: {
+            select: {
+              id: true,
+              nome: true,
+              sigla: true
+            }
+          }
+        }
       });
 
-      console.log("Fetched colaboradores:", colaboradores.length);
+      console.log("Produtor API: Data structure example:",
+        produtores.length > 0 ? JSON.stringify(produtores[0], null, 2) : "No producers found");
 
-      return { data: colaboradores };
+      console.log("Fetched produtores:", produtores.length);
+
+      return { data: produtores };
     } catch (error) {
-      console.error("Error fetching colaboradores:", error);
+      console.error("Error fetching produtores:", error);
       throw createError({
         statusCode: 500,
-        statusMessage: "Error fetching colaboradores",
+        statusMessage: "Error fetching produtores",
       });
     }
   }
@@ -76,38 +94,48 @@ export default defineEventHandler(async (event) => {
       const body = await readBody(event);
       const currentUser = session.user as Usuario;
 
+      console.log("Creating producer with data:", JSON.stringify(body, null, 2));
+
       // Normalize phone if present
       if (body.celular) {
         body.celular = normalizePhoneNumber(body.celular);
       }
 
-      // Set the colaborador type and associate with the admin's cooperativa
-      body.type = "COLABORADOR";
+      // Set the produtor type and associate with the admin's cooperativa
+      body.type = "PRODUTOR";
 
-      // If the current user has a cooperativaId, assign the same to the new colaborador
+      // If the current user has a cooperativaId, assign the same to the new comprador
       if (currentUser && currentUser.cooperativaId) {
         body.cooperativaId = currentUser.cooperativaId;
-      } else {
-        throw createError({
-          statusCode: 400,
-          statusMessage: "Current user doesn't have a cooperativa assigned",
-        });
       }
 
       // Ensure password is provided
       if (!body.password) {
         body.password = 'password'; // Set a default password if none provided
-        console.log("Setting default password for new colaborador");
+        console.log("Setting default password for new produtor");
       }
 
-      // Create the Usuario with colaborador type and cargo
+      // Log important fields
+      console.log("Producer fields being sent:", {
+        name: body.name,
+        email: body.email,
+        celular: body.celular,
+        documento: body.documento,
+        endereco: body.endereco,
+        cidade: body.cidade,
+        estadoId: body.estadoId
+      });
+
+      // Create the usuario first
       const newUser = await repository.createUsuario(body);
+
+      // No associado model: user creation complete
       return { data: [newUser] };
     } catch (error) {
-      console.error("Error creating colaborador:", error);
+      console.error("Error creating produtor:", error);
       throw createError({
         statusCode: 500,
-        statusMessage: "Error creating colaborador",
+        statusMessage: "Error creating produtor",
       });
     }
   }
@@ -116,6 +144,8 @@ export default defineEventHandler(async (event) => {
   if (method === "PUT") {
     try {
       const body = await readBody(event);
+
+      console.log("Updating producer with data:", JSON.stringify(body, null, 2));
 
       if (!body.id) {
         throw createError({
@@ -129,19 +159,33 @@ export default defineEventHandler(async (event) => {
         body.celular = normalizePhoneNumber(body.celular);
       }
 
-      // Update the Usuario (cargo, celular, etc.)
+      // Log important fields
+      console.log("Producer update fields:", {
+        id: body.id,
+        name: body.name,
+        email: body.email,
+        celular: body.celular,
+        documento: body.documento,
+        endereco: body.endereco,
+        cidade: body.cidade,
+        estadoId: body.estadoId
+      });
+
+      // Update the usuario
       const updatedUser = await repository.updateUsuario(body);
+
+      // No associado model: user update complete
       return { data: [updatedUser] };
     } catch (error) {
-      console.error("Error updating colaborador:", error);
+      console.error("Error updating produtor:", error);
       throw createError({
         statusCode: 500,
-        statusMessage: "Error updating colaborador",
+        statusMessage: "Error updating produtor",
       });
     }
   }
 
-  // DELETE - Remove colaborador
+  // DELETE - Remove produtor
   if (method === "DELETE") {
     try {
       const body = await readBody(event);
@@ -150,25 +194,18 @@ export default defineEventHandler(async (event) => {
       if (!usuario || !usuario.id) {
         throw createError({
           statusCode: 400,
-          statusMessage: "Missing colaborador data for deletion",
+          statusMessage: "Missing produtor data for deletion",
         });
       }
 
       return await repository.deleteUsuarioById(usuario.id);
     } catch (error) {
-      console.error("Error deleting colaborador:", error);
+      console.error("Error deleting produtor:", error);
       throw createError({
         statusCode: 500,
-        statusMessage: "Error deleting colaborador",
+        statusMessage: "Error deleting produtor",
       });
     }
-  }
-
-  // Helper function to fetch a colaborador by ID
-  // Helper: fetch updated usuario
-  async function fetchColaboradorById(id: number) {
-    const usuario = await prisma.usuario.findUnique({ where: { id } });
-    return { data: [usuario] };
   }
 
   throw createError({

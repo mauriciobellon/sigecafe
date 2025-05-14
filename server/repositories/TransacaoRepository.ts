@@ -7,7 +7,7 @@ interface TransacaoFilterParams {
   page?: number;
   limit?: number;
   compradorId?: number;
-  vendedorId?: number;
+  produtorId?: number;
   status?: TransacaoStatus;
   dataInicio?: Date;
   dataFim?: Date;
@@ -38,49 +38,39 @@ export class TransacaoRepository {
       data: {
         quantidade: data.quantidade,
         precoUnitario: data.precoUnitario,
-        valorTotal: data.valorTotal,
         data: data.data,
         status: data.status,
         observacoes: data.observacoes,
         comprador: { connect: { id: data.compradorId } },
-        vendedor: { connect: { id: data.vendedorId } },
+        produtor: { connect: { id: data.produtorId } },
       },
       include: {
         comprador: {
-          select: {
-            id: true,
-            name: true,
-          },
+          select: { id: true, name: true },
         },
-        vendedor: {
-          select: {
-            id: true,
-            name: true,
-          },
+        produtor: {
+          select: { id: true, name: true },
         },
       },
     });
 
     return {
       ...transaction,
+      id: transaction.id, // IDs are now numbers in the schema and DTO
       comprador: transaction.comprador.name,
-      vendedor: transaction.vendedor.name,
+      produtor: transaction.produtor.name,
     };
   }
 
   /**
    * Get transaction by ID
    */
-  async getById(id: string): Promise<TransacaoDTO | null> {
+  async getById(id: number): Promise<TransacaoDTO | null> {
     const transacao = await this.prisma.transacao.findUnique({
       where: { id },
       include: {
-        comprador: {
-          select: { name: true }
-        },
-        vendedor: {
-          select: { name: true }
-        }
+        comprador: { select: { name: true } },
+        produtor: { select: { name: true } },
       }
     });
 
@@ -88,8 +78,9 @@ export class TransacaoRepository {
 
     return {
       ...transacao,
+      id: transacao.id,
       comprador: transacao.comprador.name,
-      vendedor: transacao.vendedor.name
+      produtor: transacao.produtor.name
     };
   }
 
@@ -101,7 +92,7 @@ export class TransacaoRepository {
       page = 1,
       limit = 10,
       compradorId,
-      vendedorId,
+      produtorId,
       status,
       dataInicio,
       dataFim
@@ -116,8 +107,8 @@ export class TransacaoRepository {
       where.compradorId = compradorId;
     }
 
-    if (vendedorId) {
-      where.vendedorId = vendedorId;
+    if (produtorId) {
+      where.produtorId = produtorId;
     }
 
     if (status) {
@@ -144,7 +135,7 @@ export class TransacaoRepository {
           comprador: {
             select: { name: true }
           },
-          vendedor: {
+          produtor: {
             select: { name: true }
           }
         }
@@ -155,8 +146,9 @@ export class TransacaoRepository {
     // Transform data to match TransacaoDTO format
     const data = transacoesRaw.map(t => ({
       ...t,
+      id: t.id,
       comprador: t.comprador.name,
-      vendedor: t.vendedor.name
+      produtor: t.produtor.name
     }));
 
     return {
@@ -173,13 +165,12 @@ export class TransacaoRepository {
   /**
    * Update a transaction
    */
-  async update(id: string, data: UpdateTransacaoDTO): Promise<TransacaoDTO> {
+  async update(id: number, data: UpdateTransacaoDTO): Promise<TransacaoDTO> {
     const updatedTransacao = await this.prisma.transacao.update({
       where: { id },
       data: {
         quantidade: data.quantidade,
         precoUnitario: data.precoUnitario,
-        valorTotal: data.valorTotal,
         data: data.data,
         status: data.status,
         observacoes: data.observacoes,
@@ -188,7 +179,7 @@ export class TransacaoRepository {
         comprador: {
           select: { name: true }
         },
-        vendedor: {
+        produtor: {
           select: { name: true }
         }
       }
@@ -196,15 +187,16 @@ export class TransacaoRepository {
 
     return {
       ...updatedTransacao,
+      id: updatedTransacao.id,
       comprador: updatedTransacao.comprador.name,
-      vendedor: updatedTransacao.vendedor.name
+      produtor: updatedTransacao.produtor.name
     };
   }
 
   /**
    * Delete a transaction
    */
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     await this.prisma.transacao.delete({
       where: { id }
     });
@@ -228,7 +220,7 @@ export class TransacaoRepository {
     const where: Prisma.TransacaoWhereInput = {
       OR: [
         { compradorId: usuarioId },
-        { vendedorId: usuarioId }
+        { produtorId: usuarioId }
       ]
     };
 
@@ -257,7 +249,7 @@ export class TransacaoRepository {
           comprador: {
             select: { name: true }
           },
-          vendedor: {
+          produtor: {
             select: { name: true }
           }
         }
@@ -265,11 +257,12 @@ export class TransacaoRepository {
       this.prisma.transacao.count({ where })
     ]);
 
-    // Transform data to match TransacaoDTO format
+    // Transform data for API
     const data = transacoesRaw.map(t => ({
       ...t,
+      id: t.id,
       comprador: t.comprador.name,
-      vendedor: t.vendedor.name
+      produtor: t.produtor.name
     }));
 
     return {
@@ -284,78 +277,27 @@ export class TransacaoRepository {
   }
 
   /**
-   * Find all transactions with filtering
+   * Find all transactions with advanced filtering
    */
   async findAll(filters: TransacaoFilterDTO = {}): Promise<TransacaoPagedResponse> {
-    const { compradorId, vendedorId, status, dataInicio, dataFim, page = 1, limit = 10 } = filters;
+    const {
+      page = 1,
+      limit = 10,
+      compradorId,
+      produtorId,
+      status,
+      dataInicio,
+      dataFim
+    } = filters;
 
-    const where: Prisma.TransacaoWhereInput = {};
-
-    if (compradorId) {
-      where.compradorId = compradorId;
-    }
-
-    if (vendedorId) {
-      where.vendedorId = vendedorId;
-    }
-
-    if (status) {
-      where.status = status;
-    }
-
-    if (dataInicio || dataFim) {
-      where.data = {};
-
-      if (dataInicio) {
-        where.data.gte = dataInicio;
-      }
-
-      if (dataFim) {
-        where.data.lte = dataFim;
-      }
-    }
-
-    const skip = (page - 1) * limit;
-
-    const [total, transacoesRaw] = await Promise.all([
-      this.prisma.transacao.count({ where }),
-      this.prisma.transacao.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        include: {
-          comprador: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          vendedor: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-        },
-      }),
-    ]);
-
-    // Transform data to match TransacaoDTO format
-    const data = transacoesRaw.map(t => ({
-      ...t,
-      comprador: t.comprador.name,
-      vendedor: t.vendedor.name
-    }));
-
-    return {
-      data,
-      meta: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
+    return this.getAll({
+      page,
+      limit,
+      compradorId,
+      produtorId,
+      status,
+      dataInicio,
+      dataFim
+    });
   }
 }

@@ -12,21 +12,19 @@ function normalizePhoneNumber(phone: string): string {
 
 export default defineEventHandler(async (event) => {
   const session = await getServerSession(event);
-  if (!session) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-    });
+  const user = session?.user as Usuario | undefined;
+  if (!user) {
+    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
 
-  console.log("Session user:", session.user?.name);
+  console.log("Session user:", session?.user?.name);
 
   const method = event.method;
 
   // GET - Fetch all colaboradores
   if (method === "GET") {
     try {
-      const currentUser = session.user as Usuario;
+      const currentUser = user;
 
       // If no user, return an empty list
       if (!currentUser) {
@@ -63,7 +61,13 @@ export default defineEventHandler(async (event) => {
           cooperativaId: cooperativaId
         },
         include: {
-          associado: true
+          estado: {
+            select: {
+              id: true,
+              nome: true,
+              sigla: true
+            }
+          }
         }
       });
 
@@ -83,26 +87,33 @@ export default defineEventHandler(async (event) => {
   if (method === "POST") {
     try {
       const body = await readBody(event);
-      const currentUser = session.user as Usuario;
+      // User is already validated in the if check above, so we know it exists
+      const currentUser = user;
 
       // Normalize phone if present
       if (body.celular) {
         body.celular = normalizePhoneNumber(body.celular);
       }
 
-      // Set the colaborador type and associate with the admin's cooperativa
+      // Set the comprador type and associate with the admin's cooperativa
       body.type = "COMPRADOR";
 
-      // If the current user has a cooperativaId, assign the same to the new colaborador
+      // If the current user has a cooperativaId, assign the same to the new comprador
       if (currentUser && currentUser.cooperativaId) {
         body.cooperativaId = currentUser.cooperativaId;
       }
 
-      // Create the usuario
+      // Ensure password is provided
+      if (!body.password) {
+        body.password = 'password'; // Set a default password if none provided
+        console.log("Setting default password for new comprador");
+      }
+
+      // Create the usuario first
       const newUser = await repository.createUsuario(body);
 
-      // Force a reload after creation to get the complete object
-      return await fetchCompradorById(newUser.id);
+      // No associado model: user creation complete
+      return { data: [newUser] };
     } catch (error) {
       console.error("Error creating comprador:", error);
       throw createError({
@@ -129,36 +140,11 @@ export default defineEventHandler(async (event) => {
         body.celular = normalizePhoneNumber(body.celular);
       }
 
-      // Handle the nested colaborador field
-      if (body.colaborador) {
-        // Get the colaborador ID for this user
-        const usuario = await prisma.usuario.findUnique({
-          where: { id: body.id },
-          include: { colaborador: true }
-        });
-
-        if (usuario?.colaborador) {
-          console.log("Updating colaborador cargo:", body.colaborador.cargo);
-          // Update the colaborador record
-          await prisma.colaborador.update({
-            where: { id: usuario.colaborador.id },
-            data: {
-              cargo: body.colaborador.cargo || usuario.colaborador.cargo
-            }
-          });
-        } else {
-          console.log("User does not have a colaborador record");
-        }
-
-        // Remove the colaborador data from the update payload
-        delete body.colaborador;
-      }
-
       // Update the usuario
       const updatedUser = await repository.updateUsuario(body);
 
-      // Force a reload of updated user with relationships
-      return await fetchCompradorById(updatedUser.id);
+      // No associado model: handle only user update
+      return { data: [updatedUser] };
     } catch (error) {
       console.error("Error updating comprador:", error);
       throw createError({
@@ -189,16 +175,6 @@ export default defineEventHandler(async (event) => {
         statusMessage: "Error deleting comprador",
       });
     }
-  }
-
-  // Helper function to fetch a colaborador by ID
-  async function fetchCompradorById(id: number) {
-    const usuario = await prisma.usuario.findUnique({
-      where: { id },
-      include: { associado: true }
-    });
-
-    return { data: [usuario] };
   }
 
   throw createError({

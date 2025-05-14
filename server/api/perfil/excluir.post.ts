@@ -5,7 +5,7 @@ import { UsuarioRepository } from '@@/server/repositories/UsuarioRepository';
 export default defineEventHandler(async (event) => {
   const session = await getServerSession(event);
 
-  if (!session?.usuario) {
+  if (!session?.user) {
     return [];
   }
 

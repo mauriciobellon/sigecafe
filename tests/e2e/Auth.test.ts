@@ -496,22 +496,13 @@ async function cleanupTestUser(): Promise<void> {
     // First find the user
     const existingUser = await usuarioRepository.getUsuarioByCelular(testUsuario.celular);
     if (existingUser) {
-      // Delete associated UserPreference first to avoid foreign key constraint violation
-      await prisma.userPreference.deleteMany({
-        where: { usuarioId: existingUser.id }
-      });
-
-      // Delete any other related data that might cause FK violations
+      // Delete any related data that might cause FK violations
       await prisma.notificacao.deleteMany({
         where: { usuarioId: existingUser.id }
       });
 
-      await prisma.passwordResetToken.deleteMany({
-        where: { usuarioId: existingUser.id }
-      });
-
       await prisma.oferta.deleteMany({
-        where: { userId: existingUser.id }
+        where: { usuarioId: existingUser.id }
       });
 
       // Check if this user is involved in transactions
@@ -519,7 +510,7 @@ async function cleanupTestUser(): Promise<void> {
         where: {
           OR: [
             { compradorId: existingUser.id },
-            { vendedorId: existingUser.id }
+            { produtorId: existingUser.id }
           ]
         }
       });
@@ -530,7 +521,7 @@ async function cleanupTestUser(): Promise<void> {
           where: {
             OR: [
               { compradorId: existingUser.id },
-              { vendedorId: existingUser.id }
+              { produtorId: existingUser.id }
             ]
           }
         });
@@ -544,22 +535,13 @@ async function cleanupTestUser(): Promise<void> {
     // Check for user with the test email too
     const emailUser = await usuarioRepository.getUsuarioByEmail(testUsuario.email);
     if (emailUser && (!existingUser || emailUser.id !== existingUser.id)) {
-      // Delete associated UserPreference first
-      await prisma.userPreference.deleteMany({
-        where: { usuarioId: emailUser.id }
-      });
-
       // Delete any other related data that might cause FK violations
       await prisma.notificacao.deleteMany({
         where: { usuarioId: emailUser.id }
       });
 
-      await prisma.passwordResetToken.deleteMany({
-        where: { usuarioId: emailUser.id }
-      });
-
       await prisma.oferta.deleteMany({
-        where: { userId: emailUser.id }
+        where: { usuarioId: emailUser.id }
       });
 
       // Check if this user is involved in transactions
@@ -567,7 +549,7 @@ async function cleanupTestUser(): Promise<void> {
         where: {
           OR: [
             { compradorId: emailUser.id },
-            { vendedorId: emailUser.id }
+            { produtorId: emailUser.id }
           ]
         }
       });
@@ -578,7 +560,7 @@ async function cleanupTestUser(): Promise<void> {
           where: {
             OR: [
               { compradorId: emailUser.id },
-              { vendedorId: emailUser.id }
+              { produtorId: emailUser.id }
             ]
           }
         });
