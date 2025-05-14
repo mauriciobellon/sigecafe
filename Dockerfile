@@ -1,15 +1,5 @@
 FROM node:lts
 
-WORKDIR /nuxtapp
-
-COPY . .
-
-ENV NODE_OPTIONS="--max-old-space-size=4096"
-
-RUN npm install
-
-RUN npm run build
-
 # Install dependencies for headless browser alternatives
 RUN apt-get update && apt-get install -y \
     ca-certificates \
@@ -32,17 +22,26 @@ RUN apt-get update && apt-get install -y \
 # Set Puppeteer environment variables to skip Chrome download and use a different browser
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
+WORKDIR /nuxtapp
+
+COPY . .
+
+RUN npm install
+
+RUN npm run build
 
 # Install only production dependencies and Prisma
 # Create an entrypoint script
 
 RUN echo '#!/bin/sh\n\
 echo "Waiting for database to be ready..."\n\
-sleep 5\n\
+sleep 20\n\
 echo "Running database migrations..."\n\
-prisma migrate deploy\n\
+npm run db:migrate\n\
 echo "Running database seeds..."\n\
-node scripts/db-seed.mjs\n\
+npm run db:seed\n\
 echo "Starting application..."\n\
 node .output/server/index.mjs\n\
 ' > /nuxtapp/entrypoint.sh && chmod +x /nuxtapp/entrypoint.sh
