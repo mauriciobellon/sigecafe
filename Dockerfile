@@ -14,11 +14,7 @@ FROM node:lts as prod-stage
 
 WORKDIR /nuxtapp
 
-COPY --from=build-stage /nuxtapp/.output/ ./.output/
-COPY --from=build-stage /nuxtapp/prisma/ ./prisma/
-COPY --from=build-stage /nuxtapp/package.json ./package.json
-COPY --from=build-stage /nuxtapp/package-lock.json ./package-lock.json
-COPY --from=build-stage /nuxtapp/scripts/ ./scripts/
+COPY --from=build-stage /nuxtapp/./
 
 # Install dependencies for headless browser alternatives
 RUN apt-get update && apt-get install -y \
