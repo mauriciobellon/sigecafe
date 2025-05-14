@@ -38,9 +38,8 @@ const columns = [
   },
   {
     label: "Cargo",
-    field: "colaborador.cargo",
-    type: "text",
-    editField: "colaborador.cargo"
+    field: "cargo",
+    type: "text"
   }
 ];
 </script>

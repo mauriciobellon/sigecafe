@@ -1,5 +1,7 @@
 import { getServerSession } from '#auth'
-import { PrismaClient, Usuario, UsuarioType } from '@prisma/client'
+import { getQuery } from 'h3'
+import { PrismaClient, UsuarioType } from '@prisma/client'
+import type { Usuario } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -82,26 +84,10 @@ async function getUsuariosWithRoles(page: number, limit: number, search: string,
           celular: true,
           type: true,
           cooperativaId: true,
-          cooperativa: {
-            select: {
-              nome: true
-            }
-          },
-          associadoId: true,
-          associado: {
-            select: {
-              nome: true,
-              tipo: true
-            }
-          },
-          colaboradorId: true,
-          colaborador: {
-            select: {
-              cargo: true
-            }
-          },
+          cooperativa: { select: { nome: true } },
           createdAt: true,
           updatedAt: true
+          // associado and colaborador removed
         },
         skip,
         take: limit,
@@ -120,11 +106,7 @@ async function getUsuariosWithRoles(page: number, limit: number, search: string,
       roleLabel: formatRoleLabel(user.type),
       cooperativa: user.cooperativa?.nome,
       cooperativaId: user.cooperativaId,
-      associado: user.associado?.nome,
-      associadoId: user.associadoId,
-      associadoTipo: user.associado?.tipo,
-      colaborador: user.colaborador?.cargo || (user.colaboradorId ? 'Colaborador' : undefined),
-      colaboradorId: user.colaboradorId,
+      // associado and colaborador removed
       createdAt: user.createdAt,
       updatedAt: user.updatedAt
     }))

@@ -12,21 +12,19 @@ function normalizePhoneNumber(phone: string): string {
 
 export default defineEventHandler(async (event) => {
   const session = await getServerSession(event);
-  if (!session) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-    });
+  const user = session?.user as Usuario | undefined;
+  if (!user) {
+    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
 
-  console.log("Session user:", session.user?.name);
+  console.log("Session user:", session?.user?.name);
 
   const method = event.method;
 
   // GET - Fetch all colaboradores
   if (method === "GET") {
     try {
-      const currentUser = session.user as Usuario;
+      const currentUser = user;
 
       // If no user, return an empty list
       if (!currentUser) {
@@ -61,6 +59,15 @@ export default defineEventHandler(async (event) => {
         where: {
           type: "COMPRADOR" as UsuarioType,
           cooperativaId: cooperativaId
+        },
+        include: {
+          estado: {
+            select: {
+              id: true,
+              nome: true,
+              sigla: true
+            }
+          }
         }
       });
 
@@ -80,7 +87,8 @@ export default defineEventHandler(async (event) => {
   if (method === "POST") {
     try {
       const body = await readBody(event);
-      const currentUser = session.user as Usuario;
+      // User is already validated in the if check above, so we know it exists
+      const currentUser = user;
 
       // Normalize phone if present
       if (body.celular) {

@@ -56,10 +56,10 @@ async function handleGetTransacao(id: string, usuarioId: number, usuarioType: Us
   try {
     // Buscar a transação pelo ID
     const transacao = await prisma.transacao.findUnique({
-      where: { id },
+      where: { id: Number(id) },
       include: {
         comprador: true,
-        vendedor: true,
+        produtor: true,
       },
     })
 
@@ -72,9 +72,9 @@ async function handleGetTransacao(id: string, usuarioId: number, usuarioType: Us
 
     // Verificar se o usuário tem permissão para acessar esta transação
     // Administradores podem acessar qualquer transação
-    // Outros usuários só podem acessar transações em que são compradores ou vendedores
+    // Outros usuários só podem acessar transações em que são compradores ou produtores
     const isAdmin = usuarioType === UsuarioType.ADMINISTRADOR
-    const isInvolved = transacao.compradorId === usuarioId || transacao.vendedorId === usuarioId
+    const isInvolved = transacao.compradorId === usuarioId || transacao.produtorId === usuarioId
 
     if (!isAdmin && !isInvolved) {
       throw createError({
@@ -85,15 +85,14 @@ async function handleGetTransacao(id: string, usuarioId: number, usuarioType: Us
 
     // Formatar e retornar a transação
     return {
-      id: transacao.id,
+      id: String(transacao.id),
       data: transacao.data,
       comprador: transacao.comprador.name,
       compradorId: transacao.compradorId,
-      vendedor: transacao.vendedor.name,
-      vendedorId: transacao.vendedorId,
+      produtor: transacao.produtor.name,
+      produtorId: transacao.produtorId,
       quantidade: transacao.quantidade,
       precoUnitario: transacao.precoUnitario,
-      valorTotal: transacao.valorTotal,
       status: transacao.status,
       observacoes: transacao.observacoes || '',
       createdAt: transacao.createdAt,
@@ -115,10 +114,10 @@ async function handleUpdateTransacao(event: any, id: string, usuarioId: number, 
   try {
     // Buscar a transação pelo ID
     const transacao = await prisma.transacao.findUnique({
-      where: { id },
+      where: { id: Number(id) },
       include: {
         comprador: true,
-        vendedor: true,
+        produtor: true,
       },
     })
 
@@ -131,9 +130,9 @@ async function handleUpdateTransacao(event: any, id: string, usuarioId: number, 
 
     // Verificar se o usuário tem permissão para atualizar esta transação
     // Administradores podem atualizar qualquer transação
-    // Outros usuários só podem atualizar transações em que são compradores ou vendedores
+    // Outros usuários só podem atualizar transações em que são compradores ou produtores
     const isAdmin = usuarioType === UsuarioType.ADMINISTRADOR
-    const isInvolved = transacao.compradorId === usuarioId || transacao.vendedorId === usuarioId
+    const isInvolved = transacao.compradorId === usuarioId || transacao.produtorId === usuarioId
 
     if (!isAdmin && !isInvolved) {
       throw createError({
@@ -157,32 +156,30 @@ async function handleUpdateTransacao(event: any, id: string, usuarioId: number, 
 
     if (body.quantidade !== undefined) updateData.quantidade = body.quantidade
     if (body.precoUnitario !== undefined) updateData.precoUnitario = body.precoUnitario
-    if (body.valorTotal !== undefined) updateData.valorTotal = body.valorTotal
     if (body.data !== undefined) updateData.data = new Date(body.data)
     if (body.status !== undefined) updateData.status = body.status as TransacaoStatus
     if (body.observacoes !== undefined) updateData.observacoes = body.observacoes
 
     // Atualizar a transação
     const updatedTransacao = await prisma.transacao.update({
-      where: { id },
+      where: { id: Number(id) },
       data: updateData,
       include: {
         comprador: true,
-        vendedor: true,
+        produtor: true,
       },
     })
 
     // Formatar e retornar a transação atualizada
     return {
-      id: updatedTransacao.id,
+      id: String(updatedTransacao.id),
       data: updatedTransacao.data,
       comprador: updatedTransacao.comprador.name,
       compradorId: updatedTransacao.compradorId,
-      vendedor: updatedTransacao.vendedor.name,
-      vendedorId: updatedTransacao.vendedorId,
+      produtor: updatedTransacao.produtor.name,
+      produtorId: updatedTransacao.produtorId,
       quantidade: updatedTransacao.quantidade,
       precoUnitario: updatedTransacao.precoUnitario,
-      valorTotal: updatedTransacao.valorTotal,
       status: updatedTransacao.status,
       observacoes: updatedTransacao.observacoes || '',
       createdAt: updatedTransacao.createdAt,
@@ -204,7 +201,7 @@ async function handleDeleteTransacao(id: string, usuarioId: number, usuarioType:
   try {
     // Buscar a transação pelo ID
     const transacao = await prisma.transacao.findUnique({
-      where: { id }
+      where: { id: Number(id) }
     })
 
     if (!transacao) {
@@ -227,7 +224,7 @@ async function handleDeleteTransacao(id: string, usuarioId: number, usuarioType:
 
     // Excluir a transação
     await prisma.transacao.delete({
-      where: { id }
+      where: { id: Number(id) }
     })
 
     // Retornar sucesso

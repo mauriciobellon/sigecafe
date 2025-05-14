@@ -1,5 +1,5 @@
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { Usuario, UsuarioType } from '@prisma/client'
+import type { Usuario, UsuarioType } from '@prisma/client'
 import { NuxtAuthHandler } from '#auth'
 import { verify } from '@@/server/utils/crypto'
 import { UsuarioRepository } from '@@/server/repositories/UsuarioRepository'

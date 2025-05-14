@@ -1,6 +1,6 @@
 import { defineEventHandler } from 'h3';
 import { getServerSession } from '#auth';
-import { Usuario } from '@prisma/client';
+import type { Usuario } from '@prisma/client';
 import prisma from '@@/lib/prisma';
 import type { CooperativaDTO } from '~/types/api';
 

@@ -131,7 +131,7 @@
                       </th>
                       <th
                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Vendedor
+                        Produtor
                       </th>
                       <th
                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -156,13 +156,13 @@
                         {{ item?.comprador }}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        {{ item?.vendedor }}
+                        {{ item?.produtor }}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         {{ item?.quantidade }} sacas
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        R$ {{ item?.valorTotal ? item.valorTotal.toFixed(2) : '0.00' }}
+                        R$ {{ (item?.quantidade * item?.precoUnitario).toFixed(2) }}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" :class="{
@@ -390,11 +390,8 @@ async function fetchTransactionsReport() {
       );
     }
 
-    // Calcular o valor total para cada transação
-    reportData.value = filteredData.map((item: TransacaoDTO) => ({
-      ...item,
-      valorTotal: item.quantidade * item.precoUnitario
-    }));
+    // Set report data
+    reportData.value = filteredData;
   } catch (error) {
     console.error('Error fetching transactions report:', error);
     throw error;
@@ -446,7 +443,7 @@ function calculateTotalValue() {
   if (reportType.value !== 'transactions' || !reportData.value.length) return 0;
 
   return reportData.value.reduce((total: number, item: any) =>
-    total + (item.valorTotal || 0), 0
+    total + ((item.quantidade * item.precoUnitario) || 0), 0
   );
 }
 
@@ -504,11 +501,11 @@ function exportCSV() {
 
   // Add headers based on report type
   if (reportType.value === 'transactions') {
-    csvContent = "Data,Comprador,Vendedor,Quantidade,Valor Total,Status\n";
+    csvContent = "Data,Comprador,Produtor,Quantidade,Valor Total,Status\n";
 
     // Add data rows
     reportData.value.forEach((item: any) => {
-      csvContent += `${formatDate(item.data)},${item.comprador},${item.vendedor},${item.quantidade},${item.valorTotal},${item.status}\n`;
+      csvContent += `${formatDate(item.data)},${item.comprador},${item.produtor},${item.quantidade},${(item.quantidade * item.precoUnitario).toFixed(2)},${item.status}\n`;
     });
   } else {
     csvContent = "Nome,Contato,Documento,Cidade,Estado,Transações,Volume\n";

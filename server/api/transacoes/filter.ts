@@ -8,7 +8,7 @@ interface TransacaoFilterParams {
   page?: number;
   limit?: number;
   compradorId?: number;
-  vendedorId?: number;
+  produtorId?: number;
   status?: TransacaoStatus;
   dataInicio?: Date;
   dataFim?: Date;
@@ -72,22 +72,22 @@ export default defineEventHandler(async (event) => {
   const isAdmin = usuario.type === UsuarioType.ADMINISTRADOR
 
   if (isAdmin) {
-    // Administradores podem filtrar por comprador e vendedor específicos
+    // Administradores podem filtrar por comprador e produtor específicos
     if (query.compradorId) {
       filterParams.compradorId = Number(query.compradorId)
     }
 
-    if (query.vendedorId) {
-      filterParams.vendedorId = Number(query.vendedorId)
+    if (query.produtorId) {
+      filterParams.produtorId = Number(query.produtorId)
     }
   } else {
     // Usuários não-admin só podem ver suas próprias transações
     if (usuario.type === UsuarioType.COMPRADOR) {
       filterParams.compradorId = usuario.id
     } else if (usuario.type === UsuarioType.PRODUTOR) {
-      filterParams.vendedorId = usuario.id
+      filterParams.produtorId = usuario.id
     } else {
-      // Para outros tipos (ex: COOPERATIVA), mostra transações onde são comprador ou vendedor
+      // Para outros tipos (ex: COOPERATIVA), mostra transações onde são comprador ou produtor
       // Será tratado na construção da query
     }
   }
@@ -105,7 +105,7 @@ async function handleFilterTransacoes(
       page = 1,
       limit = 10,
       compradorId,
-      vendedorId,
+      produtorId,
       status,
       dataInicio,
       dataFim
@@ -121,12 +121,12 @@ async function handleFilterTransacoes(
       if (usuarioType === UsuarioType.COMPRADOR) {
         where.compradorId = usuarioId;
       } else if (usuarioType === UsuarioType.PRODUTOR) {
-        where.vendedorId = usuarioId;
+        where.produtorId = usuarioId;
       } else {
-        // Para usuários COOPERATIVA ou outros tipos, mostrar onde são comprador OU vendedor
+        // Para usuários COOPERATIVA ou outros tipos, mostrar onde são comprador OU produtor
         where.OR = [
           { compradorId: usuarioId },
-          { vendedorId: usuarioId }
+          { produtorId: usuarioId }
         ];
       }
     } else {
@@ -135,8 +135,8 @@ async function handleFilterTransacoes(
         where.compradorId = compradorId;
       }
 
-      if (vendedorId) {
-        where.vendedorId = vendedorId;
+      if (produtorId) {
+        where.produtorId = produtorId;
       }
     }
 
@@ -165,7 +165,7 @@ async function handleFilterTransacoes(
         orderBy: { data: 'desc' },
         include: {
           comprador: true,
-          vendedor: true,
+          produtor: true,
         },
       }),
       prisma.transacao.count({ where })
@@ -173,15 +173,14 @@ async function handleFilterTransacoes(
 
     // Formatar as transações para o formato DTO
     const data = transacoes.map(t => ({
-      id: t.id,
+      id: String(t.id),
       data: t.data,
       comprador: t.comprador.name,
       compradorId: t.compradorId,
-      vendedor: t.vendedor.name,
-      vendedorId: t.vendedorId,
+      produtor: t.produtor.name,
+      produtorId: t.produtorId,
       quantidade: t.quantidade,
       precoUnitario: t.precoUnitario,
-      valorTotal: t.valorTotal,
       status: t.status,
       observacoes: t.observacoes || '',
       createdAt: t.createdAt,

@@ -61,8 +61,20 @@ export default defineEventHandler(async (event) => {
         where: {
           type: "PRODUTOR" as UsuarioType,
           cooperativaId: cooperativaId
+        },
+        include: {
+          estado: {
+            select: {
+              id: true,
+              nome: true,
+              sigla: true
+            }
+          }
         }
       });
+
+      console.log("Produtor API: Data structure example:",
+        produtores.length > 0 ? JSON.stringify(produtores[0], null, 2) : "No producers found");
 
       console.log("Fetched produtores:", produtores.length);
 
@@ -81,6 +93,8 @@ export default defineEventHandler(async (event) => {
     try {
       const body = await readBody(event);
       const currentUser = session.user as Usuario;
+
+      console.log("Creating producer with data:", JSON.stringify(body, null, 2));
 
       // Normalize phone if present
       if (body.celular) {
@@ -101,6 +115,17 @@ export default defineEventHandler(async (event) => {
         console.log("Setting default password for new produtor");
       }
 
+      // Log important fields
+      console.log("Producer fields being sent:", {
+        name: body.name,
+        email: body.email,
+        celular: body.celular,
+        documento: body.documento,
+        endereco: body.endereco,
+        cidade: body.cidade,
+        estadoId: body.estadoId
+      });
+
       // Create the usuario first
       const newUser = await repository.createUsuario(body);
 
@@ -120,6 +145,8 @@ export default defineEventHandler(async (event) => {
     try {
       const body = await readBody(event);
 
+      console.log("Updating producer with data:", JSON.stringify(body, null, 2));
+
       if (!body.id) {
         throw createError({
           statusCode: 400,
@@ -131,6 +158,18 @@ export default defineEventHandler(async (event) => {
       if (body.celular) {
         body.celular = normalizePhoneNumber(body.celular);
       }
+
+      // Log important fields
+      console.log("Producer update fields:", {
+        id: body.id,
+        name: body.name,
+        email: body.email,
+        celular: body.celular,
+        documento: body.documento,
+        endereco: body.endereco,
+        cidade: body.cidade,
+        estadoId: body.estadoId
+      });
 
       // Update the usuario
       const updatedUser = await repository.updateUsuario(body);

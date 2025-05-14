@@ -89,8 +89,8 @@
 
                   <!-- Relation field (select from foreign table) -->
                   <UiSelect v-else-if="col.type === 'relation'" :id="col.field"
-                    :model-value="getFieldValue(store.currentItem, col.editField || col.field)"
-                    @update:model-value="setFieldValue(store.currentItem, col.editField || col.field, $event)"
+                    :model-value="getRelationValue(store.currentItem, col)"
+                    @update:model-value="handleRelationChange(store.currentItem, col, $event)"
                     :disabled="col.readonly || ((col.relationOptions ?? []).length === 1 && (col.relationOptions?.[0]?.value === '__empty__'))">
                     <UiSelectTrigger class="w-full">
                       <UiSelectValue :placeholder="col.placeholder || `Selecione ${col.label}`" />
@@ -195,7 +195,8 @@ interface Column {
   options?: { label: string; value: any }[];
   relationOptions?: { label: string; value: any }[];
   relationEndpoint?: string;
-  relationLabel?: string;
+  relationLabel?: string;       // Label field to display in table
+  relationModalLabel?: string;  // Optional different label field to display in modal dropdown
   relationValue?: string;
   statusOptions?: { label: string; value: any }[];
   statusClasses?: Record<string, string>;
@@ -234,7 +235,7 @@ const emit = defineEmits<{
   (e: "item-deleted", item: any): void;
 }>();
 
-// Process columns to automatically infer read-only and unique fields
+// Process columns to automatically infer default values and properties
 const processedColumns = computed<Column[]>(() => {
   return props.columns.map(col => {
     const column = { ...col };
@@ -253,6 +254,26 @@ const processedColumns = computed<Column[]>(() => {
     // If a field is marked as collapsible, make it hidden when editing
     if (column.collapsible && column.hidden === undefined) {
       column.hidden = true;
+    }
+
+    // Handle default values for relation fields
+    if (column.type === 'relation' && column.field.includes('.')) {
+      const [objectName, propertyName] = column.field.split('.');
+
+      // Set default relationEndpoint if not provided
+      if (!column.relationEndpoint) {
+        column.relationEndpoint = `/api/${objectName.toLowerCase()}`;
+      }
+
+      // Set default relationLabel if not provided
+      if (!column.relationLabel) {
+        column.relationLabel = propertyName;
+      }
+
+      // Set default relationValue if not provided
+      if (!column.relationValue) {
+        column.relationValue = 'id';
+      }
     }
 
     return column;
@@ -301,48 +322,139 @@ const humanizedModelName = computed(() => {
 // Get data from the store
 const storeData = computed(() => store.items);
 
+// Helper function to get value from dot notation path
+function getNestedValue(obj: any, path: string, relationColumn?: Column): any {
+  if (!obj || !path) return null;
+
+  // Handle nested fields via dot notation
+  if (path.includes('.')) {
+    const parts = path.split('.');
+    let current = obj;
+
+    // For relation fields, we might want to use the relationLabel instead of the field path
+    if (relationColumn?.type === 'relation' && parts.length === 2) {
+      const objectName = parts[0];
+
+      // If we have the nested object
+      if (current[objectName]) {
+        // Use the relationLabel field from the column definition for display
+        const labelField = relationColumn.relationLabel!;
+        return current[objectName][labelField];
+      }
+    }
+
+    // Normal nested field lookup
+    for (const part of parts) {
+      if (current === null || current === undefined) {
+        return null;
+      }
+      current = current[part];
+    }
+
+    return current;
+  }
+
+  return obj[path];
+}
+
 // Convert the column definitions to DataTables format
 const datatableColumns = computed<ConfigColumns[]>(() => {
   const columns: ConfigColumns[] = processedColumns.value
     .filter(col => !col.hidden)
-    .map(col => ({
-      data: col.field,
-      title: col.label,
-      defaultContent: "-",
-      width: col.width,
-      // Custom render functions for special types
-      ...(col.type === 'phone' ? {
-        render: function(data: any) {
-          return data ? formatPhoneNumber(data) : '-';
-        }
-      } : {}),
-      ...(col.type === 'money' ? {
-        render: function(data: any) {
-          return data ? `R$ ${parseFloat(data).toFixed(2)}` : 'R$ 0,00';
-        }
-      } : {}),
-      ...(col.type === 'date' ? {
-        render: function(data: any) {
-          return data ? formatDateDisplay(data) : '-';
-        }
-      } : {}),
-      ...(col.type === 'status' && col.statusOptions ? {
-        render: function(data: any) {
-          const status = col.statusOptions?.find(s => s.value === data);
-          if (status) {
-            const statusClass = getStatusClass(data, col.statusClasses || {});
-            return `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${status.label}</span>`;
+    .map(col => {
+      // Handle nested fields via dot notation for field access
+      const columnDef: any = {
+        title: col.label,
+        defaultContent: "-",
+        width: col.width
+      };
+
+      // If it's a dot notation field, use a render function to access the nested property
+      if (col.field.includes('.')) {
+        columnDef.data = null; // Set data to null for custom rendering
+        columnDef.render = function(data: any, type: string, row: any) {
+          // Pass the column definition to getNestedValue for relation fields
+          const value = getNestedValue(row, col.field, col);
+
+          // Apply type-specific formatting
+          if (col.type === 'phone') {
+            return value ? formatPhoneNumber(value) : '-';
+          } else if (col.type === 'money') {
+            return value ? `R$ ${parseFloat(value).toFixed(2)}` : 'R$ 0,00';
+          } else if (col.type === 'date') {
+            return value ? formatDateDisplay(value) : '-';
+          } else if (col.type === 'status' && col.statusOptions) {
+            const status = col.statusOptions?.find(s => s.value === value);
+            if (status) {
+              const statusClass = getStatusClass(value, col.statusClasses || {});
+              return `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${status.label}</span>`;
+            }
+          } else if (col.type === 'relation' && col.relationOptions) {
+            // For relation fields, first try to get from the linked object directly
+            if (col.field.includes('.')) {
+              const [objectName] = col.field.split('.');
+              if (row[objectName]) {
+                const labelToShow = row[objectName][col.relationLabel!];
+                if (labelToShow !== undefined) {
+                  return labelToShow;
+                }
+              }
+            }
+
+            // Fallback to options lookup
+            const option = col.relationOptions?.find(o => String(o.value) === String(value));
+            return option ? option.label : value || '-';
           }
-          return data || '-';
+
+          return value || '-';
+        };
+      } else {
+        // Standard field without dot notation
+        columnDef.data = col.field;
+
+        // Custom render functions for special types
+        if (col.type === 'phone') {
+          columnDef.render = function(data: any) {
+            return data ? formatPhoneNumber(data) : '-';
+          };
+        } else if (col.type === 'money') {
+          columnDef.render = function(data: any) {
+            return data ? `R$ ${parseFloat(data).toFixed(2)}` : 'R$ 0,00';
+          };
+        } else if (col.type === 'date') {
+          columnDef.render = function(data: any) {
+            return data ? formatDateDisplay(data) : '-';
+          };
+        } else if (col.type === 'status' && col.statusOptions) {
+          columnDef.render = function(data: any) {
+            const status = col.statusOptions?.find(s => s.value === data);
+            if (status) {
+              const statusClass = getStatusClass(data, col.statusClasses || {});
+              return `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">${status.label}</span>`;
+            }
+            return data || '-';
+          };
+                  } else if (col.type === 'relation' && col.relationOptions) {
+            columnDef.render = function(data: any, type: string, row: any) {
+              // First try to get the value from the relation field nested data
+              if (row[col.field.split('.')[0]]) {
+                // If we have the related object in the row data, use that directly
+                const relatedObj = row[col.field.split('.')[0]];
+                const labelField = col.relationLabel!;
+                if (relatedObj && relatedObj[labelField]) {
+                  return relatedObj[labelField];
+                }
+              }
+
+              // Fallback to option lookup from the select options
+              const option = col.relationOptions?.find(o => String(o.value) === String(data));
+              return option ? option.label : data || '-';
+            };
         }
-      } : {}),
-      ...(col.type === 'relation' && col.relationOptions ? {
-        render: function(data: any) {
-          const option = col.relationOptions?.find(o => String(o.value) === String(data));
-          return option ? option.label : data || '-';
-        }
-      } : {})
-    }));
+      }
+
+      return columnDef;
+    });
 
   // Add actions column if not hidden
   columns.push({
@@ -650,9 +762,20 @@ watch(
 // Helper function to get nested values
 function getFieldValue(obj: any, path: string): any {
   if (!obj || !path) return '';
-  return path.split('.').reduce((o, i) => {
-    return o && typeof o === 'object' ? o[i] : undefined;
-  }, obj) ?? '';
+
+  // Use dot notation to access nested properties
+  const parts = path.split('.');
+  let result = obj;
+
+  for (const part of parts) {
+    if (result === undefined || result === null) {
+      return '';
+    }
+    result = result[part];
+  }
+
+  console.log(`Getting value for ${path}:`, result);
+  return result === undefined || result === null ? '' : result;
 }
 
 // Helper function to set nested values
@@ -665,12 +788,14 @@ function setFieldValue(obj: any, path: string, value: any): void {
 
   // Create the nested object structure if it doesn't exist
   const target = parts.reduce((o, i) => {
-    if (!o[i]) o[i] = {};
+    if (o[i] === undefined || o[i] === null) o[i] = {};
     return o[i];
   }, obj);
 
   // Set the value
   target[last] = value;
+
+  console.log(`Set field ${path} to:`, value, "Updated object:", JSON.stringify(obj));
 }
 
 // Update the sanitizePhoneValue function to work with nested fields
@@ -686,17 +811,120 @@ function sanitizePhoneValue(event: Event, fieldPath: string) {
   }
 }
 
+// Get a relation field value (extracts ID for select dropdown)
+function getRelationValue(item: any, col: Column): string | null {
+  // For estado.sigla style fields we need to handle differently
+  if (col.field.includes('.')) {
+    // Extract the main object name (e.g., 'estado' from 'estado.sigla')
+    const mainObjectName = col.field.split('.')[0];
+
+    // Check if the main object exists
+    if (item && item[mainObjectName]) {
+      // We return the ID of the related entity
+      return String(item[`${mainObjectName}Id`] || '');
+    }
+
+    return '';
+  } else {
+    // For normal fields, just return the value
+    return String(getFieldValue(item, col.editField || col.field) || '');
+  }
+}
+
+// Handle relation field change (sets the ID for the relation)
+function handleRelationChange(item: any, col: Column, value: string): void {
+  if (!item) return;
+
+  // If this is a dot notation field (e.g., estado.sigla)
+  if (col.field.includes('.')) {
+    // Extract the main object name (e.g., 'estado' from 'estado.sigla')
+    const mainObjectName = col.field.split('.')[0];
+
+    // Set the ID field directly (e.g., estadoId)
+    const idField = `${mainObjectName}Id`;
+
+    // If value is empty string, set to null, otherwise convert to number
+    const idValue = value === '' ? null : Number(value);
+
+    // Set the ID in the item
+    item[idField] = idValue;
+
+    console.log(`Set relation ${idField} to:`, idValue);
+
+    // If the item already has the object structure
+    if (item[mainObjectName]) {
+      // Find the selected option to get the full object
+      const option = col.relationOptions?.find(opt => String(opt.value) === value);
+      if (option) {
+        // Set the ID in the nested object too
+        item[mainObjectName].id = idValue;
+
+        // If we have the label field (e.g., 'sigla'), set that too in the nested object
+        const labelField = col.field.split('.')[1];
+        if (labelField) {
+          // For displayed value in UI
+          item[mainObjectName][labelField] = option.label;
+        }
+      }
+    } else if (idValue !== null) {
+      // If the item doesn't have the object yet, create it
+      item[mainObjectName] = { id: idValue };
+
+      // Find the selected option to get the full label
+      const option = col.relationOptions?.find(opt => String(opt.value) === value);
+      if (option) {
+        // Set the label field (e.g., 'sigla') in the nested object
+        const labelField = col.field.split('.')[1];
+        if (labelField) {
+          item[mainObjectName][labelField] = option.label;
+        }
+      }
+    }
+  } else {
+    // For regular fields, use the normal field setter
+    setFieldValue(item, col.editField || col.field, value);
+  }
+}
+
 // Fetch relation options for columns of type 'relation' with an endpoint
 async function fetchRelationOptions(col: Column) {
-  if (!col.relationEndpoint || !col.relationLabel || !col.relationValue) return;
+  // All defaults should be set in processedColumns computed property
+  if (!col.relationEndpoint || !col.relationLabel || !col.relationValue) {
+    console.error(`Missing required relation properties for column ${col.field}`, {
+      relationEndpoint: col.relationEndpoint,
+      relationLabel: col.relationLabel,
+      relationValue: col.relationValue
+    });
+    return;
+  }
+
   try {
+    console.log(`Fetching relation data from endpoint: ${col.relationEndpoint}`);
     const apiResponse = await $fetch(col.relationEndpoint, { credentials: "include" }) as any;
-    console.log(`[GenericDatatable] Response from relationEndpoint (${col.relationEndpoint}):`, apiResponse);
+
     const apiData: any[] = Array.isArray(apiResponse) ? apiResponse : (apiResponse?.data ?? []);
-    col.relationOptions = apiData.map((item: any) => ({
-      label: item[col.relationLabel!],
-      value: item[col.relationValue!]
-    }));
+    console.log(`[GenericDatatable] Received ${apiData.length} items from endpoint (${col.relationEndpoint})`);
+
+    // Use modalLabel if provided, otherwise fall back to the regular label field
+    const displayLabelField = col.relationModalLabel || col.relationLabel;
+
+    col.relationOptions = apiData.map((item: any) => {
+      // Check if the item has the required fields
+      if (item[displayLabelField] === undefined) {
+        console.warn(`Missing displayLabelField "${displayLabelField}" in relation item:`, item);
+      }
+      if (item[col.relationValue!] === undefined) {
+        console.warn(`Missing relationValue "${col.relationValue}" in relation item:`, item);
+      }
+
+      return {
+        label: item[displayLabelField] !== undefined ? item[displayLabelField] : `Unknown ${displayLabelField}`,
+        value: item[col.relationValue!] !== undefined ? item[col.relationValue!] : null
+      };
+    });
+
+    console.log(`Created ${col.relationOptions.length} options for ${col.field} using display field: ${displayLabelField}`);
+
     // If no options, add a disabled option prompting to create a related model
     if (!col.relationOptions || col.relationOptions.length === 0) {
       col.relationOptions = [{
@@ -704,7 +932,8 @@ async function fetchRelationOptions(col: Column) {
         value: "__empty__"
       }];
     }
-  } catch (e) {
+  } catch (error) {
+    console.error(`Error fetching relation options for ${col.field}:`, error);
     col.relationOptions = [{
       label: `Favor criar um ${humanizedModelName.value} primeiro`,
       value: "__empty__"

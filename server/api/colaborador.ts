@@ -12,21 +12,18 @@ function normalizePhoneNumber(phone: string): string {
 
 export default defineEventHandler(async (event) => {
   const session = await getServerSession(event);
-  if (!session) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-    });
+  const user = session?.user as Usuario | undefined;
+  if (!user) {
+    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
-
-  console.log("Session user:", session.user?.name);
+  console.log("Session user:", user.name);
 
   const method = event.method;
 
   // GET - Fetch all colaboradores
   if (method === "GET") {
     try {
-      const currentUser = session.user as Usuario;
+      const currentUser = user;
 
       // If no user, return an empty list
       if (!currentUser) {
@@ -58,13 +55,7 @@ export default defineEventHandler(async (event) => {
 
       // Adjust the way we fetch colaboradores - now get actual colaboradores with their users
       const colaboradores = await prisma.usuario.findMany({
-        where: {
-          type: "COLABORADOR" as UsuarioType,
-          cooperativaId: cooperativaId
-        },
-        include: {
-          colaborador: true
-        }
+        where: { type: "COLABORADOR" as UsuarioType, cooperativaId }
       });
 
       console.log("Fetched colaboradores:", colaboradores.length);
@@ -109,24 +100,9 @@ export default defineEventHandler(async (event) => {
         console.log("Setting default password for new colaborador");
       }
 
-      // Extract colaborador-specific data (like cargo)
-      const colaboradorData = body.colaborador || {};
-      delete body.colaborador;
-
-      // First create the Colaborador record
-      const newColaborador = await prisma.colaborador.create({
-        data: {
-          cargo: colaboradorData.cargo || "Colaborador",
-          cooperativaId: body.cooperativaId
-        }
-      });
-
-      // Now create the Usuario with reference to the Colaborador
-      body.colaboradorId = newColaborador.id;
+      // Create the Usuario with colaborador type and cargo
       const newUser = await repository.createUsuario(body);
-
-      // Force a reload after creation to get the complete object
-      return await fetchColaboradorById(newUser.id);
+      return { data: [newUser] };
     } catch (error) {
       console.error("Error creating colaborador:", error);
       throw createError({
@@ -153,36 +129,9 @@ export default defineEventHandler(async (event) => {
         body.celular = normalizePhoneNumber(body.celular);
       }
 
-      // Handle the nested colaborador field
-      if (body.colaborador) {
-        // Get the colaborador ID for this user
-        const usuario = await prisma.usuario.findUnique({
-          where: { id: body.id },
-          include: { colaborador: true }
-        });
-
-        if (usuario?.colaborador) {
-          console.log("Updating colaborador cargo:", body.colaborador.cargo);
-          // Update the colaborador record
-          await prisma.colaborador.update({
-            where: { id: usuario.colaborador.id },
-            data: {
-              cargo: body.colaborador.cargo || usuario.colaborador.cargo
-            }
-          });
-        } else {
-          console.log("User does not have a colaborador record");
-        }
-
-        // Remove the colaborador data from the update payload
-        delete body.colaborador;
-      }
-
-      // Update the usuario
+      // Update the Usuario (cargo, celular, etc.)
       const updatedUser = await repository.updateUsuario(body);
-
-      // Force a reload of updated user with relationships
-      return await fetchColaboradorById(updatedUser.id);
+      return { data: [updatedUser] };
     } catch (error) {
       console.error("Error updating colaborador:", error);
       throw createError({
@@ -216,12 +165,9 @@ export default defineEventHandler(async (event) => {
   }
 
   // Helper function to fetch a colaborador by ID
+  // Helper: fetch updated usuario
   async function fetchColaboradorById(id: number) {
-    const usuario = await prisma.usuario.findUnique({
-      where: { id },
-      include: { colaborador: true }
-    });
-
+    const usuario = await prisma.usuario.findUnique({ where: { id } });
     return { data: [usuario] };
   }
 

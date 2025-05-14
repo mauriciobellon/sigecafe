@@ -5,18 +5,35 @@ export default defineEventHandler(async (event) => {
     // Buscar valores mínimos e máximos
     const result = await prisma.transacao.aggregate({
       _min: {
-        valorTotal: true,
+        quantidade: true,
+        precoUnitario: true,
         data: true
       },
       _max: {
-        valorTotal: true,
+        quantidade: true,
+        precoUnitario: true,
         data: true
       }
     });
 
+    // Buscar todas as transações para calcular os valores mínimos e máximos
+    const transacoes = await prisma.transacao.findMany({
+      select: {
+        quantidade: true,
+        precoUnitario: true
+      }
+    });
+
+    // Calcular valorTotal para cada transação
+    const valores = transacoes.map(t => t.quantidade * t.precoUnitario);
+
+    // Encontrar o valor mínimo e máximo
+    const minValue = valores.length ? Math.min(...valores) : 0;
+    const maxValue = valores.length ? Math.max(...valores) : 0;
+
     return {
-      minValue: result._min.valorTotal || 0,
-      maxValue: result._max.valorTotal || 0,
+      minValue,
+      maxValue,
       minDate: result._min.data || new Date(),
       maxDate: result._max.data || new Date()
     };
@@ -27,4 +44,4 @@ export default defineEventHandler(async (event) => {
       message: 'Erro ao buscar limites'
     });
   }
-}); 
+});

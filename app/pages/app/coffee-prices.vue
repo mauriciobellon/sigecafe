@@ -28,9 +28,27 @@
     </UiCard>
 
     <UiCard>
-      <UiCardHeader>
-        <UiCardTitle>Histórico de Preços</UiCardTitle>
-        <UiCardDescription>Tendência de preços ao longo do último mês</UiCardDescription>
+      <UiCardHeader class="flex flex-row items-center justify-between pb-2">
+        <div>
+          <UiCardTitle>Histórico de Preços</UiCardTitle>
+          <UiCardDescription>Tendência de preços ao longo do período</UiCardDescription>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button
+            class="px-3 py-1 text-sm rounded-md transition-colors"
+            :class="period === 'month' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'"
+            @click="setPeriod('month')"
+          >
+            Mês
+          </button>
+          <button
+            class="px-3 py-1 text-sm rounded-md transition-colors"
+            :class="period === 'year' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'"
+            @click="setPeriod('year')"
+          >
+            Ano
+          </button>
+        </div>
       </UiCardHeader>
       <UiCardContent class="p-0 mx-[-20px] mb-[50px]">
         <!-- Area Chart -->
@@ -93,7 +111,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, defineAsyncComponent } from 'vue'
+import { ref, onMounted, computed, defineAsyncComponent, watch } from 'vue'
 import type { PrecoCafeDTO } from '~/types/api'
 import { formatDate } from '~/utils'
 
@@ -102,6 +120,7 @@ const ChartTooltip = defineAsyncComponent(() => import('~/components/Ui/Chart/Ch
 const latest = ref<{ arabica: number; robusta: number; date: Date }>({ arabica: 0, robusta: 0, date: new Date() })
 const history = ref<PrecoCafeDTO[]>([])
 const priceError = ref<string | null>(null)
+const period = ref<'month' | 'year'>('year') // Default to year view
 
 // Chart colors
 const chartColors = ['#4CAF50', '#FF9800']
@@ -158,12 +177,26 @@ async function fetchLatest() {
 
 async function fetchHistory() {
   try {
-    const res = await $fetch<{ success: boolean; data: PrecoCafeDTO[] }>('/api/coffee-prices/history', { credentials: 'include' })
+    const res = await $fetch<{ success: boolean; data: PrecoCafeDTO[] }>('/api/coffee-prices/history', {
+      credentials: 'include',
+      query: {
+        period: period.value
+      }
+    })
     if (res.success) history.value = res.data
   } catch (e) {
     console.error('Erro ao buscar histórico de preços:', e)
   }
 }
+
+function setPeriod(newPeriod: 'month' | 'year') {
+  period.value = newPeriod
+  fetchHistory()
+}
+
+watch(period, () => {
+  fetchHistory()
+})
 
 onMounted(async () => {
   await fetchLatest()

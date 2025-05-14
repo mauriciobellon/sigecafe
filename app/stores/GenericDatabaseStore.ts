@@ -35,7 +35,47 @@ export const createGenericDatabaseStore = (modelName: string) => {
       processItemForApi(item: any, columns?: any[]) {
         const processed = { ...item };
 
-        // Handle nested fields (fields with dots like "associado.documento")
+        console.log("Processing item for API:", JSON.stringify(item, null, 2));
+
+        // First, process relations and extract just the IDs needed for the API
+        if (columns) {
+          columns.forEach(col => {
+            // Handle relation fields (looking for estado.sigla pattern)
+            if (col.type === 'relation' && col.field.includes('.')) {
+              const [objectName, fieldName] = col.field.split('.');
+              const idField = `${objectName}Id`;
+
+              console.log(`Processing relation field: ${col.field}, looking for ${idField}`);
+
+              // Check if we have a direct ID value in the form data
+              if (processed[col.field]) {
+                // If we have a direct value in a nested field format (e.g., "estado.sigla"),
+                // convert it to the proper ID field
+                console.log(`Found direct value in ${col.field}: ${processed[col.field]}`);
+                processed[idField] = Number(processed[col.field]);
+                delete processed[col.field]; // Remove the dot notation field
+              }
+              // Also check for separate estado objects
+              else if (processed[objectName]) {
+                // If we have the relation object, extract the ID
+                if (processed[objectName]?.id !== undefined) {
+                  console.log(`Found object ${objectName} with ID: ${processed[objectName].id}`);
+                  processed[idField] = processed[objectName].id;
+                }
+
+                // Remove the relation object - API only needs the ID field
+                delete processed[objectName];
+              }
+            }
+
+            // Normalize phone numbers
+            if (col.type === 'phone' && processed[col.field]) {
+              processed[col.field] = getPhoneDigits(processed[col.field]);
+            }
+          });
+        }
+
+        // Handle any remaining nested fields (fields with dots like "associado.documento")
         const nestedFields: Record<string, any> = {};
 
         // First pass: identify all nested fields and their values
@@ -64,16 +104,7 @@ export const createGenericDatabaseStore = (modelName: string) => {
           };
         }
 
-        // If we have columns, check for special types that need normalization
-        if (columns) {
-          columns.forEach(col => {
-            if (col.type === 'phone' && processed[col.field]) {
-              // Strip formatting from phone numbers
-              processed[col.field] = getPhoneDigits(processed[col.field]);
-            }
-          });
-        }
-
+        console.log(`ProcessItemForApi: Final payload:`, JSON.stringify(processed, null, 2));
         return processed;
       },
 

@@ -1,5 +1,6 @@
 import { getServerSession } from '#auth'
-import { PrismaClient, Notificacao } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
+import type { Notificacao } from '@prisma/client'
 
 const prisma = new PrismaClient()
 

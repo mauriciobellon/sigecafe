@@ -47,7 +47,7 @@ export default defineEventHandler(async (event) => {
         `
         // console.log('[coffee-prices] recentPrices from DB:', recentPrices)
         if (recentPrices && recentPrices.length > 0) {
-          const price = recentPrices[0]
+        const price = recentPrices[0]!
           // console.log('[coffee-prices] Returning cached prices:', price)
           return {
             success: true,
@@ -128,7 +128,7 @@ async function fetchLatestPrices() {
       // @ts-ignore - Running in browser context via Puppeteer
       const tables = document.querySelectorAll('table.imagenet-table')
       if (tables.length >= 2) {
-        const robustaTable = tables[1]
+        const robustaTable = tables[1]!
         const row = robustaTable.querySelector('tbody tr')
         const cells = row?.querySelectorAll('td') ?? []
         result.robustaText = cells[1]?.textContent?.trim() ?? ''

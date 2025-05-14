@@ -51,7 +51,10 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
           type: true,
           theme: true,
           fontSize: true,
-          cooperativaId: true
+          cooperativaId: true,
+          estadoId: true,
+          cidade: true,
+          endereco: true
         }
       })
 
@@ -69,7 +72,10 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
         type: usuario.type,
         theme: usuario.theme,
         fontSize: usuario.fontSize,
-        cooperativaId: usuario.cooperativaId
+        cooperativaId: usuario.cooperativaId,
+        estadoId: usuario.estadoId,
+        cidade: usuario.cidade,
+        endereco: usuario.endereco
       }
 
       return {
@@ -89,13 +95,15 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
   if (event.method === 'PUT') {
     try {
       const body = await readBody(event) as UsuarioPreferencesDTO
-      const { name, email, celular, theme, fontSize } = body
+      const { name, email, celular, theme, fontSize, cidade, endereco } = body
 
       // Build update data
       const updateData: any = {}
       if (name) updateData.name = name
       if (email !== undefined) updateData.email = email
       if (celular) updateData.celular = celular
+      if (cidade) updateData.cidade = cidade
+      if (endereco) updateData.endereco = endereco
       // Validate and include preferences
       if (theme && ['light', 'dark', 'system'].includes(theme)) {
         updateData.theme = theme
@@ -132,7 +140,11 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
           celular: true,
           type: true,
           theme: true,
-          fontSize: true
+          fontSize: true,
+          cooperativaId: true,
+          estadoId: true,
+          cidade: true,
+          endereco: true
         }
       })
 
@@ -142,7 +154,11 @@ export default defineEventHandler(async (event): Promise<AuthResponseDTO> => {
         celular: updatedUser.celular,
         type: updatedUser.type,
         theme: updatedUser.theme,
-        fontSize: updatedUser.fontSize
+        fontSize: updatedUser.fontSize,
+        cooperativaId: updatedUser.cooperativaId,
+        estadoId: updatedUser.estadoId,
+        cidade: updatedUser.cidade,
+        endereco: updatedUser.endereco
       }
 
       return {

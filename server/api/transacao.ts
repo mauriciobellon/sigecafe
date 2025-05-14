@@ -144,23 +144,19 @@ export default defineEventHandler(async (event) => {
       if (body.quantidade) body.quantidade = Number(body.quantidade);
       if (body.precoUnitario) body.precoUnitario = Number(body.precoUnitario);
 
-      // Calculate total value if quantity or price changed
-      if (body.quantidade && body.precoUnitario) {
-        body.valorTotal = body.quantidade * body.precoUnitario;
-      }
-
-      // Update the transaction - using the ID as is (after schema change to Int)
-      const updatedTransacao = await prisma.$executeRaw`
-        UPDATE "Transacao"
-        SET "compradorId" = ${body.compradorId},
-            "produtorId" = ${body.produtorId},
-            "quantidade" = ${body.quantidade},
-            "precoUnitario" = ${body.precoUnitario},
-            "data" = ${body.data ? new Date(body.data) : undefined},
-            "status" = ${body.status},
-            "observacoes" = ${body.observacoes}
-        WHERE "id" = ${id}
-      `;
+      // Update the transaction using Prisma ORM
+      const updatedTransacao = await prisma.transacao.update({
+        where: { id },
+        data: {
+          ...(body.compradorId ? { compradorId: body.compradorId } : {}),
+          ...(body.produtorId ? { produtorId: body.produtorId } : {}),
+          ...(body.quantidade ? { quantidade: body.quantidade } : {}),
+          ...(body.precoUnitario ? { precoUnitario: body.precoUnitario } : {}),
+          ...(body.data ? { data: new Date(body.data) } : {}),
+          ...(body.status ? { status: body.status } : {}),
+          ...(body.observacoes !== undefined ? { observacoes: body.observacoes } : {})
+        }
+      });
 
       // Fetch the updated transaction
       const transaction = await prisma.transacao.findUnique({
@@ -188,6 +184,7 @@ export default defineEventHandler(async (event) => {
       const idParam = event.context.params?.id;
 
       // If no ID in params, try from body
+      let transactionId: number;
       if (!idParam) {
         const body = await readBody(event);
         if (!body.id) {
@@ -196,11 +193,15 @@ export default defineEventHandler(async (event) => {
             statusMessage: "Missing transaction ID for deletion",
           });
         }
-
-        await prisma.$executeRaw`DELETE FROM "Transacao" WHERE "id" = ${Number(body.id)}`;
+        transactionId = Number(body.id);
       } else {
-        await prisma.$executeRaw`DELETE FROM "Transacao" WHERE "id" = ${Number(idParam)}`;
+        transactionId = Number(idParam);
       }
+
+      // Delete using Prisma ORM
+      await prisma.transacao.delete({
+        where: { id: transactionId }
+      });
 
       return { success: true, message: "Transaction deleted successfully" };
     } catch (error) {
@@ -253,7 +254,7 @@ export const getContrapartes = defineEventHandler(async (event) => {
         }
       });
     } else if (currentUser.type === "COMPRADOR") {
-      // Buyers need vendedores/produtores
+      // Buyers can transact with producers
       usuarios = await prisma.usuario.findMany({
         where: {
           type: "PRODUTOR"
@@ -265,7 +266,7 @@ export const getContrapartes = defineEventHandler(async (event) => {
         }
       });
     } else if (currentUser.type === "PRODUTOR") {
-      // Sellers need compradores
+      // Producers can transact with buyers
       usuarios = await prisma.usuario.findMany({
         where: {
           type: "COMPRADOR"
