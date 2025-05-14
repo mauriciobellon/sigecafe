@@ -39,7 +39,7 @@ RUN echo '#!/bin/sh\n\
 echo "Waiting for database to be ready..."\n\
 sleep 20\n\
 echo "Running database migrations..."\n\
-npm run db:migrate\n\
+npx prisma migrate reset --force\n\
 echo "Running database seeds..."\n\
 npm run db:seed\n\
 echo "Starting application..."\n\
