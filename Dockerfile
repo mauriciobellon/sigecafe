@@ -1,4 +1,4 @@
-FROM node:lts as build-stage
+FROM node:lts
 
 WORKDIR /nuxtapp
 
@@ -9,12 +9,6 @@ ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN npm install
 
 RUN npm run build
-
-FROM node:lts as prod-stage
-
-WORKDIR /nuxtapp
-
-COPY --from=build-stage /nuxtapp/ ./
 
 # Install dependencies for headless browser alternatives
 RUN apt-get update && apt-get install -y \
@@ -40,10 +34,8 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Install only production dependencies and Prisma
-RUN npm install --only=production && \
-    npm install -g prisma
-
 # Create an entrypoint script
+
 RUN echo '#!/bin/sh\n\
 echo "Waiting for database to be ready..."\n\
 sleep 5\n\
