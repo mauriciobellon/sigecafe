@@ -14,7 +14,7 @@ FROM node:lts as prod-stage
 
 WORKDIR /nuxtapp
 
-COPY --from=build-stage /nuxtapp/./
+COPY --from=build-stage /nuxtapp/ ./
 
 # Install dependencies for headless browser alternatives
 RUN apt-get update && apt-get install -y \
